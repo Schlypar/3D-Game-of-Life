@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4...3.28 FATAL_ERROR)
 
-project(test)
+project(cellular_automata)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -9,9 +9,13 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
 # --- START PROJECT ---
 
-file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*")
+file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*.cpp")
+file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*" "${SRC_DIR}/renderer/*.cpp")
+
+message(SOURCE="${source}")
 
 add_executable(${PROJECT_NAME} ${source})
+target_include_directories(${PROJECT_NAME} PRIVATE "${SOURCE_DIR}/renderer")
 
 # --- END PROJECT ---
 
