@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+namespace GoL {
+
 void Renderer::Clear() const {
     glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -10,4 +12,6 @@ void Renderer::Draw(const VertexBuffer& vertexBuffer, const IndexBuffer& indexBu
     indexBuffer.Bind();
 
     glDrawElements(GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
+}
+
 }

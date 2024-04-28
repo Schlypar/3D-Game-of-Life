@@ -1,6 +1,8 @@
 #include "IndexBuffer.h"
 #include "glad/gl.h"
 
+namespace GoL {
+
 IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count)
     : count(count) {
     glGenBuffers(1, &id);
@@ -18,4 +20,6 @@ void IndexBuffer::Bind() const {
 
 void IndexBuffer::Unbind() const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 }

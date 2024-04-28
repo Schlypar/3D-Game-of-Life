@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace GoL {
+
 Shader::Shader(const std::string& shaderFilePath)
     : id(0) {
     ProgramSource source = ParseShader(shaderFilePath);
@@ -122,4 +124,6 @@ unsigned int Shader::GetUniformLocation(const std::string& name) {
     }
 
     return location;
+}
+
 }

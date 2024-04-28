@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+namespace GoL {
+
 class VertexBuffer {
 private:
     unsigned int id;
@@ -13,3 +15,5 @@ public:
     void Bind() const;
     void Unbind() const;
 };
+
+}

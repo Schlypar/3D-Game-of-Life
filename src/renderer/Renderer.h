@@ -9,8 +9,12 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 
+namespace GoL {
+
 class Renderer {
 public:
     void Clear() const;
-    void Draw(const VertexBuffer& vertexBuffer, const IndexBuffer& indexBuffer, const Shader& shader) const;
+    void Draw(const GoL::VertexBuffer& vertexBuffer, const GoL::IndexBuffer& indexBuffer, const GoL::Shader& shader) const;
 };
+
+}

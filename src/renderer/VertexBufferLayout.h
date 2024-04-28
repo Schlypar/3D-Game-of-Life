@@ -1,8 +1,10 @@
 #pragma once
 
 #include "glad/gl.h"
-#include <vector>
 #include <cassert>
+#include <vector>
+
+namespace Gol {
 
 class VertexBufferLayout {
 public:
@@ -69,3 +71,5 @@ public:
         return this->stride;
     }
 };
+
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+namespace GoL {
+
 class IndexBuffer {
 private:
     unsigned int id;
@@ -16,3 +18,5 @@ public:
         return count;
     }
 };
+
+}

@@ -53,19 +53,19 @@ int main(void) {
         0
     };
 
-    VertexBuffer vertexBuffer = { positions, 2 * 4 * sizeof(float) };
+    GoL::VertexBuffer vertexBuffer = { positions, 2 * 4 * sizeof(float) };
 
-    VertexBufferLayout layout;
+    Gol::VertexBufferLayout layout;
     layout.Push<float>(2);
 
-    VertexArray vertexArray;
+    GoL::VertexArray vertexArray;
     vertexArray.AddBuffer(vertexBuffer, layout);
 
-    IndexBuffer indexBuffer = { indices, 6 };
+    GoL::IndexBuffer indexBuffer = { indices, 6 };
 
-    Shader shader = { "resources/shaders/test_vertex.shader", "resources/shaders/test_fragment.shader" };
+    GoL::Shader shader = { "resources/shaders/test_vertex.shader", "resources/shaders/test_fragment.shader" };
 
-    Renderer renderer;
+    GoL::Renderer renderer;
 
     while (!glfwWindowShouldClose(window)) {
         renderer.Clear();

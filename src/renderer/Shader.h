@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace GoL {
+
 class Shader {
     struct ProgramSource {
         std::string vertexSource;
@@ -29,3 +31,5 @@ private:
     unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
     unsigned int GetUniformLocation(const std::string& name);
 };
+
+}

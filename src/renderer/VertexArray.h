@@ -3,15 +3,20 @@
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 
+namespace GoL {
+
 class VertexArray {
 private:
     unsigned int id;
+
 public:
     VertexArray();
     ~VertexArray();
 
-    void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
+    void AddBuffer(const VertexBuffer& vb, const Gol::VertexBufferLayout& layout);
 
     void Bind() const;
     void Unbind() const;
 };
+
+}
