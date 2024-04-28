@@ -4,7 +4,7 @@
 #include <cassert>
 #include <vector>
 
-namespace Gol {
+namespace GoL {
 
 class VertexBufferLayout {
 public:

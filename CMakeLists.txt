@@ -12,11 +12,9 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*.cpp")
 file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*" "${SRC_DIR}/renderer/*.cpp")
 
-message(SOURCE="${source}")
-
 add_executable(${PROJECT_NAME} ${source})
-target_include_directories(${PROJECT_NAME} PRIVATE "${SOURCE_DIR}/renderer")
-target_include_directories(${PROJECT_NAME} PRIVATE "${SOURCE_DIR}/vendor")
+target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/renderer")
+target_include_directories(${PROJECT_NAME} PUBLIC "${SRC_DIR}/vendor")
 
 # --- END PROJECT ---
 
@@ -26,6 +24,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${SOURCE_DIR}/vendor")
 
 set(DEPS_DIR "${PROJECT_SOURCE_DIR}/dependencies")
 
+target_include_directories(${PROJECT_NAME} PUBLIC "${DEPS_DIR}/glad/include/")
+
 add_subdirectory("${DEPS_DIR}/glfw")
 target_link_libraries(${PROJECT_NAME} "glfw")
 
@@ -34,8 +34,11 @@ target_link_libraries(${PROJECT_NAME} OpenGL::GL)
 
 add_library(gladlib STATIC "${DEPS_DIR}/glad/src/gl.c")
 target_include_directories(gladlib PUBLIC "${DEPS_DIR}/glad/include/")
-
 target_link_libraries(${PROJECT_NAME} gladlib)
-target_include_directories(${PROJECT_NAME} PRIVATE "${DEPS_DIR}/glad/include/")
+
+file(GLOB imguisource CONFIGURE_DEPENDS "${SRC_DIR}/vendor/imgui/*.cpp")
+add_library(imguilib STATIC "${imguisource}")
+target_link_libraries(imguilib "glfw")
+target_link_libraries(${PROJECT_NAME} imguilib)
 
 # --- END DEPENDENCIES ---

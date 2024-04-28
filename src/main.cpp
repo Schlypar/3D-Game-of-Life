@@ -5,7 +5,10 @@
 #include <stdlib.h>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+
+// #include <imgui/imgui.h>
+// #include <imgui/imgui_impl_glfw.h>
+// #include <imgui/imgui_impl_opengl3.h>
 
 #include "renderer/Renderer.h"
 
@@ -59,7 +62,7 @@ int main(void) {
 
     GoL::VertexBuffer vertexBuffer = { positions, 2 * 4 * sizeof(float) };
 
-    Gol::VertexBufferLayout layout;
+    GoL::VertexBufferLayout layout;
     layout.Push<float>(2);
 
     GoL::VertexArray vertexArray;
@@ -67,7 +70,7 @@ int main(void) {
 
     GoL::IndexBuffer indexBuffer = { indices, 6 };
 
-    GoL::Shader shader = { "resources/shaders/test_vertex.shader", "resources/shaders/test_fragment.shader" };
+    GoL::Shader shader = { "resources/shaders/test.shader" };
 
     GoL::Renderer renderer;
 
