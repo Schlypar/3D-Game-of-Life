@@ -31,6 +31,14 @@ void Shader::Unbind() const {
     glUseProgram(0);
 }
 
+void Shader::SetUniform4f(const std::string& name, float f1, float f2, float f3, float f4) {
+    glUniform4f(GetUniformLocation(name), f1, f2, f3, f4);
+}
+
+void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix) {
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+}
+
 std::string Shader::ParseFile(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {

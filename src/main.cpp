@@ -1,6 +1,11 @@
 #include <cstddef>
+#include <glm/ext/matrix_projection.hpp>
+#include <glm/fwd.hpp>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "renderer/Renderer.h"
 
@@ -10,7 +15,6 @@ static void error_callback(int error, const char* description) {
 
 int main(void) {
     GLFWwindow* window;
-
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit()) {

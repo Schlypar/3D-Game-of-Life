@@ -16,6 +16,7 @@ message(SOURCE="${source}")
 
 add_executable(${PROJECT_NAME} ${source})
 target_include_directories(${PROJECT_NAME} PRIVATE "${SOURCE_DIR}/renderer")
+target_include_directories(${PROJECT_NAME} PRIVATE "${SOURCE_DIR}/vendor")
 
 # --- END PROJECT ---
 
