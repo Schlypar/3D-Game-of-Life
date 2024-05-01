@@ -7,8 +7,29 @@ VertexArray::VertexArray() {
     glGenVertexArrays(1, &id);
 }
 
+VertexArray::VertexArray(const VertexArray& other)
+    : id(other.id) {
+}
+
+VertexArray::VertexArray(VertexArray&& other)
+    : id(other.id) {
+    other.id = 0;
+}
+
 VertexArray::~VertexArray() {
     glDeleteVertexArrays(1, &id);
+}
+
+VertexArray& VertexArray::operator=(const VertexArray& other) {
+    id = other.id;
+    return *this;
+}
+
+VertexArray& VertexArray::operator=(VertexArray&& other) {
+    id = other.id;
+    other.id = 0;
+
+    return *this;
 }
 
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout) {
