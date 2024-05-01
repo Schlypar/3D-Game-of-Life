@@ -1,7 +1,6 @@
 #include <cstddef>
 #include <glm/ext/matrix_projection.hpp>
 #include <glm/fwd.hpp>
-#include <iostream>
 #include <memory>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,9 +12,6 @@
 #include "Camera.h"
 #include "Models/Cube.h"
 #include "glad/gl.h"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/vector_float3.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "renderer/Renderer.h"
 
 float deltaTime = 0.0f; // time between current frame and last frame
