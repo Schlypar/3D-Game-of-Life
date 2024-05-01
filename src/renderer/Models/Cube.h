@@ -111,6 +111,7 @@ public:
     void Draw() override {
         vbo.Bind();
         ibo.Bind();
+        vao.Bind();
 
         glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
     }

@@ -93,7 +93,7 @@ int main(void) {
     GoL::Renderer renderer;
 
     std::shared_ptr<GoL::Model> cube = std::make_shared<GoL::Cube>(
-            glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.01f
+            glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.5f
     );
 
     while (!glfwWindowShouldClose(window)) {
