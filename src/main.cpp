@@ -11,6 +11,7 @@
 
 #include "Camera.h"
 #include "Models/Cube.h"
+#include "Models/Cursor3D.h"
 #include "glad/gl.h"
 #include "renderer/Renderer.h"
 
@@ -87,10 +88,13 @@ int main(void) {
 
     GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height, GoL::YAW, GoL::PITCH);
     GoL::Renderer renderer;
+    GoL::Cursor3DRenderer cursor_renderer;
+
 
     std::shared_ptr<GoL::Model> cube = std::make_shared<GoL::Cube>(
             glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.5f
     );
+    std::shared_ptr<GoL::Model> cursor = std::make_shared<GoL::Cursor3D>();
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -102,6 +106,8 @@ int main(void) {
         renderer.Clear();
 
         renderer.Draw(cube, camera, shader);
+
+        cursor_renderer.Draw(cursor, camera, shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

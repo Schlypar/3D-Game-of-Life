@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Model.h"
+#include "Vertex.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -18,11 +19,6 @@ private:
     glm::vec3 position;
     glm::vec3 rotation;
     float scaleFactor;
-
-    struct Vertex {
-        glm::vec3 position;
-        glm::vec3 color;
-    };
 
 public:
     Cube(glm::vec3 position = glm::vec3(0.0f),
