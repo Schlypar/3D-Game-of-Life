@@ -60,10 +60,10 @@ public:
         ibo.Bind();
         vao.Bind();
 
-        glDrawArrays(GL_LINE_STRIP, 0, 2);
-        glDrawArrays(GL_LINE_STRIP, 2, 2);
-        glDrawArrays(GL_LINE_STRIP, 4, 2);
-        // glDrawElements(GL_LINES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
+        // glDrawArrays(GL_LINE_STRIP, 0, 2);
+        // glDrawArrays(GL_LINE_STRIP, 2, 2);
+        // glDrawArrays(GL_LINE_STRIP, 4, 2);
+        glDrawElements(GL_LINES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
     glm::mat4 GetModelMatrix() override {
