@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "Models/Cube.h"
 #include "Models/Cursor3D.h"
+#include "Models/Prism.h"
 #include "glad/gl.h"
 #include "renderer/Renderer.h"
 
@@ -39,6 +40,12 @@ void processInput(GLFWwindow* window, GoL::Camera& camera) {
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         camera.ProcessKeyboard(GoL::CameraMovement::RIGHT, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        camera.ProcessKeyboard(GoL::CameraMovement::UP, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        camera.ProcessKeyboard(GoL::CameraMovement::DOWN, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
         camera.ProcessMouseMovement(-10.0f, 0.0f);
@@ -94,11 +101,15 @@ int main(void) {
 
     GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height, 0.0f, 0.0f);
     GoL::Renderer renderer;
+    GoL::Cursor3DRenderer cursor_renderer;
 
     std::shared_ptr<GoL::Model> cube = std::make_shared<GoL::Cube>(
             glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.5f
     );
     std::shared_ptr<GoL::Model> cursor = std::make_shared<GoL::Cursor3D>();
+    std::shared_ptr<GoL::Model> prism = std::make_shared<GoL::Prism>(
+            glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f
+    );
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -109,8 +120,12 @@ int main(void) {
 
         renderer.Clear();
 
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((GoL::Cube*)cube.get())->ibo.id);
         renderer.Draw(cube, camera, shader);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((GoL::Prism*)prism.get())->ibo.id);
+        renderer.Draw(prism, camera, shader);
         renderer.Draw(cursor, camera, shader);
+        cursor_renderer.Draw(cursor, camera, shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
