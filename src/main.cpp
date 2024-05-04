@@ -99,7 +99,7 @@ int main(void) {
     GoL::Shader shader = { "resources/shaders/test.shader" };
     // shader.Bind();
 
-    GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height, 0.0f, 0.0f);
+    GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height);
     GoL::Renderer renderer;
     GoL::Cursor3DRenderer cursor_renderer;
 
