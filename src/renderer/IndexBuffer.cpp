@@ -3,21 +3,21 @@
 
 namespace GoL {
 
-IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count)
-    : count(count) {
+IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int size)
+    : size(size) {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
 IndexBuffer::IndexBuffer(const IndexBuffer& other)
     : id(other.id)
-    , count(other.count) {
+    , size(other.size) {
 }
 
 IndexBuffer::IndexBuffer(IndexBuffer&& other)
     : id(other.id)
-    , count(other.count) {
+    , size(other.size) {
     other.id = 0;
 }
 
@@ -27,13 +27,13 @@ IndexBuffer::~IndexBuffer() {
 
 IndexBuffer& IndexBuffer::operator=(const IndexBuffer& other) {
     this->id = other.id;
-    this->count = other.count;
+    this->size = other.size;
     return *this;
 }
 
 IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) {
     this->id = other.id;
-    this->count = other.count;
+    this->size = other.size;
 
     other.id = 0;
 

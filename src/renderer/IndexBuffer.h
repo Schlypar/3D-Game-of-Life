@@ -5,10 +5,10 @@ namespace GoL {
 class IndexBuffer {
 private:
     unsigned int id;
-    unsigned int count;
+    unsigned int size;
 
 public:
-    IndexBuffer(const unsigned int* data, unsigned int count);
+    IndexBuffer(const unsigned int* data, unsigned int size);
     IndexBuffer(const IndexBuffer& other);
     IndexBuffer(IndexBuffer&& other);
     ~IndexBuffer();
@@ -20,7 +20,7 @@ public:
     void Unbind() const;
 
     inline unsigned int GetCount() const {
-        return count;
+        return size;
     }
 };
 
