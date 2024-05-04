@@ -46,11 +46,17 @@ void processInput(GLFWwindow* window, GoL::Camera& camera) {
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
         camera.ProcessMouseMovement(10.0f, 0.0f);
     }
-    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
-        camera.ProcessMouseMovement(0.0f, -10.0f);
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        camera.ProcessMouseMovement(-10.0f, 0.0f);
     }
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        camera.ProcessMouseMovement(10.0f, 0.0f);
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         camera.ProcessMouseMovement(0.0f, 10.0f);
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        camera.ProcessMouseMovement(0.0f, -10.0f);
     }
 }
 
@@ -84,9 +90,9 @@ int main(void) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     GoL::Shader shader = { "resources/shaders/test.shader" };
-    shader.Bind();
+    // shader.Bind();
 
-    GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height, GoL::YAW, GoL::PITCH);
+    GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height, 0.0f, 0.0f);
     GoL::Renderer renderer;
 
     std::shared_ptr<GoL::Model> cube = std::make_shared<GoL::Cube>(
