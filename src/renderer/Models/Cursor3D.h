@@ -57,8 +57,14 @@ public:
 
     void Draw() override {
         vbo.Bind();
-        ibo.Bind();
         vao.Bind();
+        ibo.Bind();
+
+        // glDrawElements(GL_LINE_STRIP, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
+
+        glDrawArrays(GL_LINES, 0, 2);
+        glDrawArrays(GL_LINES, 2, 2);
+        glDrawArrays(GL_LINES, 4, 2);
 
         // glDrawArrays(GL_LINE_STRIP, 0, 2);
         // glDrawArrays(GL_LINE_STRIP, 2, 2);
@@ -68,10 +74,27 @@ public:
 
     glm::mat4 GetModelMatrix() override {
         glm::mat4 modelMatrix = glm::mat4(1.0f);
+        modelMatrix = glm::translate(modelMatrix, position_on_screen);
         modelMatrix = glm::scale(modelMatrix, glm::vec3{ scaling });
 
         return modelMatrix;
     }
 };
+
+class Cursor3DRenderer : public Renderer {
+public:
+    void Draw(const std::shared_ptr<Model>& model, const Camera& camera, Shader& shader) const;
+};
+
+void Cursor3DRenderer::Draw(const std::shared_ptr<Model>& model, const Camera& camera, Shader& shader) const {
+    auto modelMatrix = model->GetModelMatrix();
+    modelMatrix = glm::rotate(modelMatrix, glm::radians(camera.Yaw), glm::vec3(modelMatrix[1][0], modelMatrix[1][1], modelMatrix[1][2]));
+    modelMatrix = glm::rotate(modelMatrix, glm::radians(camera.Pitch), glm::vec3(modelMatrix[0][0], modelMatrix[0][1], modelMatrix[0][2]));
+
+    // shader.Bind();
+    shader.SetUniformMat4f("Model", modelMatrix);
+    shader.SetUniformMat4f("ProjectionView", glm::mat4(1.0f));
+    model->Draw();
+}
 
 }
