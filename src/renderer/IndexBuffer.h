@@ -3,7 +3,8 @@
 namespace GoL {
 
 class IndexBuffer {
-private:
+// private:
+public:
     unsigned int id;
     unsigned int size;
 

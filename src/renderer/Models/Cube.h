@@ -11,7 +11,8 @@
 namespace GoL {
 
 class Cube : public Model {
-private:
+// private:
+public:
     VertexArray vao;
     VertexBuffer vbo;
     IndexBuffer ibo;
@@ -109,7 +110,7 @@ public:
         ibo.Bind();
         vao.Bind();
 
-        glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, (void*)0);
     }
 
     glm::mat4 GetModelMatrix() override {
