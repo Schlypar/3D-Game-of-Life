@@ -23,7 +23,7 @@ private:
 public:
     Cursor3D(
         glm::vec3 position_on_screen = glm::vec3{ 0.0f },
-        float scaling = 1.0f
+        float scaling = 0.1f
     )
         : vbo(nullptr, 0)
         , ibo(nullptr, 0)
@@ -31,11 +31,11 @@ public:
         , scaling(scaling) {
         
         Vertex vertices[] = {
-            { { 0.0f, 0.0f, 0.0f }, { 1, 1, 1 } },  // center
+            { { 0.0f, 0.0f, 0.0f }, { 1, 0, 0 } },  // center
             { { 1.0f, 0.0f, 0.0f }, { 1, 0, 0 } },  // abscissa
-            { { 0.0f, 0.0f, 0.0f }, { 1, 1, 1 } },  // center
+            { { 0.0f, 0.0f, 0.0f }, { 0, 1, 0 } },  // center
             { { 0.0f, 1.0f, 0.0f }, { 0, 1, 0 } },  // ordinate
-            { { 0.0f, 0.0f, 0.0f }, { 1, 1, 1 } },  // center
+            { { 0.0f, 0.0f, 0.0f }, { 0, 0, 1 } },  // center
             { { 0.0f, 0.0f, 1.0f }, { 0, 0, 1 } },  // applicata
         };
         vbo = VertexBuffer { vertices, sizeof(vertices) };
@@ -60,16 +60,16 @@ public:
         vao.Bind();
         ibo.Bind();
 
-        // glDrawElements(GL_LINE_STRIP, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_LINE_STRIP, ibo.GetCount(), GL_UNSIGNED_INT, (void*)0);
 
-        glDrawArrays(GL_LINES, 0, 2);
-        glDrawArrays(GL_LINES, 2, 2);
-        glDrawArrays(GL_LINES, 4, 2);
+        // glDrawArrays(GL_LINES, 0, 2);
+        // glDrawArrays(GL_LINES, 2, 2);
+        // glDrawArrays(GL_LINES, 4, 2);
 
         // glDrawArrays(GL_LINE_STRIP, 0, 2);
         // glDrawArrays(GL_LINE_STRIP, 2, 2);
         // glDrawArrays(GL_LINE_STRIP, 4, 2);
-        glDrawElements(GL_LINES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
+        // glDrawElements(GL_LINES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
     glm::mat4 GetModelMatrix() override {
