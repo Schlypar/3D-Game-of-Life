@@ -15,6 +15,7 @@
 #include "Models/Prism.h"
 #include "glad/gl.h"
 #include "renderer/Renderer.h"
+#include "IndexBuffer.h"
 
 float deltaTime = 0.0f; // time between current frame and last frame
 float lastFrame = 0.0f;
@@ -97,19 +98,22 @@ int main(void) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     GoL::Shader shader = { "resources/shaders/test.shader" };
-    // shader.Bind();
+    shader.Bind();
 
     GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height);
     GoL::Renderer renderer;
     GoL::Cursor3DRenderer cursor_renderer;
 
-    std::shared_ptr<GoL::Model> cube = std::make_shared<GoL::Cube>(
-            glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.5f
-    );
-    std::shared_ptr<GoL::Model> cursor = std::make_shared<GoL::Cursor3D>();
-    std::shared_ptr<GoL::Model> prism = std::make_shared<GoL::Prism>(
-            glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f
-    );
+    auto cube = GoL::Cube(glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.5f);
+    cube.BindIndices();
+
+    auto cursor = GoL::Cursor3D();
+    cursor.BindIndices();
+    
+    auto prism = GoL::Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
+    prism.BindIndices();
+
+    GoL::IndexBuffer::Init();
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -120,12 +124,10 @@ int main(void) {
 
         renderer.Clear();
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((GoL::Cube*)cube.get())->ibo.id);
-        renderer.Draw(cube, camera, shader);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((GoL::Prism*)prism.get())->ibo.id);
-        renderer.Draw(prism, camera, shader);
-        renderer.Draw(cursor, camera, shader);
-        cursor_renderer.Draw(cursor, camera, shader);
+        renderer.Draw<GoL::Cube>(cube, camera, shader);
+        renderer.Draw<GoL::Prism>(prism, camera, shader);
+        renderer.Draw<GoL::Cursor3D>(cursor, camera, shader);
+        cursor_renderer.Draw<GoL::Cursor3D>(cursor, camera, shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

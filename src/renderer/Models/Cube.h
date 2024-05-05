@@ -10,12 +10,11 @@
 
 namespace GoL {
 
-class Cube : public Model {
-// private:
-public:
+class Cube {
+private:
     VertexArray vao;
     VertexBuffer vbo;
-    IndexBuffer ibo;
+    IndexBuffer::Id* ibo;
 
     glm::vec3 position;
     glm::vec3 rotation;
@@ -27,7 +26,7 @@ public:
          float scaleFactor = 1.0f
     )
         : vbo(nullptr, 0)
-        , ibo(nullptr, 0)
+        , ibo(nullptr)
         , position(position)
         , rotation(rotation)
         , scaleFactor(scaleFactor) {
@@ -68,6 +67,17 @@ public:
             { { -0.5f, 0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
             { { -0.5f, -0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
         };
+
+        vbo = VertexBuffer { vertices, sizeof(vertices) };
+
+        GoL::VertexBufferLayout layout;
+        layout.Push<float>(3);
+        layout.Push<float>(3);
+
+        vao.AddBuffer(vbo, layout);
+    }
+
+    void BindIndices() {
         unsigned int indices[] = {
             //front
             0, 1, 2,
@@ -94,26 +104,18 @@ public:
             22, 23, 20
         };
 
-        vbo = VertexBuffer { vertices, sizeof(vertices) };
-
-        GoL::VertexBufferLayout layout;
-        layout.Push<float>(3);
-        layout.Push<float>(3);
-
-        vao.AddBuffer(vbo, layout);
-
-        ibo = IndexBuffer { indices, sizeof(indices) };
+        ibo = new IndexBuffer::Id;
+        *ibo = IndexBuffer::Register(indices, sizeof(indices) / sizeof(unsigned int));
     }
 
-    void Draw() override {
+    void Draw() {
         vbo.Bind();
-        ibo.Bind();
         vao.Bind();
 
-        glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, (void*)0);
+        glDrawElements(GL_TRIANGLES, IndexBuffer::GetCount(*ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*ibo));
     }
 
-    glm::mat4 GetModelMatrix() override {
+    glm::mat4 GetModelMatrix() {
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         modelMatrix = glm::translate(modelMatrix, position);
         modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1, 0, 0));
@@ -122,6 +124,12 @@ public:
         modelMatrix = glm::scale(modelMatrix, glm::vec3(scaleFactor));
 
         return modelMatrix;
+    }
+
+    ~Cube() {
+        if (ibo != nullptr) {
+            delete ibo;
+        }
     }
 };
 

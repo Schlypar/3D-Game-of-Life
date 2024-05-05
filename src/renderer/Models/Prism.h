@@ -10,12 +10,12 @@
 
 namespace GoL {
 
-class Prism : public Model {
+class Prism {
 // private:
 public:
     VertexArray vao;
     VertexBuffer vbo;
-    IndexBuffer ibo;
+    IndexBuffer::Id* ibo;
 
     glm::vec3 position;
     glm::vec3 rotation;
@@ -27,7 +27,7 @@ public:
          float scaleFactor = 1.0f
     )
         : vbo(nullptr, 0)
-        , ibo(nullptr, 0)
+        , ibo(nullptr)
         , position(position)
         , rotation(rotation)
         , scaleFactor(scaleFactor) {
@@ -43,14 +43,6 @@ public:
             { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
 
         };
-        unsigned int indices[] = {
-            0, 1, 2,
-            2,0,3,
-            3,0,4,
-            4,0,1,
-            1,2,3,
-            3,4,1,
-        };
 
         vbo = VertexBuffer { vertices, sizeof(vertices) };
 
@@ -58,20 +50,31 @@ public:
         layout.Push<float>(3);
         layout.Push<float>(3);
 
-        vao.AddBuffer(vbo, layout);
-
-        ibo = IndexBuffer { indices, sizeof(indices) };
+        vao.AddBuffer(vbo, layout);        
     }
 
-    void Draw() override {
+    void BindIndices() {
+        unsigned int indices[] = {
+            0,1,2,
+            2,0,3,
+            3,0,4,
+            4,0,1,
+            1,2,3,
+            3,4,1,
+        };
+
+        ibo = new IndexBuffer::Id;
+        *ibo = IndexBuffer::Register(indices, sizeof(indices) / sizeof(unsigned int));
+    }
+
+    void Draw() {
         vbo.Bind();
-        ibo.Bind();
         vao.Bind();
 
-        glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, (void*)0);
+        glDrawElements(GL_TRIANGLES, IndexBuffer::GetCount(*ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*ibo));
     }
 
-    glm::mat4 GetModelMatrix() override {
+    glm::mat4 GetModelMatrix() {
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         modelMatrix = glm::translate(modelMatrix, position);
         modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1, 0, 0));
@@ -81,6 +84,13 @@ public:
 
         return modelMatrix;
     }
+
+    ~Prism() {
+        if (ibo != nullptr) {
+            delete ibo;
+        }
+    }
 };
+
 
 }

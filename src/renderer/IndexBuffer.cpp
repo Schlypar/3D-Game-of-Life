@@ -1,51 +1,44 @@
 #include "IndexBuffer.h"
 #include "glad/gl.h"
+#include <cstring>
+#include <stdio.h>
 
 namespace GoL {
 
-IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int size)
-    : size(size) {
+// init
+unsigned int* IndexBuffer::all_indices = nullptr;
+int IndexBuffer::size = 0;
+unsigned int IndexBuffer::id = 0;
+std::vector<int> IndexBuffer::index_offsets = std::vector<int>();
+
+IndexBuffer::IndexBuffer() {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-}
-
-IndexBuffer::IndexBuffer(const IndexBuffer& other)
-    : id(other.id)
-    , size(other.size) {
-}
-
-IndexBuffer::IndexBuffer(IndexBuffer&& other)
-    : id(other.id)
-    , size(other.size) {
-    other.id = 0;
+    
 }
 
 IndexBuffer::~IndexBuffer() {
-    glDeleteBuffers(1, &id);
+    glDeleteBuffers(1, &IndexBuffer::id);
+    delete[] all_indices;
 }
 
-IndexBuffer& IndexBuffer::operator=(const IndexBuffer& other) {
-    this->id = other.id;
-    this->size = other.size;
-    return *this;
+IndexBuffer::Id IndexBuffer::Register(const unsigned int* indices, int _size) {
+    unsigned int* ptr = new unsigned int[size + _size];
+    std::memcpy(ptr, all_indices, size * sizeof(unsigned int));
+    std::memcpy(ptr + size, indices, _size * sizeof(unsigned int));
+    index_offsets.push_back(size);
+    size += _size;
+    delete[] all_indices;
+    all_indices = ptr;
+    return index_offsets.size() - 1;
 }
 
-IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) {
-    this->id = other.id;
-    this->size = other.size;
-
-    other.id = 0;
-
-    return *this;
+void IndexBuffer::Init() {
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(unsigned int), all_indices, GL_STATIC_DRAW);   
 }
 
-void IndexBuffer::Bind() const {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-}
-
-void IndexBuffer::Unbind() const {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+void* IndexBuffer::GetOffset(Id id) {
+    return (void*)(all_indices + index_offsets[id]);
 }
 
 }
