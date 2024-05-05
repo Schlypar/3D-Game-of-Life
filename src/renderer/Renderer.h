@@ -16,9 +16,19 @@ namespace GoL {
 
 class Renderer {
 public:
-    void Clear() const;
-    void Draw(const VertexBuffer& vertexBuffer, const IndexBuffer& indexBuffer, const Shader& shader) const;
-    void Draw(const std::shared_ptr<Model>& model, const Camera& camera, Shader& shader) const;
+    inline void Clear() const {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    template <Model M>
+    void Draw(M& model, const Camera& camera, Shader& shader) const {
+        shader.Bind();
+        shader.SetUniformMat4f("Model", model.GetModelMatrix());
+        shader.SetUniformMat4f("ProjectionView", camera.GetProjectionMatrix() * camera.GetViewMatrix());
+        model.Draw();
+    }
 };
+
+
 
 }

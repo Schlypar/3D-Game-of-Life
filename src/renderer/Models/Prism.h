@@ -10,7 +10,7 @@
 
 namespace GoL {
 
-class Cube {
+class Prism {
 private:
     VertexArray vao;
     VertexBuffer vbo;
@@ -21,7 +21,7 @@ private:
     float scaleFactor;
 
 public:
-    Cube(glm::vec3 position = glm::vec3(0.0f),
+    Prism(glm::vec3 position = glm::vec3(0.0f),
          glm::vec3 rotation = glm::vec3(0.0f),
          float scaleFactor = 1.0f
     )
@@ -31,41 +31,16 @@ public:
         , rotation(rotation)
         , scaleFactor(scaleFactor) {
         Vertex vertices[] = {
-            // front
-            { { -0.5f, -0.5, -0.5f }, { 1, 0, 0 } },
-            { { 0.5f, -0.5f, -0.5f }, { 1, 0, 0 } },
-            { { 0.5f, 0.5f, -0.5f }, { 1, 0, 0 } },
-            { { -0.5f, 0.5f, -0.5f }, { 1, 0, 0 } },
-
-            // back
-            { { -0.5f, -0.5, 0.5f }, { 0, 1, 0 } },
-            { { 0.5f, -0.5f, 0.5f }, { 0, 1, 0 } },
-            { { 0.5f, 0.5f, 0.5f }, { 0, 1, 0 } },
-            { { -0.5f, 0.5f, 0.5f }, { 0, 1, 0 } },
 
             // up
-            { { -0.5f, 0.5f, -0.5f }, { 0, 0, 1 } },
-            { { 0.5f, 0.5f, -0.5f }, { 0, 0, 1 } },
             { { 0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
-            { { -0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
 
             // bottom
-            { { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.7f, 0.7f } },
-            { { 0.5f, -0.5f, -0.5f }, { 0.0f, 0.7f, 0.7f } },
-            { { 0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
+            { { -0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
+            { { 0.5f, -0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f } },
+            { { 0.5f, -0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
             { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
 
-            // right
-            { { 0.5f, -0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f  } },
-            { { 0.5f, 0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f  } },
-            { { 0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, 0.5f  } },
-            { { 0.5f, -0.5f, 0.5f }, { 0.5f, 0.5f, 0.5f  } },
-
-            // left
-            { { -0.5f, -0.5f, -0.5f }, { 0.9f, 0.0f, 0.3f } },
-            { { -0.5f, 0.5f, -0.5f }, { 0.9f, 0.0f, 0.3f } },
-            { { -0.5f, 0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
-            { { -0.5f, -0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
         };
 
         vbo = VertexBuffer { vertices, sizeof(vertices) };
@@ -74,34 +49,17 @@ public:
         layout.Push<float>(3);
         layout.Push<float>(3);
 
-        vao.AddBuffer(vbo, layout);
+        vao.AddBuffer(vbo, layout);        
     }
 
     void BindIndices() {
         unsigned int indices[] = {
-            //front
-            0, 1, 2,
-            2, 3, 0,
-
-            // back
-            4, 5, 6,
-            6, 7, 4,
-
-            // up
-            8, 9, 10,
-            10, 11, 8,
-
-            // bottom
-            12, 13, 14,
-            14, 15, 12,
-
-            // right
-            16, 17, 18,
-            18, 19, 16,
-
-            // left
-            20, 21, 22,
-            22, 23, 20
+            0,1,2,
+            2,0,3,
+            3,0,4,
+            4,0,1,
+            1,2,3,
+            3,4,1,
         };
 
         ibo = new IndexBuffer::Id;
@@ -126,11 +84,12 @@ public:
         return modelMatrix;
     }
 
-    ~Cube() {
+    ~Prism() {
         if (ibo != nullptr) {
             delete ibo;
         }
     }
 };
+
 
 }

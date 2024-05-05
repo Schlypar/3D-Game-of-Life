@@ -1,51 +1,44 @@
 #include "IndexBuffer.h"
 #include "glad/gl.h"
+#include <cstring>
+#include <stdio.h>
 
 namespace GoL {
 
-IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count)
-    : count(count) {
+// init
+unsigned int* IndexBuffer::all_indices = nullptr;
+int IndexBuffer::count = 0;
+unsigned int IndexBuffer::id = 0;
+std::vector<int> IndexBuffer::index_offsets = std::vector<int>();
+
+IndexBuffer::IndexBuffer() {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);
-}
-
-IndexBuffer::IndexBuffer(const IndexBuffer& other)
-    : id(other.id)
-    , count(other.count) {
-}
-
-IndexBuffer::IndexBuffer(IndexBuffer&& other)
-    : id(other.id)
-    , count(other.count) {
-    other.id = 0;
+    
 }
 
 IndexBuffer::~IndexBuffer() {
-    glDeleteBuffers(1, &id);
+    glDeleteBuffers(1, &IndexBuffer::id);
+    delete[] all_indices;
 }
 
-IndexBuffer& IndexBuffer::operator=(const IndexBuffer& other) {
-    this->id = other.id;
-    this->count = other.count;
-    return *this;
+IndexBuffer::Id IndexBuffer::Register(const unsigned int* indices, int _count) {
+    unsigned int* ptr = new unsigned int[count + _count];
+    std::memcpy(ptr, all_indices, count * sizeof(unsigned int));
+    std::memcpy(ptr + count, indices, _count * sizeof(unsigned int));
+    index_offsets.push_back(count);
+    count += _count;
+    delete[] all_indices;
+    all_indices = ptr;
+    return index_offsets.size() - 1;
 }
 
-IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) {
-    this->id = other.id;
-    this->count = other.count;
-
-    other.id = 0;
-
-    return *this;
+void IndexBuffer::Init() {
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), all_indices, GL_STATIC_DRAW);   
 }
 
-void IndexBuffer::Bind() const {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-}
-
-void IndexBuffer::Unbind() const {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+void* IndexBuffer::GetOffset(Id id) {
+    return (void*)(all_indices + index_offsets[id]);
 }
 
 }

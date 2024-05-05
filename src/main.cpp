@@ -11,8 +11,11 @@
 
 #include "Camera.h"
 #include "Models/Cube.h"
+#include "Models/Cursor3D.h"
+#include "Models/Prism.h"
 #include "glad/gl.h"
 #include "renderer/Renderer.h"
+#include "IndexBuffer.h"
 
 float deltaTime = 0.0f; // time between current frame and last frame
 float lastFrame = 0.0f;
@@ -39,17 +42,29 @@ void processInput(GLFWwindow* window, GoL::Camera& camera) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         camera.ProcessKeyboard(GoL::CameraMovement::RIGHT, deltaTime);
     }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        camera.ProcessKeyboard(GoL::CameraMovement::UP, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        camera.ProcessKeyboard(GoL::CameraMovement::DOWN, deltaTime);
+    }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
         camera.ProcessMouseMovement(-10.0f, 0.0f);
     }
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
         camera.ProcessMouseMovement(10.0f, 0.0f);
     }
-    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
-        camera.ProcessMouseMovement(0.0f, -10.0f);
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        camera.ProcessMouseMovement(-10.0f, 0.0f);
     }
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        camera.ProcessMouseMovement(10.0f, 0.0f);
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         camera.ProcessMouseMovement(0.0f, 10.0f);
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        camera.ProcessMouseMovement(0.0f, -10.0f);
     }
 }
 
@@ -85,12 +100,20 @@ int main(void) {
     GoL::Shader shader = { "resources/shaders/test.shader" };
     shader.Bind();
 
-    GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height, GoL::YAW, GoL::PITCH);
+    GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height);
     GoL::Renderer renderer;
+    GoL::Cursor3DRenderer cursor_renderer;
 
-    std::shared_ptr<GoL::Model> cube = std::make_shared<GoL::Cube>(
-            glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.5f
-    );
+    auto cube = GoL::Cube(glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.5f);
+    cube.BindIndices();
+
+    auto cursor = GoL::Cursor3D();
+    cursor.BindIndices();
+    
+    auto prism = GoL::Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
+    prism.BindIndices();
+
+    GoL::IndexBuffer::Init();
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -101,7 +124,10 @@ int main(void) {
 
         renderer.Clear();
 
-        renderer.Draw(cube, camera, shader);
+        renderer.Draw<GoL::Cube>(cube, camera, shader);
+        renderer.Draw<GoL::Prism>(prism, camera, shader);
+        renderer.Draw<GoL::Cursor3D>(cursor, camera, shader);
+        cursor_renderer.Draw<GoL::Cursor3D>(cursor, camera, shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

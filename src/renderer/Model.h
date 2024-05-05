@@ -1,15 +1,15 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <concepts>
 
 namespace GoL {
 
-class Model {
-public:
-    virtual ~Model() = default;
-
-    virtual void Draw() = 0;
-    virtual glm::mat4 GetModelMatrix() = 0;
+template <typename T>
+concept Model = requires(T m) {
+    { m.Draw() };
+    { m.BindIndices() };
+    { m.GetModelMatrix() } -> std::convertible_to<glm::mat4>;
 };
 
 }
