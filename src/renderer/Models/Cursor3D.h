@@ -77,6 +77,10 @@ public:
         return modelMatrix;
     }
 
+    void SetScaleFactor(float scale) {
+        scaling = scale;
+    }
+
     ~Cursor3D() {
         if (ibo != nullptr) {
             delete ibo;

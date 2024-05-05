@@ -160,7 +160,9 @@ int main(void) {
 
         renderer.Draw<GoL::Cube>(cube, camera, shader);
         renderer.Draw<GoL::Prism>(prism, camera, shader);
+        cursor.SetScaleFactor(100);
         renderer.Draw<GoL::Cursor3D>(cursor, camera, shader);
+        cursor.SetScaleFactor(0.1);
         cursor_renderer.Draw<GoL::Cursor3D>(cursor, camera, shader);
 
         glfwSwapBuffers(window);
