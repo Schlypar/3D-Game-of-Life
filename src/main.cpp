@@ -24,10 +24,30 @@ static void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
-void processInput(GLFWwindow* window, GoL::Camera& camera) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
+bool firstMouse = true;
+float lastX, lastY;
+GoL::Camera* cam = nullptr;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (cam == nullptr) {
+        return;
     }
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+  
+    glm::vec2 offset(xpos - lastX, lastY - ypos); 
+    lastX = xpos;
+    lastY = ypos;
+
+    cam->ProcessMouseMovement(offset.x, offset.y);
+}
+
+void processInput(GLFWwindow* window, GoL::Camera& camera) {
 
     float cameraSpeed = static_cast<float>(2.5 * deltaTime);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -66,7 +86,17 @@ void processInput(GLFWwindow* window, GoL::Camera& camera) {
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         camera.ProcessMouseMovement(0.0f, -10.0f);
     }
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetCursorPosCallback(window, NULL);
+        firstMouse = false;
+    }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1 == GLFW_PRESS)) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(window, mouse_callback);
+    }
 }
+
 
 int main(void) {
     GLFWwindow* window;
@@ -89,6 +119,9 @@ int main(void) {
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
+
     glEnable(GL_DEPTH_TEST);
 
     // glEnable(GL_CULL_FACE);
@@ -101,6 +134,7 @@ int main(void) {
     shader.Bind();
 
     GoL::Camera camera = GoL::Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, width, height);
+    cam = &camera;
     GoL::Renderer renderer;
     GoL::Cursor3DRenderer cursor_renderer;
 
