@@ -7,7 +7,7 @@ namespace GoL {
 
 // init
 unsigned int* IndexBuffer::all_indices = nullptr;
-int IndexBuffer::size = 0;
+int IndexBuffer::count = 0;
 unsigned int IndexBuffer::id = 0;
 std::vector<int> IndexBuffer::index_offsets = std::vector<int>();
 
@@ -22,19 +22,19 @@ IndexBuffer::~IndexBuffer() {
     delete[] all_indices;
 }
 
-IndexBuffer::Id IndexBuffer::Register(const unsigned int* indices, int _size) {
-    unsigned int* ptr = new unsigned int[size + _size];
-    std::memcpy(ptr, all_indices, size * sizeof(unsigned int));
-    std::memcpy(ptr + size, indices, _size * sizeof(unsigned int));
-    index_offsets.push_back(size);
-    size += _size;
+IndexBuffer::Id IndexBuffer::Register(const unsigned int* indices, int _count) {
+    unsigned int* ptr = new unsigned int[count + _count];
+    std::memcpy(ptr, all_indices, count * sizeof(unsigned int));
+    std::memcpy(ptr + count, indices, _count * sizeof(unsigned int));
+    index_offsets.push_back(count);
+    count += _count;
     delete[] all_indices;
     all_indices = ptr;
     return index_offsets.size() - 1;
 }
 
 void IndexBuffer::Init() {
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(unsigned int), all_indices, GL_STATIC_DRAW);   
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), all_indices, GL_STATIC_DRAW);   
 }
 
 void* IndexBuffer::GetOffset(Id id) {

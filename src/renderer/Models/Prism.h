@@ -11,8 +11,7 @@
 namespace GoL {
 
 class Prism {
-// private:
-public:
+private:
     VertexArray vao;
     VertexBuffer vbo;
     IndexBuffer::Id* ibo;

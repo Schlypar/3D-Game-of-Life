@@ -6,7 +6,7 @@ namespace GoL {
 class IndexBuffer {
 private:
     static unsigned int id;
-    static int size;
+    static int count;
     static unsigned int*    all_indices;
     static std::vector<int> index_offsets;
 
@@ -21,13 +21,13 @@ public:
     IndexBuffer& operator=(IndexBuffer&& other) = delete;
 
     static void* GetOffset(Id id);
-    static Id Register(const unsigned int* indices, int size);
+    static Id Register(const unsigned int* indices, int count);
     static void Init();
 
     static inline unsigned int GetCount(Id index) {
         if (index_offsets.size() == 0) return 0;
         if (index == index_offsets.size() - 1) {
-            return size - index_offsets[index];
+            return count - index_offsets[index];
         }
         return index_offsets[index + 1] - index_offsets[index];
     }
