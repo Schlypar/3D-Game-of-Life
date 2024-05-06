@@ -24,7 +24,7 @@ public:
         model.Draw();
     }
 
-    template <Model M, void (*CustomDraw)(M&, const Camera&, const Shader&)>
+    template <Model M, void (*CustomDraw)(M&, const Camera&, Shader&)>
     static void DrawCustom(M& model, const Camera& camera, Shader& shader) {
         CustomDraw(model, camera, shader);
     }
@@ -34,7 +34,5 @@ public:
         model.Draw(camera, shader);
     }
 };
-
-
 
 }
