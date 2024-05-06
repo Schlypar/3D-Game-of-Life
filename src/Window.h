@@ -137,10 +137,8 @@ public:
     }
 
     void Configure() {
-        glfwSetErrorCallback(error_callback);
-
-        glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwSetCursorPosCallback(this->window, mouse_callback);
+        SetErrorCallback(error_callback);
+        SetCursorPosCallback(mouse_callback);
 
         glEnable(GL_DEPTH_TEST);
 
@@ -152,11 +150,19 @@ public:
     }
 
     void OnUpdate(GoL::Camera& camera) {
-
         glfwPollEvents();
         glfwSwapBuffers(this->window);
 
         processInput(this->window, camera);
+    }
+
+    void SetErrorCallback(void (*callback)(int, const char*)) {
+        glfwSetErrorCallback(callback);
+    }
+
+    void SetCursorPosCallback(void (*callback)(GLFWwindow*, double, double)) {
+        glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(this->window, callback);
     }
 
     bool ShouldClose() const {
