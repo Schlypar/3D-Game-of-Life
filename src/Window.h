@@ -9,84 +9,75 @@
 
 namespace GoL {
 
-static bool firstMouse = true;
-static float lastX, lastY;
+// static void error_callback(int error, const char* description) {
+//     fprintf(stderr, "Error: %s\n", description);
+// }
 
-static float currentFrameTime;
-static float lastFrameTime;
-static float deltaTime;
+// static void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+//     if (cam == nullptr) {
+//         return;
+//     }
+//     if (firstMouse) {
+//         lastX = xpos;
+//         lastY = ypos;
+//         firstMouse = false;
+//     }
 
-static Camera* cam = nullptr;
+//     glm::vec2 offset(xpos - lastX, lastY - ypos);
+//     lastX = xpos;
+//     lastY = ypos;
 
-static void error_callback(int error, const char* description) {
-    fprintf(stderr, "Error: %s\n", description);
-}
+//     cam->ProcessMouseMovement(offset.x, offset.y);
+// }
 
-static void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (cam == nullptr) {
-        return;
-    }
-    if (firstMouse) {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    glm::vec2 offset(xpos - lastX, lastY - ypos);
-    lastX = xpos;
-    lastY = ypos;
-
-    cam->ProcessMouseMovement(offset.x, offset.y);
-}
-
-static void processInput(GLFWwindow* window, GoL::Camera& camera) {
-    float cameraSpeed = static_cast<float>(2.5 * deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera.ProcessKeyboard(GoL::CameraMovement::FORWARD, deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera.ProcessKeyboard(GoL::CameraMovement::BACKWARD, deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera.ProcessKeyboard(GoL::CameraMovement::LEFT, deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera.ProcessKeyboard(GoL::CameraMovement::RIGHT, deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        camera.ProcessKeyboard(GoL::CameraMovement::UP, deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        camera.ProcessKeyboard(GoL::CameraMovement::DOWN, deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        camera.ProcessMouseMovement(-10.0f, 0.0f);
-    }
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        camera.ProcessMouseMovement(10.0f, 0.0f);
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        camera.ProcessMouseMovement(-10.0f, 0.0f);
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        camera.ProcessMouseMovement(10.0f, 0.0f);
-    }
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        camera.ProcessMouseMovement(0.0f, 10.0f);
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        camera.ProcessMouseMovement(0.0f, -10.0f);
-    }
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetCursorPosCallback(window, NULL);
-        firstMouse = false;
-    }
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1 == GLFW_PRESS)) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwSetCursorPosCallback(window, mouse_callback);
-    }
-}
+// static void processInput(GLFWwindow* window, GoL::Camera& camera) {
+//     float cameraSpeed = static_cast<float>(2.5 * deltaTime);
+//     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+//         camera.ProcessKeyboard(GoL::CameraMovement::FORWARD, deltaTime);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+//         camera.ProcessKeyboard(GoL::CameraMovement::BACKWARD, deltaTime);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+//         camera.ProcessKeyboard(GoL::CameraMovement::LEFT, deltaTime);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+//         camera.ProcessKeyboard(GoL::CameraMovement::RIGHT, deltaTime);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+//         camera.ProcessKeyboard(GoL::CameraMovement::UP, deltaTime);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+//         camera.ProcessKeyboard(GoL::CameraMovement::DOWN, deltaTime);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+//         camera.ProcessMouseMovement(-10.0f, 0.0f);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+//         camera.ProcessMouseMovement(10.0f, 0.0f);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+//         camera.ProcessMouseMovement(-10.0f, 0.0f);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+//         camera.ProcessMouseMovement(10.0f, 0.0f);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+//         camera.ProcessMouseMovement(0.0f, 10.0f);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+//         camera.ProcessMouseMovement(0.0f, -10.0f);
+//     }
+//     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+//         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+//         glfwSetCursorPosCallback(window, NULL);
+//         firstMouse = false;
+//     }
+//     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1 == GLFW_PRESS)) {
+//         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//         glfwSetCursorPosCallback(window, mouse_callback);
+//     }
+// }
 
 class Window {
 public:
@@ -137,9 +128,6 @@ public:
     }
 
     void Configure() {
-        SetErrorCallback(error_callback);
-        SetCursorPosCallback(mouse_callback);
-
         glEnable(GL_DEPTH_TEST);
 
         // glEnable(GL_CULL_FACE);
@@ -152,8 +140,6 @@ public:
     void OnUpdate(GoL::Camera& camera) {
         glfwPollEvents();
         glfwSwapBuffers(this->window);
-
-        processInput(this->window, camera);
     }
 
     void SetErrorCallback(void (*callback)(int, const char*)) {
@@ -188,6 +174,10 @@ public:
 
     void Close() {
         glfwDestroyWindow(this->window);
+    }
+
+    operator GLFWwindow*() {
+        return this->window;
     }
 };
 
