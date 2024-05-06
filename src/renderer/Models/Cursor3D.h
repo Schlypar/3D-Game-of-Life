@@ -86,13 +86,9 @@ public:
             delete ibo;
         }
     }
-};
 
-class Cursor3DRenderer : public Renderer {
 public:
-
-    template <Model M>
-    void Draw(M& model, const Camera& camera, Shader& shader) const {
+    static void CustomDraw(Cursor3D& model, const Camera& camera, Shader& shader) {
         auto modelMatrix = model.GetModelMatrix();
         modelMatrix = glm::rotate(modelMatrix, glm::radians(camera.Yaw), glm::vec3(modelMatrix[1][0], modelMatrix[1][1], modelMatrix[1][2]));
         modelMatrix = glm::rotate(modelMatrix, glm::radians(camera.Pitch), glm::vec3(modelMatrix[0][0], modelMatrix[0][1], modelMatrix[0][2]));

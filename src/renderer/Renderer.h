@@ -12,16 +12,26 @@ namespace GoL {
 
 class Renderer {
 public:
-    inline void Clear() const {
+    static inline void Clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     template <Model M>
-    void Draw(M& model, const Camera& camera, Shader& shader) const {
+    static void DrawBasic(M& model, const Camera& camera, Shader& shader) {
         shader.Bind();
         shader.SetUniformMat4f("Model", model.GetModelMatrix());
         shader.SetUniformMat4f("ProjectionView", camera.GetProjectionMatrix() * camera.GetViewMatrix());
         model.Draw();
+    }
+
+    template <Model M, void (*CustomDraw)(M&, const Camera&, const Shader&)>
+    static void DrawCustom(M& model, const Camera& camera, Shader& shader) {
+        CustomDraw(model, camera, shader);
+    }
+
+    template <Model M>
+    static void DrawInstanced(M& model, const Camera& camera, Shader& shader, glm::mat4 getInstanceMatrix(M&, unsigned int)) {
+        model.Draw(camera, shader);
     }
 };
 
