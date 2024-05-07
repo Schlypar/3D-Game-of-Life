@@ -6,13 +6,12 @@ layout (location = 1) in vec4 color;
 layout (location = 2) in vec4 instanceMatrix;
 out vec4 i_color;
 
-uniform mat4 Model;
 uniform mat4 ProjectionView;
 
 void main()
 {
     i_color = color;
-    gl_Position = ProjectionView * Model * instanceMatrix * position;
+    gl_Position = ProjectionView * instanceMatrix * position;
 };
 
 #shader fragment
