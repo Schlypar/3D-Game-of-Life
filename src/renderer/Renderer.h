@@ -5,12 +5,15 @@
 #include <GLFW/glfw3.h>
 
 #include "Camera.h"
+#include "IndexBuffer.h"
+#include "InstanceHandler.h"
 #include "Model.h"
 #include "Shader.h"
 
 namespace GoL {
 
 class Renderer {
+
 public:
     static inline void Clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -30,8 +33,8 @@ public:
     }
 
     template <Model M>
-    static void DrawInstanced(M& model, const Camera& camera, Shader& shader, glm::mat4 getInstanceMatrix(M&, unsigned int)) {
-        model.Draw(camera, shader);
+    static void DrawInstanced(InstanceHandler<M>& instancies, const Camera& camera, Shader& shader) {
+
     }
 };
 
