@@ -60,14 +60,14 @@ public:
         Shader shader = { "resources/shaders/test.shader" };
         shader.Bind();
 
-        auto cube = Cube(glm::vec3 { 0.0f }, glm::vec3 { 15.0f, 0.0f, 45.0f }, 0.5f);
+        auto cube = Cube(glm::vec3 { 0.0f }, glm::vec3 { 0.0f }, 0.5f);
         cube.BindIndices();
 
         auto cursor = Cursor3D();
         cursor.BindIndices();
 
-        auto prism = Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
-        prism.BindIndices();
+        // auto prism = Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
+        // prism.BindIndices();
 
         IndexBuffer::Init();
 
@@ -79,7 +79,7 @@ public:
             renderer.Clear();
 
             renderer.Draw<Cube>(cube, Parameters::camera, shader);
-            renderer.Draw<Prism>(prism, Parameters::camera, shader);
+            // renderer.Draw<Prism>(prism, Parameters::camera, shader);
             cursor.SetScaleFactor(100);
             renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
             cursor.SetScaleFactor(0.1);

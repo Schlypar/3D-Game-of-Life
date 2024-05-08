@@ -80,16 +80,16 @@ public:
     void BindIndices() {
         unsigned int indices[] = {
             //front
-            0, 1, 2,
-            2, 3, 0,
+            0, 2, 1,
+            2, 0, 3,
 
             // back
             4, 5, 6,
             6, 7, 4,
 
             // up
-            8, 9, 10,
-            10, 11, 8,
+            8, 10, 9,
+            10, 8, 11,
 
             // bottom
             12, 13, 14,
@@ -100,8 +100,8 @@ public:
             18, 19, 16,
 
             // left
-            20, 21, 22,
-            22, 23, 20
+            20, 22, 21,
+            22, 20, 23
         };
 
         ibo = new IndexBuffer::Id;
