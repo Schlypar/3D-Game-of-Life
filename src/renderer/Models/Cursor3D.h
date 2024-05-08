@@ -20,6 +20,15 @@ private:
     glm::vec3 position_on_screen;
     float scaling;
 
+    constexpr static const Vertex vertices[] = {
+        { { 0.0f, 0.0f, 0.0f }, { 1, 0, 0 } }, // center
+        { { 1.0f, 0.0f, 0.0f }, { 1, 0, 0 } }, // abscissa
+        { { 0.0f, 0.0f, 0.0f }, { 0, 1, 0 } }, // center
+        { { 0.0f, 1.0f, 0.0f }, { 0, 1, 0 } }, // ordinate
+        { { 0.0f, 0.0f, 0.0f }, { 0, 0, 1 } }, // center
+        { { 0.0f, 0.0f, 1.0f }, { 0, 0, 1 } }, // applicata
+    };
+
 public:
     Cursor3D(
             glm::vec3 position_on_screen = glm::vec3 { 0.0f },
@@ -30,14 +39,7 @@ public:
         , position_on_screen(position_on_screen)
         , scaling(scaling) {
 
-        Vertex vertices[] = {
-            { { 0.0f, 0.0f, 0.0f }, { 1, 0, 0 } }, // center
-            { { 1.0f, 0.0f, 0.0f }, { 1, 0, 0 } }, // abscissa
-            { { 0.0f, 0.0f, 0.0f }, { 0, 1, 0 } }, // center
-            { { 0.0f, 1.0f, 0.0f }, { 0, 1, 0 } }, // ordinate
-            { { 0.0f, 0.0f, 0.0f }, { 0, 0, 1 } }, // center
-            { { 0.0f, 0.0f, 1.0f }, { 0, 0, 1 } }, // applicata
-        };
+        
         vbo = VertexBuffer { vertices, sizeof(vertices) };
 
         GoL::VertexBufferLayout layout;
@@ -77,6 +79,10 @@ public:
 
     void SetScaleFactor(float scale) {
         scaling = scale;
+    }
+
+    std::pair<const Vertex*, int> GetVerticies() {
+        return std::pair<const Vertex*, int>(vertices, 6);
     }
 
     ~Cursor3D() {

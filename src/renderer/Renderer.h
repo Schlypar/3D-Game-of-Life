@@ -34,7 +34,9 @@ public:
 
     template <Model M>
     static void DrawInstanced(InstanceHandler<M>& instancies, const Camera& camera, Shader& shader) {
-
+        shader.Bind();
+        shader.SetUniformMat4f("ProjectionView", camera.GetProjectionMatrix() * camera.GetViewMatrix());
+        instancies.Draw();
     }
 };
 

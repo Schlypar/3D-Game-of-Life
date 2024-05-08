@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Model.h"
+#include "VertexBufferLayout.h"
 #include "glm/ext/matrix_transform.hpp"
 #include <glm/glm.hpp>
 #include <vector>
@@ -16,21 +17,24 @@ private:
 
 private:
     M origin;
+    VertexBufferLayout layout;
+    std::vector<Instance> instances;
 
 public:
-    std::vector<Instance> Instances;
-
     InstanceHandler(M model = M());
     ~InstanceHandler();
 
     void AddInstance(glm::vec3 position, glm::vec3 rotation, float scale);
-
-    void Setup();
+    void Draw();
 };
 
 template <Model M>
 InstanceHandler<M>::InstanceHandler(M model) {
     origin = model;
+    layout = model.GetLayout();
+    for (int i = 0; i < 4; i++) {
+        layout.Push<float>(4);
+    }
 }
 
 template <Model M>
@@ -45,7 +49,12 @@ void InstanceHandler<M>::AddInstance(glm::vec3 position, glm::vec3 rotation, flo
     instanceMatrix = glm::rotate(instanceMatrix, rotation.z, glm::vec3(0, 0, 1));
     instanceMatrix = glm::scale(instanceMatrix, glm::vec3(scale));
 
-    Instances.push_back(std::move(instanceMatrix));
+    instances.push_back(std::move(instanceMatrix));
+}
+
+template <Model M>
+void InstanceHandler<M>::Draw() {
+    
 }
 
 };

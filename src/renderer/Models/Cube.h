@@ -1,12 +1,15 @@
 #pragma once
 
 #include "../Model.h"
-#include "Vertex.h"
 #include "IndexBuffer.h"
+#include "Vertex.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
+#include <cstdlib>
+#include <utility>
 
 namespace GoL {
 
@@ -20,6 +23,44 @@ private:
     glm::vec3 rotation;
     float scaleFactor;
 
+    constexpr static const Vertex vertices[] = {
+        // front
+        { { -0.5f, -0.5, -0.5f }, { 1, 0, 0 } },
+        { { 0.5f, -0.5f, -0.5f }, { 1, 0, 0 } },
+        { { 0.5f, 0.5f, -0.5f }, { 1, 0, 0 } },
+        { { -0.5f, 0.5f, -0.5f }, { 1, 0, 0 } },
+
+        // back
+        { { -0.5f, -0.5, 0.5f }, { 0, 1, 0 } },
+        { { 0.5f, -0.5f, 0.5f }, { 0, 1, 0 } },
+        { { 0.5f, 0.5f, 0.5f }, { 0, 1, 0 } },
+        { { -0.5f, 0.5f, 0.5f }, { 0, 1, 0 } },
+
+        // up
+        { { -0.5f, 0.5f, -0.5f }, { 0, 0, 1 } },
+        { { 0.5f, 0.5f, -0.5f }, { 0, 0, 1 } },
+        { { 0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
+        { { -0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
+
+        // bottom
+        { { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.7f, 0.7f } },
+        { { 0.5f, -0.5f, -0.5f }, { 0.0f, 0.7f, 0.7f } },
+        { { 0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
+        { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
+
+        // right
+        { { 0.5f, -0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f } },
+        { { 0.5f, 0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f } },
+        { { 0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, 0.5f } },
+        { { 0.5f, -0.5f, 0.5f }, { 0.5f, 0.5f, 0.5f } },
+
+        // left
+        { { -0.5f, -0.5f, -0.5f }, { 0.9f, 0.0f, 0.3f } },
+        { { -0.5f, 0.5f, -0.5f }, { 0.9f, 0.0f, 0.3f } },
+        { { -0.5f, 0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
+        { { -0.5f, -0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
+    };
+
 public:
     Cube(glm::vec3 position = glm::vec3(0.0f),
          glm::vec3 rotation = glm::vec3(0.0f),
@@ -30,43 +71,6 @@ public:
         , position(position)
         , rotation(rotation)
         , scaleFactor(scaleFactor) {
-        Vertex vertices[] = {
-            // front
-            { { -0.5f, -0.5, -0.5f }, { 1, 0, 0 } },
-            { { 0.5f, -0.5f, -0.5f }, { 1, 0, 0 } },
-            { { 0.5f, 0.5f, -0.5f }, { 1, 0, 0 } },
-            { { -0.5f, 0.5f, -0.5f }, { 1, 0, 0 } },
-
-            // back
-            { { -0.5f, -0.5, 0.5f }, { 0, 1, 0 } },
-            { { 0.5f, -0.5f, 0.5f }, { 0, 1, 0 } },
-            { { 0.5f, 0.5f, 0.5f }, { 0, 1, 0 } },
-            { { -0.5f, 0.5f, 0.5f }, { 0, 1, 0 } },
-
-            // up
-            { { -0.5f, 0.5f, -0.5f }, { 0, 0, 1 } },
-            { { 0.5f, 0.5f, -0.5f }, { 0, 0, 1 } },
-            { { 0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
-            { { -0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
-
-            // bottom
-            { { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.7f, 0.7f } },
-            { { 0.5f, -0.5f, -0.5f }, { 0.0f, 0.7f, 0.7f } },
-            { { 0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
-            { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
-
-            // right
-            { { 0.5f, -0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f  } },
-            { { 0.5f, 0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f  } },
-            { { 0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, 0.5f  } },
-            { { 0.5f, -0.5f, 0.5f }, { 0.5f, 0.5f, 0.5f  } },
-
-            // left
-            { { -0.5f, -0.5f, -0.5f }, { 0.9f, 0.0f, 0.3f } },
-            { { -0.5f, 0.5f, -0.5f }, { 0.9f, 0.0f, 0.3f } },
-            { { -0.5f, 0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
-            { { -0.5f, -0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
-        };
 
         vbo = VertexBuffer { vertices, sizeof(vertices) };
 
@@ -84,20 +88,32 @@ public:
             2, 0, 3,
 
             // back
-            4, 5, 6,
-            6, 7, 4,
+            4,
+            5,
+            6,
+            6,
+            7,
+            4,
 
             // up
             8, 10, 9,
             10, 8, 11,
 
             // bottom
-            12, 13, 14,
-            14, 15, 12,
+            12,
+            13,
+            14,
+            14,
+            15,
+            12,
 
             // right
-            16, 17, 18,
-            18, 19, 16,
+            16,
+            17,
+            18,
+            18,
+            19,
+            16,
 
             // left
             20, 22, 21,
@@ -124,6 +140,10 @@ public:
         modelMatrix = glm::scale(modelMatrix, glm::vec3(scaleFactor));
 
         return modelMatrix;
+    }
+
+    std::pair<const Vertex*, int> GetVerticies() {
+        return std::pair<const Vertex*, int>(vertices, 24);
     }
 
     ~Cube() {

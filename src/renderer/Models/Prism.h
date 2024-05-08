@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Model.h"
-#include "Vertex.h"
 #include "IndexBuffer.h"
+#include "Vertex.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "glm/ext/matrix_transform.hpp"
@@ -20,28 +20,29 @@ private:
     glm::vec3 rotation;
     float scaleFactor;
 
+    constexpr static const Vertex vertices[] = {
+
+        // up
+        { { 0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
+
+        // bottom
+        { { -0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
+        { { 0.5f, -0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f } },
+        { { 0.5f, -0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
+        { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
+
+    };
+
 public:
     Prism(glm::vec3 position = glm::vec3(0.0f),
-         glm::vec3 rotation = glm::vec3(0.0f),
-         float scaleFactor = 1.0f
+          glm::vec3 rotation = glm::vec3(0.0f),
+          float scaleFactor = 1.0f
     )
         : vbo(nullptr, 0)
         , ibo(nullptr)
         , position(position)
         , rotation(rotation)
         , scaleFactor(scaleFactor) {
-        Vertex vertices[] = {
-
-            // up
-            { { 0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
-
-            // bottom
-            { { -0.5f, -0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } },
-            { { 0.5f, -0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f } },
-            { { 0.5f, -0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
-            { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
-
-        };
 
         vbo = VertexBuffer { vertices, sizeof(vertices) };
 
@@ -49,17 +50,29 @@ public:
         layout.Push<float>(3);
         layout.Push<float>(3);
 
-        vao.AddBuffer(vbo, layout);        
+        vao.AddBuffer(vbo, layout);
     }
 
     void BindIndices() {
         unsigned int indices[] = {
-            0,1,2,
-            2,0,3,
-            3,0,4,
-            4,0,1,
-            1,2,3,
-            3,4,1,
+            0,
+            1,
+            2,
+            2,
+            0,
+            3,
+            3,
+            0,
+            4,
+            4,
+            0,
+            1,
+            1,
+            2,
+            3,
+            3,
+            4,
+            1,
         };
 
         ibo = new IndexBuffer::Id;
@@ -84,12 +97,15 @@ public:
         return modelMatrix;
     }
 
+    std::pair<const Vertex*, int> GetVerticies() {
+        return std::pair<const Vertex*, int>(vertices, 5);
+    }
+
     ~Prism() {
         if (ibo != nullptr) {
             delete ibo;
         }
     }
 };
-
 
 }

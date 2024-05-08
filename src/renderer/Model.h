@@ -1,7 +1,10 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <concepts>
+#include <glm/glm.hpp>
+
+#include "VertexBufferLayout.h"
+#include "Models/Vertex.h"
 
 namespace GoL {
 
@@ -12,6 +15,7 @@ concept Model = requires(T m, T n) {
     { m.Draw() };
     { m.BindIndices() };
     { m.GetModelMatrix() } -> std::convertible_to<glm::mat4>;
+    { m.GetVerticies() } -> std::convertible_to<std::pair<const Vertex*, int>>;
 };
 
 }
