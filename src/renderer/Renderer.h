@@ -3,14 +3,10 @@
 #include <glad/gl.h>
 
 #include <GLFW/glfw3.h>
-#include <memory>
 
 #include "Camera.h"
-#include "IndexBuffer.h"
 #include "Model.h"
 #include "Shader.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
 
 namespace GoL {
 
