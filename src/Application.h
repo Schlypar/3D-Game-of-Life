@@ -54,10 +54,8 @@ public:
     }
 
     void Run() {
-        Renderer renderer;
-        Cursor3DRenderer cursor_renderer;
 
-        Shader shader = { "resources/shaders/test.shader" };
+        Shader shader = { "../resources/shaders/test.shader" };
         shader.Bind();
 
         auto cube = Cube(glm::vec3 { 0.0f }, glm::vec3 { 0.0f }, 0.5f);
@@ -76,14 +74,14 @@ public:
             Parameters::deltaTime = Parameters::currentFrameTime - Parameters::lastFrameTime;
             Parameters::lastFrameTime = Parameters::currentFrameTime;
 
-            renderer.Clear();
+            Renderer::Clear();
 
-            renderer.Draw<Cube>(cube, Parameters::camera, shader);
-            // renderer.Draw<Prism>(prism, Parameters::camera, shader);
+            Renderer::DrawBasic<Cube>(cube, Parameters::camera, shader);
+            // Renderer.Draw<Prism>(prism, Parameters::camera, shader);
             cursor.SetScaleFactor(100);
-            renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
+            Renderer::DrawBasic<Cursor3D>(cursor, Parameters::camera, shader);
             cursor.SetScaleFactor(0.1);
-            cursor_renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
+            Renderer::DrawCustom<Cursor3D, Cursor3D::CustomDraw>(cursor, Parameters::camera, shader);
 
             window.OnUpdate(Parameters::camera);
             ProcessInput();

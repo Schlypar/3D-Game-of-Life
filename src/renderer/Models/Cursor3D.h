@@ -81,7 +81,7 @@ public:
         scaling = scale;
     }
 
-    std::pair<const Vertex*, int> GetVerticies() {
+    constexpr std::pair<const Vertex*, int> GetVerticies() {
         return std::pair<const Vertex*, int>(vertices, 6);
     }
 
