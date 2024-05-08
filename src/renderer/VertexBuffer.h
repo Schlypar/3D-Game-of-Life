@@ -9,7 +9,7 @@ private:
     unsigned int id;
 
 public:
-    VertexBuffer(const void* data, const size_t size);
+    VertexBuffer(const void* data = nullptr, const size_t size = 0);
     VertexBuffer(const VertexBuffer& other);
     VertexBuffer(VertexBuffer&& other);
     ~VertexBuffer();

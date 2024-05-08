@@ -101,6 +101,14 @@ public:
         return std::pair<const Vertex*, int>(vertices, 5);
     }
 
+    VertexArray& GetVAO() {
+        return vao;
+    }
+
+    VertexBuffer& GetVBO() {
+        return vbo;
+    }
+
     ~Prism() {
         if (ibo != nullptr) {
             delete ibo;

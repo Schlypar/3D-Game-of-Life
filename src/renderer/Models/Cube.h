@@ -81,7 +81,7 @@ public:
         vao.AddBuffer(vbo, layout);
     }
 
-    void BindIndices() {
+    int BindIndices() {
         unsigned int indices[] = {
             //front
             0, 2, 1,
@@ -122,6 +122,7 @@ public:
 
         ibo = new IndexBuffer::Id;
         *ibo = IndexBuffer::Register(indices, sizeof(indices) / sizeof(unsigned int));
+        return *ibo;
     }
 
     void Draw() {
@@ -129,6 +130,14 @@ public:
         vao.Bind();
 
         glDrawElements(GL_TRIANGLES, IndexBuffer::GetCount(*ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*ibo));
+    }
+
+    VertexArray& GetVAO() {
+        return vao;
+    }
+
+    VertexBuffer& GetVBO() {
+        return vbo;
     }
 
     glm::mat4 GetModelMatrix() {
@@ -142,7 +151,7 @@ public:
         return modelMatrix;
     }
 
-    constexpr std::pair<const Vertex*, int> GetVerticies() {
+    static constexpr std::pair<const Vertex*, int> GetVerticies() {
         return std::pair<const Vertex*, int>(vertices, 24);
     }
 

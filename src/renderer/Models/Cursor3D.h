@@ -85,6 +85,14 @@ public:
         return std::pair<const Vertex*, int>(vertices, 6);
     }
 
+    VertexArray& GetVAO() {
+        return vao;
+    }
+
+    VertexBuffer& GetVBO() {
+        return vbo;
+    }
+
     ~Cursor3D() {
         if (ibo != nullptr) {
             delete ibo;

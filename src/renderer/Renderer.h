@@ -33,10 +33,10 @@ public:
     }
 
     template <Model M>
-    static void DrawInstanced(InstanceHandler<M>& instancies, const Camera& camera, Shader& shader) {
+    static void DrawInstanced(InstanceHandler<M>& instancies, int ibo, const Camera& camera, Shader& shader) {
         shader.Bind();
         shader.SetUniformMat4f("ProjectionView", camera.GetProjectionMatrix() * camera.GetViewMatrix());
-        instancies.Draw();
+        instancies.Draw(ibo);
     }
 };
 

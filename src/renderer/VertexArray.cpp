@@ -32,7 +32,7 @@ VertexArray& VertexArray::operator=(VertexArray&& other) {
     return *this;
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout) {
+void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout, unsigned int gloffset) {
     this->Bind();
     vb.Bind();
 
@@ -41,8 +41,8 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
     unsigned int offset = 0;
     for (int i = 0; i < elements.size(); i++) {
         const VertexBufferLayout::Element& element = elements[i];
-        glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*) offset);
+        glEnableVertexAttribArray(gloffset + i);
+        glVertexAttribPointer(gloffset + i, element.count, element.type, element.normalized, layout.GetStride(), (const void*) offset);
         offset += element.count * VertexBufferLayout::Element::GetSizeOfType(element.type);
     }
 }

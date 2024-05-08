@@ -3,7 +3,7 @@
 
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec4 color;
-layout (location = 2) in vec4 instanceMatrix;
+layout (location = 2) in mat4 instanceMatrix;
 out vec4 i_color;
 
 uniform mat4 ProjectionView;

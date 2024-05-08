@@ -3,8 +3,10 @@
 #include <concepts>
 #include <glm/glm.hpp>
 
-#include "VertexBufferLayout.h"
 #include "Models/Vertex.h"
+#include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 
 namespace GoL {
 
@@ -15,6 +17,8 @@ concept Model = requires(T m, T n) {
     { m.Draw() };
     { m.BindIndices() };
     { m.GetModelMatrix() } -> std::convertible_to<glm::mat4>;
+    { m.GetVAO() } -> std::convertible_to<VertexArray&>;
+    { m.GetVBO() } -> std::convertible_to<VertexBuffer&>;
     { m.GetVerticies() } -> std::convertible_to<std::pair<const Vertex*, int>>;
 };
 

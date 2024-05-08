@@ -4,6 +4,7 @@
 // #include <imgui/imgui_impl_glfw.h>
 // #include <imgui/imgui_impl_opengl3.h>
 
+#include "InstanceHandler.h"
 #include "Window.h"
 
 #include "IndexBuffer.h"
@@ -56,13 +57,23 @@ public:
     void Run() {
 
         Shader shader = { "../resources/shaders/test.shader" };
+        Shader instanceShader = { "../resources/shaders/instance.shader" };
         shader.Bind();
 
         auto cube = Cube(glm::vec3 { 0.0f }, glm::vec3 { 0.0f }, 0.5f);
-        cube.BindIndices();
+        int cube_ibo = cube.BindIndices();
 
         auto cursor = Cursor3D();
         cursor.BindIndices();
+
+        InstanceHandler<Cube> cubes;
+        for (float i = 5; i < 8; i += 0.5) {
+            for (float j = 5; j < 8; j += 0.5) {    
+                for (float k = 5; k < 8; k += 0.5) {
+                    cubes.AddInstance(glm::vec3(i, j, k), glm::vec3(0.0f), 0.2);
+                }
+            }
+        }
 
         // auto prism = Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
         // prism.BindIndices();
@@ -82,6 +93,8 @@ public:
             Renderer::DrawBasic<Cursor3D>(cursor, Parameters::camera, shader);
             cursor.SetScaleFactor(0.1);
             Renderer::DrawCustom<Cursor3D, Cursor3D::CustomDraw>(cursor, Parameters::camera, shader);
+
+            Renderer::DrawInstanced(cubes, cube_ibo,  Parameters::camera, instanceShader);
 
             window.OnUpdate(Parameters::camera);
             ProcessInput();
