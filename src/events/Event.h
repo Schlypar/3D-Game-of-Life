@@ -68,6 +68,9 @@ public:
 };
 
 class EventDispatcher {
+    template <typename T>
+    using EventFunc = std::function<bool(T&)>;
+
 private:
     Event& event;
 
@@ -76,9 +79,8 @@ public:
         : event(event) {
     }
 
-    // F will be deduced by the compiler ?
-    template <typename T, typename F>
-    bool Dispatch(const F& func) {
+    template <typename T>
+    bool Dispatch(EventFunc<T> func) {
         if (event.GetEventType() == T::GetStaticType()) {
             event.Handled |= func(static_cast<T&>(event));
             return true;
