@@ -6,10 +6,10 @@ AlignAfterOpenBracket: BlockIndent
 AlignArrayOfStructures: None
 AlignConsecutiveMacros: None
 AlignConsecutiveAssignments: false
-AlignConsecutiveBitFields: None
+AlignConsecutiveBitFields: Consecutive
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Left
-AlignOperands:   DontAlign
+AlignOperands:   AlignAfterOperator
 AllowAllArgumentsOnNextLine: true
 AllowAllConstructorInitializersOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
