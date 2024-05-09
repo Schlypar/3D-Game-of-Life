@@ -6,10 +6,10 @@
 namespace GoL {
 
 #define EVENT_IMPL_GETTYPE(type)                      \
-    static EventType GetStaticType() {                \
-        return EventType::type;                       \
+    static Event::Type GetStaticType() {                \
+        return Event::Type::type;                       \
     }                                                 \
-    virtual EventType GetEventType() const override { \
+    virtual Event::Type GetEventType() const override { \
         return GetStaticType();                       \
     }                                                 \
     virtual const char* GetName() const override {    \
