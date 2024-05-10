@@ -5,12 +5,20 @@
 #include <GLFW/glfw3.h>
 
 #include "Camera.h"
+
+#include "events/ApplicationEvent.h"
 #include "events/Event.h"
+#include "events/KeyEvent.h"
+#include "events/MouseEvent.h"
 
 #include <functional>
 #include <string>
 
 namespace GoL {
+
+static void error_callback(int error, const char* description) {
+    fprintf(stderr, "Error: %s\n", description);
+}
 
 class Window {
 protected:
@@ -45,6 +53,11 @@ public:
         if (!glfwInit()) {
             exit(EXIT_FAILURE);
         }
+        data.Title = settings.Title;
+        data.Width = settings.Width;
+        data.Height = settings.Height;
+
+        glfwSetErrorCallback(error_callback);
         this->window = glfwCreateWindow(
                 settings.Width,
                 settings.Height,
@@ -56,9 +69,87 @@ public:
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
-        glfwMakeContextCurrent(this->window);
-        gladLoadGL(glfwGetProcAddress);
-        this->data = settings;
+        glfwSetWindowUserPointer(this->window, &this->data);
+
+        glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+            Data& data = *(Data*) glfwGetWindowUserPointer(window);
+            data.Width = width;
+            data.Height = height;
+
+            WindowResizeEvent event(width, height);
+            data.EventCallback(event);
+        });
+
+        glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
+            Data& data = *(Data*) glfwGetWindowUserPointer(window);
+            WindowCloseEvent event;
+            data.EventCallback(event);
+        });
+
+        glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+            Data& data = *(Data*) glfwGetWindowUserPointer(window);
+
+            switch (action) {
+                case GLFW_PRESS:
+                    {
+                        KeyPressedEvent event(key, 0);
+                        data.EventCallback(event);
+                        break;
+                    }
+                case GLFW_RELEASE:
+                    {
+                        KeyReleasedEvent event(key);
+                        data.EventCallback(event);
+                        break;
+                    }
+                case GLFW_REPEAT:
+                    {
+                        KeyPressedEvent event(key, true);
+                        data.EventCallback(event);
+                        break;
+                    }
+            }
+        });
+
+        glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int keycode) {
+            Data& data = *(Data*) glfwGetWindowUserPointer(window);
+
+            KeyTypedEvent event(keycode);
+            data.EventCallback(event);
+        });
+
+        glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
+            Data& data = *(Data*) glfwGetWindowUserPointer(window);
+
+            switch (action) {
+                case GLFW_PRESS:
+                    {
+                        MouseButtonPressedEvent event(button);
+                        data.EventCallback(event);
+                        break;
+                    }
+                case GLFW_RELEASE:
+                    {
+                        MouseButtonReleasedEvent event(button);
+                        data.EventCallback(event);
+                        break;
+                    }
+            }
+        });
+
+        glfwSetScrollCallback(window, [](GLFWwindow* window, double xOffset, double yOffset) {
+            Data& data = *(Data*) glfwGetWindowUserPointer(window);
+
+            MouseScrolledEvent event((float) xOffset, (float) yOffset);
+            data.EventCallback(event);
+        });
+
+        glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xPos, double yPos) {
+            Data& data = *(Data*) glfwGetWindowUserPointer(window);
+
+            MouseMovedEvent event((float) xPos, (float) yPos);
+            data.EventCallback(event);
+        });
     }
 
     ~Window() {
@@ -75,7 +166,7 @@ public:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    void OnUpdate(GoL::Camera& camera) {
+    void OnUpdate() {
         glfwPollEvents();
         glfwSwapBuffers(this->window);
     }
