@@ -69,6 +69,8 @@ public:
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
+        glfwMakeContextCurrent(this->window);
+        gladLoadGL(glfwGetProcAddress);
         glfwSetWindowUserPointer(this->window, &this->data);
 
         glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
