@@ -7,6 +7,7 @@
 #include "Window.h"
 #include "events/ApplicationEvent.h"
 #include "events/Event.h"
+#include "events/KeyEvent.h"
 #include "events/MouseEvent.h"
 
 #include <imgui/imgui.h>
@@ -17,24 +18,25 @@
 
 namespace GoL {
 
-static bool captureMouse = true;
+// constexpr glm::vec3 CAMERA_POSITION = { 0.0f, 0.0f, -3.0f };
+// constexpr glm::vec3 WOLRD_UP = { 0.0f, 1.0f, 0.0f };
+// constexpr float WINDOW_WIDTH = 1920;
+// constexpr float WINDOW_HEIGHT = 1080;
 
 class Application {
 public:
-    struct Parameters {
-        static bool firstMouse;
-        static float lastX, lastY;
-
-        static float currentFrameTime;
-        static float lastFrameTime;
-        static float deltaTime;
-
-        static Camera camera;
-    };
-
 private:
     Window window;
+    Camera camera;
+
     bool isRunning = true;
+
+    bool firstMouse = true;
+    float lastX = 0, lastY = 0;
+
+    float currentFrameTime = 0;
+    float lastFrameTime = 0;
+    float deltaTime = 0;
 
 public:
     Application(
@@ -42,12 +44,14 @@ public:
             unsigned int width = 1980,
             unsigned int height = 1080
     )
-        : window(Window::Data(title, width, height)) {
+        : window(Window::Data(title, width, height))
+        , camera({ 0.0f, 0.0f, -3.0f }, { 0.0f, 1.0f, 0.0f }, 1920.0f, 1080.0f) {
         this->window.SetEventCallback(
                 [this](Event& e) {
                     this->OnEvent(e);
                 }
         );
+        this->window.Configure();
     }
 
     void Run() {
@@ -69,18 +73,18 @@ public:
         IndexBuffer::Init();
 
         while (isRunning) {
-            Parameters::currentFrameTime = static_cast<float>(glfwGetTime());
-            Parameters::deltaTime = Parameters::currentFrameTime - Parameters::lastFrameTime;
-            Parameters::lastFrameTime = Parameters::currentFrameTime;
+            currentFrameTime = static_cast<float>(glfwGetTime());
+            deltaTime = currentFrameTime - lastFrameTime;
+            lastFrameTime = currentFrameTime;
 
             renderer.Clear();
 
-            renderer.Draw<Cube>(cube, Parameters::camera, shader);
-            // renderer.Draw<Prism>(prism, Parameters::camera, shader);
+            renderer.Draw<Cube>(cube, camera, shader);
+            // renderer.Draw<Prism>(prism, camera, shader);
             cursor.SetScaleFactor(100);
-            renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
+            renderer.Draw<Cursor3D>(cursor, camera, shader);
             cursor.SetScaleFactor(0.1);
-            cursor_renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
+            cursor_renderer.Draw<Cursor3D>(cursor, camera, shader);
 
             window.OnUpdate();
         }
@@ -90,12 +94,61 @@ public:
     }
 
     void OnEvent(Event& e) {
+        std::cout << e << std::endl;
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_MEMBER_EVENT_FN(Application::OnWindowClose));
+        dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPressed));
     }
 
     bool OnWindowClose(WindowCloseEvent& e) {
         isRunning = false;
+        return true;
+    }
+
+    bool OnKeyPressed(KeyPressedEvent& e) {
+        float cameraSpeed = static_cast<float>(2.5 * deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            camera.ProcessKeyboard(GoL::CameraMovement::FORWARD, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            camera.ProcessKeyboard(GoL::CameraMovement::BACKWARD, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            camera.ProcessKeyboard(GoL::CameraMovement::LEFT, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            camera.ProcessKeyboard(GoL::CameraMovement::RIGHT, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            camera.ProcessKeyboard(GoL::CameraMovement::UP, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+            camera.ProcessKeyboard(GoL::CameraMovement::DOWN, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+            camera.ProcessMouseMovement(-10.0f, 0.0f);
+        }
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+            camera.ProcessMouseMovement(10.0f, 0.0f);
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+            camera.ProcessMouseMovement(-10.0f, 0.0f);
+        }
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+            camera.ProcessMouseMovement(10.0f, 0.0f);
+        }
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+            camera.ProcessMouseMovement(0.0f, 10.0f);
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+            camera.ProcessMouseMovement(0.0f, -10.0f);
+        }
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPosCallback(window, NULL);
+            firstMouse = false;
+        }
+
         return true;
     }
 };
