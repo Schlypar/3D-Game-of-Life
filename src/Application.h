@@ -4,7 +4,9 @@
 #include "Models/Cursor3D.h"
 #include "Models/Prism.h"
 #include "Renderer.h"
+
 #include "Window.h"
+
 #include "events/ApplicationEvent.h"
 #include "events/Event.h"
 #include "events/KeyEvent.h"
@@ -17,11 +19,6 @@
 #include <iostream>
 
 namespace GoL {
-
-// constexpr glm::vec3 CAMERA_POSITION = { 0.0f, 0.0f, -3.0f };
-// constexpr glm::vec3 WOLRD_UP = { 0.0f, 1.0f, 0.0f };
-// constexpr float WINDOW_WIDTH = 1920;
-// constexpr float WINDOW_HEIGHT = 1080;
 
 class Application {
 public:
@@ -107,43 +104,43 @@ public:
 
     bool OnKeyPressed(KeyPressedEvent& e) {
         float cameraSpeed = static_cast<float>(2.5 * deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_W) {
             camera.ProcessKeyboard(GoL::CameraMovement::FORWARD, deltaTime);
         }
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_S) {
             camera.ProcessKeyboard(GoL::CameraMovement::BACKWARD, deltaTime);
         }
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_A) {
             camera.ProcessKeyboard(GoL::CameraMovement::LEFT, deltaTime);
         }
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_D) {
             camera.ProcessKeyboard(GoL::CameraMovement::RIGHT, deltaTime);
         }
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_LEFT_SHIFT) {
             camera.ProcessKeyboard(GoL::CameraMovement::UP, deltaTime);
         }
-        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_LEFT_CONTROL) {
             camera.ProcessKeyboard(GoL::CameraMovement::DOWN, deltaTime);
         }
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_Q) {
             camera.ProcessMouseMovement(-10.0f, 0.0f);
         }
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_E) {
             camera.ProcessMouseMovement(10.0f, 0.0f);
         }
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_LEFT) {
             camera.ProcessMouseMovement(-10.0f, 0.0f);
         }
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_RIGHT) {
             camera.ProcessMouseMovement(10.0f, 0.0f);
         }
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_UP) {
             camera.ProcessMouseMovement(0.0f, 10.0f);
         }
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_DOWN) {
             camera.ProcessMouseMovement(0.0f, -10.0f);
         }
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        if (e.GetKeyCode() == GLFW_KEY_ESCAPE) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             glfwSetCursorPosCallback(window, NULL);
             firstMouse = false;
