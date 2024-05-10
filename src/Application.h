@@ -38,7 +38,7 @@ private:
 public:
     Application(
             std::string title = "Game of Life",
-            unsigned int width = 1980,
+            unsigned int width = 1920,
             unsigned int height = 1080
     )
         : window(Window::Data(title, width, height))
@@ -93,11 +93,14 @@ public:
     void OnEvent(Event& e) {
         std::cout << e << std::endl;
         EventDispatcher dispatcher(e);
+
+        // probably make it async in the future ?
         dispatcher.Dispatch<WindowCloseEvent>(BIND_MEMBER_EVENT_FN(Application::OnWindowClose));
         dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
         dispatcher.Dispatch<MouseMovedEvent>(BIND_MEMBER_EVENT_FN(Application::OnMouseMove));
     }
 
+private:
     bool OnWindowClose(WindowCloseEvent& e) {
         isRunning = false;
         return true;
