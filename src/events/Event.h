@@ -5,20 +5,25 @@
 
 namespace GoL {
 
-#define EVENT_IMPL_GETTYPE(type)                      \
+#define EVENT_IMPL_GETTYPE(type)                        \
     static Event::Type GetStaticType() {                \
         return Event::Type::type;                       \
-    }                                                 \
+    }                                                   \
     virtual Event::Type GetEventType() const override { \
-        return GetStaticType();                       \
-    }                                                 \
-    virtual const char* GetName() const override {    \
-        return #type;                                 \
+        return GetStaticType();                         \
+    }                                                   \
+    virtual const char* GetName() const override {      \
+        return #type;                                   \
     }
 
 #define EVENT_IMPL_GETCATEGORY(category)            \
     virtual int GetCategoryFlags() const override { \
         return category;                            \
+    }
+
+#define BIND_MEMBER_EVENT_FN(fn)                          \
+    [this](auto&&... args) -> decltype(auto) {            \
+        return fn(std::forward<decltype(args)>(args)...); \
     }
 
 class Event {
@@ -79,8 +84,8 @@ public:
         : event(event) {
     }
 
-    template <typename T>
-    bool Dispatch(EventFunc<T> func) {
+    template <typename T, typename F>
+    bool Dispatch(const F& func) {
         if (event.GetEventType() == T::GetStaticType()) {
             event.Handled |= func(static_cast<T&>(event));
             return true;

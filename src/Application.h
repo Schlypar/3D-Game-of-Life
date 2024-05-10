@@ -5,6 +5,8 @@
 #include "Models/Prism.h"
 #include "Renderer.h"
 #include "Window.h"
+#include "events/ApplicationEvent.h"
+#include "events/Event.h"
 #include "events/MouseEvent.h"
 
 #include <imgui/imgui.h>
@@ -32,6 +34,7 @@ public:
 
 private:
     Window window;
+    bool isRunning = true;
 
 public:
     Application(
@@ -48,36 +51,36 @@ public:
     }
 
     void Run() {
-        // Renderer renderer;
-        // Cursor3DRenderer cursor_renderer;
+        Renderer renderer;
+        Cursor3DRenderer cursor_renderer;
 
-        // Shader shader = { "resources/shaders/test.shader" };
-        // shader.Bind();
+        Shader shader = { "resources/shaders/test.shader" };
+        shader.Bind();
 
-        // auto cube = Cube(glm::vec3 { 0.0f }, glm::vec3 { 0.0f }, 0.5f);
-        // cube.BindIndices();
+        auto cube = Cube(glm::vec3 { 0.0f }, glm::vec3 { 0.0f }, 0.5f);
+        cube.BindIndices();
 
-        // auto cursor = Cursor3D();
-        // cursor.BindIndices();
+        auto cursor = Cursor3D();
+        cursor.BindIndices();
 
-        // auto prism = Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
-        // prism.BindIndices();
+        auto prism = Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
+        prism.BindIndices();
 
-        // IndexBuffer::Init();
+        IndexBuffer::Init();
 
-        while (!window.ShouldClose()) {
+        while (isRunning) {
             Parameters::currentFrameTime = static_cast<float>(glfwGetTime());
             Parameters::deltaTime = Parameters::currentFrameTime - Parameters::lastFrameTime;
             Parameters::lastFrameTime = Parameters::currentFrameTime;
 
-            // renderer.Clear();
+            renderer.Clear();
 
-            // renderer.Draw<Cube>(cube, Parameters::camera, shader);
-            // // renderer.Draw<Prism>(prism, Parameters::camera, shader);
-            // cursor.SetScaleFactor(100);
-            // renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
-            // cursor.SetScaleFactor(0.1);
-            // cursor_renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
+            renderer.Draw<Cube>(cube, Parameters::camera, shader);
+            // renderer.Draw<Prism>(prism, Parameters::camera, shader);
+            cursor.SetScaleFactor(100);
+            renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
+            cursor.SetScaleFactor(0.1);
+            cursor_renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
 
             window.OnUpdate();
         }
@@ -87,8 +90,13 @@ public:
     }
 
     void OnEvent(Event& e) {
-        std::cout << e << std::endl;
-        // EventDispatcher dispatcher(e);
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<WindowCloseEvent>(BIND_MEMBER_EVENT_FN(Application::OnWindowClose));
+    }
+
+    bool OnWindowClose(WindowCloseEvent& e) {
+        isRunning = false;
+        return true;
     }
 };
 
