@@ -94,7 +94,8 @@ public:
         std::cout << e << std::endl;
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_MEMBER_EVENT_FN(Application::OnWindowClose));
-        dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPressed));
+        dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
+        dispatcher.Dispatch<MouseMovedEvent>(BIND_MEMBER_EVENT_FN(Application::OnMouseMove));
     }
 
     bool OnWindowClose(WindowCloseEvent& e) {
@@ -102,7 +103,7 @@ public:
         return true;
     }
 
-    bool OnKeyPressed(KeyPressedEvent& e) {
+    bool OnKeyPress(KeyPressedEvent& e) {
         float cameraSpeed = static_cast<float>(2.5 * deltaTime);
         if (e.GetKeyCode() == GLFW_KEY_W) {
             camera.ProcessKeyboard(GoL::CameraMovement::FORWARD, deltaTime);
@@ -145,6 +146,22 @@ public:
             glfwSetCursorPosCallback(window, NULL);
             firstMouse = false;
         }
+
+        return true;
+    }
+
+    bool OnMouseMove(MouseMovedEvent& e) {
+        if (firstMouse) {
+            lastX = e.GetX();
+            lastY = e.GetY();
+            firstMouse = false;
+        }
+
+        glm::vec2 offset(e.GetX() - lastX, lastY - e.GetY());
+        lastX = e.GetX();
+        lastY = e.GetY();
+
+        camera.ProcessMouseMovement(offset.x, offset.y);
 
         return true;
     }
