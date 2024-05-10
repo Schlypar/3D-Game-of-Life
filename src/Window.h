@@ -1,26 +1,30 @@
 #pragma once
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
-#include "Camera.h"
 #include <glad/gl.h>
 
 #include <GLFW/glfw3.h>
 
+#include "Camera.h"
+#include "events/Event.h"
+
+#include <functional>
 #include <string>
 
 namespace GoL {
 
 class Window {
+protected:
+    using EventCallbackFn = std::function<void(Event&)>;
+
 public:
-    struct Settings {
+    struct Data {
         std::string Title;
         unsigned int Width;
         unsigned int Height;
 
-        Settings(
+        EventCallbackFn EventCallback;
+
+        Data(
                 std::string title = "Game of Life",
                 unsigned int width = 1920,
                 unsigned int height = 1080
@@ -33,11 +37,11 @@ public:
 
 private:
     GLFWwindow* window;
-    Settings settings;
+    Data data;
     bool isVsync;
 
 public:
-    Window(const Settings& settings) {
+    Window(const Data& settings) {
         if (!glfwInit()) {
             exit(EXIT_FAILURE);
         }
@@ -54,7 +58,7 @@ public:
         }
         glfwMakeContextCurrent(this->window);
         gladLoadGL(glfwGetProcAddress);
-        this->settings = settings;
+        this->data = settings;
     }
 
     ~Window() {
@@ -76,13 +80,8 @@ public:
         glfwSwapBuffers(this->window);
     }
 
-    void SetErrorCallback(void (*callback)(int, const char*)) {
-        glfwSetErrorCallback(callback);
-    }
-
-    void SetCursorPosCallback(void (*callback)(GLFWwindow*, double, double)) {
-        glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwSetCursorPosCallback(this->window, callback);
+    void SetEventCallback(const EventCallbackFn& callback) {
+        this->data.EventCallback = callback;
     }
 
     bool ShouldClose() const {
@@ -90,11 +89,11 @@ public:
     }
 
     float GetWidth() const {
-        return settings.Width;
+        return data.Width;
     }
 
     float GetHeight() const {
-        return settings.Height;
+        return data.Height;
     }
 
     void SetVSync(bool isVsync) {
