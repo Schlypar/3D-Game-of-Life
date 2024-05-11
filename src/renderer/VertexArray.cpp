@@ -32,17 +32,24 @@ VertexArray& VertexArray::operator=(VertexArray&& other) {
     return *this;
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout, unsigned int gloffset) {
+void VertexArray::AddBuffer(const std::vector<VertexBuffer>& vb, const VertexBufferLayout& layout) {
     this->Bind();
-    vb.Bind();
+    vb[0].Bind();
 
     const std::vector<VertexBufferLayout::Element>& elements = layout.GetLayoutElements();
 
     unsigned int offset = 0;
     for (int i = 0; i < elements.size(); i++) {
         const VertexBufferLayout::Element& element = elements[i];
-        glEnableVertexAttribArray(gloffset + i);
-        glVertexAttribPointer(gloffset + i, element.count, element.type, element.normalized, layout.GetStride(), (const void*) offset);
+        if (i <= 1) {
+            glEnableVertexAttribArray(i);
+            glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*) offset);
+        } else {
+            vb[1].Bind();
+            glEnableVertexAttribArray(i);
+            glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (const void*) ((i - 2) * sizeof(glm::vec4)));
+            glVertexAttribDivisorARB(i, 1);
+        }
         offset += element.count * VertexBufferLayout::Element::GetSizeOfType(element.type);
     }
 }

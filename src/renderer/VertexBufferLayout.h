@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glad/gl.h"
+#include "glm/ext/matrix_float4x4.hpp"
 #include <cassert>
 #include <vector>
 
@@ -43,6 +44,17 @@ public:
     template <typename T>
     void Push(unsigned int count) {
         assert(false);
+    }
+
+    template <>
+    void Push<glm::mat4>(unsigned int count) {
+        for (int i = 0; i < count; i++) {
+            elements.push_back({ GL_FLOAT, sizeof(glm::mat4), GL_FALSE });
+            elements.push_back({ GL_FLOAT, sizeof(glm::mat4), GL_FALSE });
+            elements.push_back({ GL_FLOAT, sizeof(glm::mat4), GL_FALSE });
+            elements.push_back({ GL_FLOAT, sizeof(glm::mat4), GL_FALSE });
+        }
+        stride += count * sizeof(glm::mat4);
     }
 
     template <>

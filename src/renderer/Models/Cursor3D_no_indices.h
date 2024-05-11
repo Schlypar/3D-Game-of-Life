@@ -38,14 +38,13 @@ public:
         , position_on_screen(position_on_screen)
         , scaling(scaling) {
 
-        
         vbo = VertexBuffer { vertices, sizeof(vertices) };
 
         GoL::VertexBufferLayout layout;
         layout.Push<float>(3);
         layout.Push<float>(3);
 
-        vao.AddBuffer(vbo, layout);
+        vao.AddBuffer(std::vector<VertexBuffer> { vbo }, layout);
     }
 
     void Draw() {

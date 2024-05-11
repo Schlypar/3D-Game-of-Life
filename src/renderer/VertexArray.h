@@ -2,6 +2,7 @@
 
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
+#include <vector>
 
 namespace GoL {
 
@@ -18,7 +19,7 @@ public:
     VertexArray& operator=(const VertexArray& other);
     VertexArray& operator=(VertexArray&& other);
 
-    void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout, unsigned int offset = 0);
+    void AddBuffer(const std::vector<VertexBuffer>& vb, const VertexBufferLayout& layout);
 
     void Bind() const;
     void Unbind() const;

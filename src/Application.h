@@ -4,20 +4,152 @@
 // #include <imgui/imgui_impl_glfw.h>
 // #include <imgui/imgui_impl_opengl3.h>
 
-#include "InstanceHandler.h"
-#include "Models/Vertex.h"
+// #include "InstanceHandler.h"
+// #include "Models/Vertex.h"
+// #include "VertexBuffer.h"
+// #include "VertexBufferLayout.h"
 #include "Window.h"
 
 #include "IndexBuffer.h"
 
-#include "Models/Cube.h"
-#include "Models/Cursor3D.h"
+// #include "Models/Cube.h"
+// #include "Models/Cursor3D.h"
 #include "Models/Cursor3D_no_indices.h"
-#include "Models/Prism.h"
-#include "glad/gl.h"
+// #include "Models/Prism.h"
+#include "glm/fwd.hpp"
 #include "renderer/Renderer.h"
+#include <cstring>
 
 namespace GoL {
+
+#define VERTEX_LOCATION 0
+
+// static GLuint VBO;
+// static GLuint MBO;
+#define MATRICES_LOCATION 1
+#define NUM_INSTANCES 1000
+
+// static void CreateVertexBuffer() {
+//     float vertices[9] = { -0.3f, -0.3f, 0.0f, 0.3f, -0.3f, 0.0f, 0.0f, 0.25f, 0.0f };
+//     glGenBuffers(1, &VBO);
+//     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//     glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), vertices, GL_STATIC_DRAW);
+//     glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, GL_FALSE, (GLsizei) 3 * sizeof(float), NULL);
+//     glEnableVertexAttribArray(VERTEX_LOCATION);
+
+//     float mat[NUM_INSTANCES * 16];
+//     for (int matrix_id = 0; matrix_id < NUM_INSTANCES; matrix_id++) {
+//         float pos_x = 0.002f * matrix_id * cos(40 * M_PI * matrix_id / NUM_INSTANCES);
+//         float pos_y = 0.002f * matrix_id * sin(40 * M_PI * matrix_id / NUM_INSTANCES);
+//         float scale = 0.0004f * matrix_id;
+//         int i = 16 * matrix_id;
+//         mat[i + 0] = scale;
+//         mat[i + 4] = 0.0f;
+//         mat[i + 8] = 0.0f;
+//         mat[i + 12] = pos_x;
+//         mat[i + 1] = 0.0f;
+//         mat[i + 5] = scale;
+//         mat[i + 9] = 0.0f;
+//         mat[i + 13] = pos_y;
+//         mat[i + 2] = 0.0f;
+//         mat[i + 6] = 0.0f;
+//         mat[i + 10] = scale;
+//         mat[i + 14] = 0.0f;
+//         mat[i + 3] = 0.0f;
+//         mat[i + 7] = 0.0f;
+//         mat[i + 11] = 0.0f;
+//         mat[i + 15] = 1.0f;
+//     }
+//     glGenBuffers(1, &(MBO));
+//     glBindBuffer(GL_ARRAY_BUFFER, MBO);
+//     glBufferData(GL_ARRAY_BUFFER, NUM_INSTANCES * 16 * sizeof(float), mat, GL_DYNAMIC_DRAW);
+//     for (unsigned int i = 0; i < 4; i++) {
+//         glEnableVertexAttribArray(MATRICES_LOCATION + i);
+//         glVertexAttribPointer(MATRICES_LOCATION + i, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (const GLvoid*) (sizeof(GLfloat) * i * 4));
+//         glVertexAttribDivisor(MATRICES_LOCATION + i, 1);
+//     }
+// }
+
+static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType) {
+    GLuint ShaderObj = glCreateShader(ShaderType);
+
+    if (ShaderObj == 0) {
+        fprintf(stderr, "Error creating shader type %d\n", ShaderType);
+        exit(0);
+    }
+
+    const GLchar* p[1];
+    p[0] = pShaderText;
+
+    GLint Lengths[1];
+    Lengths[0] = (GLint) strlen(pShaderText);
+
+    glShaderSource(ShaderObj, 1, p, Lengths);
+
+    glCompileShader(ShaderObj);
+
+    GLint success;
+    glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
+
+    if (!success) {
+        GLchar InfoLog[1024];
+        glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
+        fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
+        exit(1);
+    }
+
+    glAttachShader(ShaderProgram, ShaderObj);
+}
+
+static void CompileShaders() {
+    GLuint ShaderProgram = glCreateProgram();
+
+    if (ShaderProgram == 0) {
+        fprintf(stderr, "Error creating shader program\n");
+        exit(1);
+    }
+
+    std::string vs, fs;
+
+    vs = "#version 330 core\n"
+         "layout (location = 0) in vec3 Vertex;\n"
+         "layout (location = 1) in mat4 Matrix;\n"
+         "void main()\n"
+         "{\n"
+         "  gl_Position = Matrix*vec4(Vertex.x, Vertex.y, Vertex.z, 1.0);\n"
+         "}\n";
+    AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
+
+    fs = "#version 330 core\n"
+         "out vec4 FragColor;\n"
+         "void main()\n"
+         "{\n"
+         "  FragColor = vec4(1.0, 1.0, 1.0, 0.0);\n"
+         "}\n";
+    AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
+
+    GLint Success = 0;
+    GLchar ErrorLog[1024] = { 0 };
+
+    glLinkProgram(ShaderProgram);
+
+    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
+    if (Success == 0) {
+        glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
+        fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
+        exit(1);
+    }
+
+    glValidateProgram(ShaderProgram);
+    glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
+    if (!Success) {
+        glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
+        fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
+        exit(1);
+    }
+
+    glUseProgram(ShaderProgram);
+}
 
 class Application {
 public:
@@ -50,7 +182,7 @@ public:
     ) {
         // window settings
         window.SetVSync(true);
-        window.Configure();
+        // window.Configure();
         window.SetErrorCallback(error_callback);
         window.SetCursorPosCallback(mouse_callback);
 
@@ -58,87 +190,62 @@ public:
     }
 
     void Run() {
+        GLclampf Red = 0.2f, Green = 0.2f, Blue = 0.2f, Alpha = 0.0f;
+        glClearColor(Red, Green, Blue, Alpha);
 
-        Shader shader = { "../resources/shaders/test.shader" };
-        Shader instanceShader = { "../resources/shaders/instance.shader" };
-        shader.Bind();
+        // CreateVertexBuffer();
 
-        auto cube = Cube(glm::vec3 { 0.0f }, glm::vec3 { 0.0f }, 0.5f);
-        int cube_ibo = cube.BindIndices();
-
-        auto cursor = Cursor3D();
-        cursor.BindIndices();
-        auto cur = Cursor3D_no_i();
-        auto cursors = InstanceHandler<Cursor3D_no_i>(cur);
-
-        // InstanceHandler<Cube> cubes;
-        std::vector<glm::mat4> instances;
-        for (float i = -3; i < 3; i += 0.5) {
-            for (float j = -3; j < 3; j += 0.5) {    
-                glm::mat4 instanceMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(i, j, 0));
-                instances.push_back(instanceMatrix);
-            }
-        }
-
-        // auto prism = Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
-        // prism.BindIndices();
-
-        GLuint VBO, vao, modelVBO;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
-        auto v = cube.GetVerticies();
-        glGenBuffers(1, &modelVBO);
-        glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
-        glBufferData(modelVBO, v.second * sizeof(Vertex), v.first, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)sizeof(glm::vec3));
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-
+        GLuint VBO;
+        GLuint MBO;
+        float vertices[9] = { -0.3f, -0.3f, 0.0f, 0.3f, -0.3f, 0.0f, 0.0f, 0.25f, 0.0f };
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_DYNAMIC_DRAW);
-        int matrix_layout_loc = 2;
-        for (int i = 0; i < 4; i++) {
-            glEnableVertexAttribArray(i + matrix_layout_loc);
-            glVertexAttribPointer(i + matrix_layout_loc, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * sizeof(glm::vec4)));
-            glVertexAttribDivisorARB(i + matrix_layout_loc, 1);
+        glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), vertices, GL_STATIC_DRAW);
+        glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, GL_FALSE, (GLsizei) 3 * sizeof(float), NULL);
+        glEnableVertexAttribArray(VERTEX_LOCATION);
+
+        float mat[NUM_INSTANCES * 16];
+        for (int matrix_id = 0; matrix_id < NUM_INSTANCES; matrix_id++) {
+            float pos_x = 0.002f * matrix_id * cos(40 * M_PI * matrix_id / NUM_INSTANCES);
+            float pos_y = 0.002f * matrix_id * sin(40 * M_PI * matrix_id / NUM_INSTANCES);
+            float scale = 0.0004f * matrix_id;
+            int i = 16 * matrix_id;
+            mat[i + 0] = scale;
+            mat[i + 4] = 0.0f;
+            mat[i + 8] = 0.0f;
+            mat[i + 12] = pos_x;
+            mat[i + 1] = 0.0f;
+            mat[i + 5] = scale;
+            mat[i + 9] = 0.0f;
+            mat[i + 13] = pos_y;
+            mat[i + 2] = 0.0f;
+            mat[i + 6] = 0.0f;
+            mat[i + 10] = scale;
+            mat[i + 14] = 0.0f;
+            mat[i + 3] = 0.0f;
+            mat[i + 7] = 0.0f;
+            mat[i + 11] = 0.0f;
+            mat[i + 15] = 1.0f;
+        }
+        glGenBuffers(1, &(MBO));
+        glBindBuffer(GL_ARRAY_BUFFER, MBO);
+        glBufferData(GL_ARRAY_BUFFER, NUM_INSTANCES * 16 * sizeof(float), mat, GL_DYNAMIC_DRAW);
+        for (unsigned int i = 0; i < 4; i++) {
+            glEnableVertexAttribArray(MATRICES_LOCATION + i);
+            glVertexAttribPointer(MATRICES_LOCATION + i, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (const GLvoid*) (sizeof(GLfloat) * i * 4));
+            glVertexAttribDivisor(MATRICES_LOCATION + i, 1);
         }
 
-        glBindVertexArray(0);
+        CompileShaders();
 
+        while (!glfwWindowShouldClose(window)) {
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        IndexBuffer::Init();
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 3, (GLsizei) NUM_INSTANCES);
 
-        while (!window.ShouldClose()) {
-            Parameters::currentFrameTime = static_cast<float>(glfwGetTime());
-            Parameters::deltaTime = Parameters::currentFrameTime - Parameters::lastFrameTime;
-            Parameters::lastFrameTime = Parameters::currentFrameTime;
-
-            Renderer::Clear();
-
-            // Renderer::DrawBasic<Cube>(cube, Parameters::camera, shader);
-            // Renderer::DrawBasic<Cursor3D_no_i>(cursos, Parameters::camera, shader);
-            // // Renderer.Draw<Prism>(prism, Parameters::camera, shader);
-            // cursor.SetScaleFactor(100);
-            // Renderer::DrawBasic<Cursor3D>(cursor, Parameters::camera, shader);
-            cursor.SetScaleFactor(0.1);
-            Renderer::DrawCustom<Cursor3D, Cursor3D::CustomDraw>(cursor, Parameters::camera, shader);
-
-            // Renderer::DrawInstanced(cursors, 0,  Parameters::camera, instanceShader);
-            instanceShader.Bind();
-            instanceShader.SetUniformMat4f("ProjectionView", Parameters::camera.GetProjectionMatrix() * Parameters::camera.GetViewMatrix());
-            glBindVertexArray(vao);
-            // glDrawArraysInstanced(GL_LINE, 0, 6, instances.size());
-            glDrawElementsInstanced(GL_TRIANGLES, IndexBuffer::GetCount(cube_ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(cube_ibo), instances.size());
-            glBindVertexArray(0);
-
-            window.OnUpdate(Parameters::camera);
-            ProcessInput();
+            glfwSwapBuffers(window);
+            glfwPollEvents();
         }
-        glfwTerminate();
-        exit(EXIT_SUCCESS);
     }
 
 private:
@@ -191,5 +298,4 @@ private:
         // }
     }
 };
-
 }
