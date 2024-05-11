@@ -5,13 +5,16 @@
 // #include <imgui/imgui_impl_opengl3.h>
 
 #include "InstanceHandler.h"
+#include "Models/Vertex.h"
 #include "Window.h"
 
 #include "IndexBuffer.h"
 
 #include "Models/Cube.h"
 #include "Models/Cursor3D.h"
+#include "Models/Cursor3D_no_indices.h"
 #include "Models/Prism.h"
+#include "glad/gl.h"
 #include "renderer/Renderer.h"
 
 namespace GoL {
@@ -65,18 +68,46 @@ public:
 
         auto cursor = Cursor3D();
         cursor.BindIndices();
+        auto cur = Cursor3D_no_i();
+        auto cursors = InstanceHandler<Cursor3D_no_i>(cur);
 
-        InstanceHandler<Cube> cubes;
-        for (float i = 5; i < 8; i += 0.5) {
-            for (float j = 5; j < 8; j += 0.5) {    
-                for (float k = 5; k < 8; k += 0.5) {
-                    cubes.AddInstance(glm::vec3(i, j, k), glm::vec3(0.0f), 0.2);
-                }
+        // InstanceHandler<Cube> cubes;
+        std::vector<glm::mat4> instances;
+        for (float i = -3; i < 3; i += 0.5) {
+            for (float j = -3; j < 3; j += 0.5) {    
+                glm::mat4 instanceMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(i, j, 0));
+                instances.push_back(instanceMatrix);
             }
         }
 
         // auto prism = Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
         // prism.BindIndices();
+
+        GLuint VBO, vao, modelVBO;
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        auto v = cube.GetVerticies();
+        glGenBuffers(1, &modelVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
+        glBufferData(modelVBO, v.second * sizeof(Vertex), v.first, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)sizeof(glm::vec3));
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_DYNAMIC_DRAW);
+        int matrix_layout_loc = 2;
+        for (int i = 0; i < 4; i++) {
+            glEnableVertexAttribArray(i + matrix_layout_loc);
+            glVertexAttribPointer(i + matrix_layout_loc, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * sizeof(glm::vec4)));
+            glVertexAttribDivisorARB(i + matrix_layout_loc, 1);
+        }
+
+        glBindVertexArray(0);
+
 
         IndexBuffer::Init();
 
@@ -87,14 +118,21 @@ public:
 
             Renderer::Clear();
 
-            Renderer::DrawBasic<Cube>(cube, Parameters::camera, shader);
-            // Renderer.Draw<Prism>(prism, Parameters::camera, shader);
-            cursor.SetScaleFactor(100);
-            Renderer::DrawBasic<Cursor3D>(cursor, Parameters::camera, shader);
+            // Renderer::DrawBasic<Cube>(cube, Parameters::camera, shader);
+            // Renderer::DrawBasic<Cursor3D_no_i>(cursos, Parameters::camera, shader);
+            // // Renderer.Draw<Prism>(prism, Parameters::camera, shader);
+            // cursor.SetScaleFactor(100);
+            // Renderer::DrawBasic<Cursor3D>(cursor, Parameters::camera, shader);
             cursor.SetScaleFactor(0.1);
             Renderer::DrawCustom<Cursor3D, Cursor3D::CustomDraw>(cursor, Parameters::camera, shader);
 
-            Renderer::DrawInstanced(cubes, cube_ibo,  Parameters::camera, instanceShader);
+            // Renderer::DrawInstanced(cursors, 0,  Parameters::camera, instanceShader);
+            instanceShader.Bind();
+            instanceShader.SetUniformMat4f("ProjectionView", Parameters::camera.GetProjectionMatrix() * Parameters::camera.GetViewMatrix());
+            glBindVertexArray(vao);
+            // glDrawArraysInstanced(GL_LINE, 0, 6, instances.size());
+            glDrawElementsInstanced(GL_TRIANGLES, IndexBuffer::GetCount(cube_ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(cube_ibo), instances.size());
+            glBindVertexArray(0);
 
             window.OnUpdate(Parameters::camera);
             ProcessInput();

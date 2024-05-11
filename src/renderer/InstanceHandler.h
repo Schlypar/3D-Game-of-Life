@@ -18,22 +18,31 @@ namespace GoL {
 template <Model M>
 class InstanceHandler {
 private:
-private:
     VertexBuffer vbo;
     // VertexBufferLayout layout;
+    M model;
     std::vector<glm::mat4> instances;
     GLuint vao;
     bool is_set_up;
 
     void setup() {
-        glGenBuffers(1, &vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vao);
+        GLuint VBO;
+        glBindVertexArray(vao);
+
+        model.GetVBO().Bind();
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)sizeof(glm::vec3));
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
 
         int matrix_layout_loc = 2;
         for (int i = 0; i < 4; i++) {
             glEnableVertexAttribArray(i + matrix_layout_loc);
-            glVertexAttribPointer(i + matrix_layout_loc, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * sizeof(glm::vec4)));
+            glVertexAttribPointer(i + matrix_layout_loc, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * sizeof(glm::vec4) + 2 * sizeof(glm::vec3)));
             glVertexAttribDivisorARB(i, 1);
         }
 
@@ -42,7 +51,7 @@ private:
     }
 
 public:
-    InstanceHandler();
+    InstanceHandler(M model);
     ~InstanceHandler();
 
     void AddInstance(glm::vec3 position, glm::vec3 rotation, float scale);
@@ -50,9 +59,10 @@ public:
 };
 
 template <Model M>
-InstanceHandler<M>::InstanceHandler() {
+InstanceHandler<M>::InstanceHandler(M model) {
     is_set_up = false;
-
+    this->model = model;
+    glGenVertexArrays(1, &vao);
     // for (int i = 0; i < 4; i++) {
     //     layout.Push<float>(4);
     // }
@@ -82,7 +92,8 @@ void InstanceHandler<M>::Draw(int ibo, GLenum drawMode) {
     }
 
     glBindVertexArray(vao);
-    glDrawElementsInstanced(GL_TRIANGLES, IndexBuffer::GetCount(ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(ibo), instances.size());
+    // glDrawElementsInstanced(GL_TRIANGLES, IndexBuffer::GetCount(ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(ibo), instances.size());
+    glDrawArraysInstanced(drawMode, 0, 6, instances.size());
     glBindVertexArray(0);
 
 }

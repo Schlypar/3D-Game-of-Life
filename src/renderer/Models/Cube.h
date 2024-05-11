@@ -79,6 +79,7 @@ public:
         layout.Push<float>(3);
 
         vao.AddBuffer(vbo, layout);
+        vao.Unbind();
     }
 
     int BindIndices() {
@@ -130,6 +131,7 @@ public:
         vao.Bind();
 
         glDrawElements(GL_TRIANGLES, IndexBuffer::GetCount(*ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*ibo));
+        vao.Unbind();
     }
 
     VertexArray& GetVAO() {

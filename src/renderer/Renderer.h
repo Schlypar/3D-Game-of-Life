@@ -36,7 +36,7 @@ public:
     static void DrawInstanced(InstanceHandler<M>& instancies, int ibo, const Camera& camera, Shader& shader) {
         shader.Bind();
         shader.SetUniformMat4f("ProjectionView", camera.GetProjectionMatrix() * camera.GetViewMatrix());
-        instancies.Draw(ibo);
+        instancies.Draw(ibo, GL_LINE_STRIP);
     }
 };
 

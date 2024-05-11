@@ -6,16 +6,16 @@
 #include "Vertex.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
+#include "glad/gl.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
 
 namespace GoL {
 
-class Cursor3D {
+class Cursor3D_no_i {
 private:
     VertexArray vao;
     VertexBuffer vbo;
-    IndexBuffer::Id* ibo;
 
     glm::vec3 position_on_screen;
     float scaling;
@@ -30,12 +30,11 @@ private:
     };
 
 public:
-    Cursor3D(
+    Cursor3D_no_i(
             glm::vec3 position_on_screen = glm::vec3 { 0.0f },
             float scaling = 0.1f
     )
         : vbo(nullptr, 0)
-        , ibo(nullptr)
         , position_on_screen(position_on_screen)
         , scaling(scaling) {
 
@@ -47,28 +46,14 @@ public:
         layout.Push<float>(3);
 
         vao.AddBuffer(vbo, layout);
-        vao.Unbind();
-    }
-
-    void BindIndices() {
-        unsigned int indices[] = {
-            0, 1, // abscissa
-            2,
-            3, // ordinate
-            4,
-            5 // applicata
-        };
-
-        ibo = new IndexBuffer::Id;
-        *ibo = IndexBuffer::Register(indices, sizeof(indices) / sizeof(unsigned int));
     }
 
     void Draw() {
         vbo.Bind();
         vao.Bind();
 
-        glDrawElements(GL_LINE_STRIP, IndexBuffer::GetCount(*ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*ibo));
-        vao.Unbind();
+        // glDrawElements(GL_LINE_STRIP, IndexBuffer::GetCount(*ibo), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*ibo));
+        glDrawArrays(GL_LINE_STRIP, 0, 6);
     }
 
     glm::mat4 GetModelMatrix() {
@@ -93,12 +78,6 @@ public:
 
     VertexBuffer& GetVBO() {
         return vbo;
-    }
-
-    ~Cursor3D() {
-        if (ibo != nullptr) {
-            delete ibo;
-        }
     }
 
 public:
