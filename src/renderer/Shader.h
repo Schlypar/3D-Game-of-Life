@@ -34,6 +34,7 @@ private:
     std::string ParseFile(const std::string& filePath);
     unsigned int CompileShader(unsigned int type, const std::string& name);
     unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
+public:
     unsigned int GetUniformLocation(const std::string& name);
 };
 
