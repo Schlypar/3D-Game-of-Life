@@ -160,20 +160,82 @@ public:
         //     3, 0, 2
         // };
         // int vert_size = 24 * sizeof(float);
+        // unsigned int indices[] = {
+        //     0, 1,  // abscissa
+        //     2, 3,  // ordinate
+        //     4, 5   // applicata
+        // };
+        // float vertices[36] = {
+        //     0.0f, 0.0f, 0.0f, 1, 0, 0, // center
+        //     1.0f, 0.0f, 0.0f, 1, 0, 0, // abscissa
+        //     0.0f, 0.0f, 0.0f, 0, 1, 0, // center
+        //     0.0f, 1.0f, 0.0f, 0, 1, 0, // ordinate
+        //     0.0f, 0.0f, 0.0f, 0, 0, 1, // center
+        //     0.0f, 0.0f, 1.0f, 0, 0, 1  // applicata
+        // };
+        Vertex vertices[] = {
+            // front
+            { { -0.5f, -0.5, -0.5f }, { 1, 0, 0 } },
+            { { 0.5f, -0.5f, -0.5f }, { 1, 0, 0 } },
+            { { 0.5f, 0.5f, -0.5f }, { 1, 0, 0 } },
+            { { -0.5f, 0.5f, -0.5f }, { 1, 0, 0 } },
+
+            // back
+            { { -0.5f, -0.5, 0.5f }, { 0, 1, 0 } },
+            { { 0.5f, -0.5f, 0.5f }, { 0, 1, 0 } },
+            { { 0.5f, 0.5f, 0.5f }, { 0, 1, 0 } },
+            { { -0.5f, 0.5f, 0.5f }, { 0, 1, 0 } },
+
+            // up
+            { { -0.5f, 0.5f, -0.5f }, { 0, 0, 1 } },
+            { { 0.5f, 0.5f, -0.5f }, { 0, 0, 1 } },
+            { { 0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
+            { { -0.5f, 0.5f, 0.5f }, { 0, 0, 1 } },
+
+            // bottom
+            { { -0.5f, -0.5f, -0.5f }, { 0.0f, 0.7f, 0.7f } },
+            { { 0.5f, -0.5f, -0.5f }, { 0.0f, 0.7f, 0.7f } },
+            { { 0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
+            { { -0.5f, -0.5f, 0.5f }, { 0.0f, 0.7f, 0.7f } },
+
+            // right
+            { { 0.5f, -0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f  } },
+            { { 0.5f, 0.5f, -0.5f }, { 0.5f, 0.5f, 0.5f  } },
+            { { 0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, 0.5f  } },
+            { { 0.5f, -0.5f, 0.5f }, { 0.5f, 0.5f, 0.5f  } },
+
+            // left
+            { { -0.5f, -0.5f, -0.5f }, { 0.9f, 0.0f, 0.3f } },
+            { { -0.5f, 0.5f, -0.5f }, { 0.9f, 0.0f, 0.3f } },
+            { { -0.5f, 0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
+            { { -0.5f, -0.5f, 0.5f }, { 0.9f, 0.0f, 0.3f } },
+        };
         unsigned int indices[] = {
-            0, 1,  // abscissa
-            2, 3,  // ordinate
-            4, 5   // applicata
+            //front
+            0, 2, 1,
+            2, 0, 3,
+
+            // back
+            4, 5, 6,
+            6, 7, 4,
+
+            // up
+            8, 10, 9,
+            10, 8, 11,
+
+            // bottom
+            12, 13, 14,
+            14, 15, 12,
+
+            // right
+            16, 17, 18,
+            18, 19, 16,
+
+            // left
+            20, 22, 21,
+            22, 20, 23
         };
-        float vertices[36] = {
-            0.0f, 0.0f, 0.0f, 1, 0, 0, // center
-            1.0f, 0.0f, 0.0f, 1, 0, 0, // abscissa
-            0.0f, 0.0f, 0.0f, 0, 1, 0, // center
-            0.0f, 1.0f, 0.0f, 0, 1, 0, // ordinate
-            0.0f, 0.0f, 0.0f, 0, 0, 1, // center
-            0.0f, 0.0f, 1.0f, 0, 0, 1  // applicata
-        };
-        int vert_size = 36 * sizeof(float);
+        int vert_size = 24 * 6 * sizeof(float);
 
         glGenVertexArrays(1, &VAO);
         glBindVertexArray(VAO);
@@ -188,10 +250,10 @@ public:
 
         int NUM_INSTANCES = 0;
 
-        glm::mat4* mat = new glm::mat4[15000];
-        for (float x = -20; x < 20; x += 1.5) {
-            for (float y = -20; y < 20; y += 1.5) {
-                for (float z = -20; z < 20; z += 1.5) {
+        glm::mat4* mat = new glm::mat4[5000];
+        for (float x = -15; x < 15; x += 3) {
+            for (float y = -15; y < 15; y += 3) {
+                for (float z = -15; z < 15; z += 3) {
                     mat[NUM_INSTANCES] = glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(0.3)), glm::vec3(x, y, z));
                     NUM_INSTANCES++;
                 }
@@ -209,7 +271,7 @@ public:
             glVertexAttribDivisorARB(MATRICES_LOCATION + i, 1);
         }
 
-        retval[2] = IndexBuffer::Register(indices, 6);
+        retval[2] = IndexBuffer::Register(indices, 36);
 
         glBindVertexArray(0);
 
@@ -256,8 +318,8 @@ public:
             // // renderer.Draw<Prism>(prism, Parameters::camera, shader);
             // cursor.SetScaleFactor(100);
             // renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
-            // cursor.SetScaleFactor(0.1);
-            // cursor_renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
+            cursor.SetScaleFactor(0.06);
+            cursor_renderer.Draw<Cursor3D>(cursor, Parameters::camera, shader);
 
             // glUseProgram(example_data[1]);
             instanceShader.Bind();
@@ -267,8 +329,8 @@ public:
             glBindVertexArray(example_data[0]);
             // glDrawArraysInstanced(GL_TRIANGLES, 0, 3, (GLsizei) 2);
             glDrawElementsInstanced(
-                // GL_TRIANGLES,
-                GL_LINE_STRIP,
+                GL_TRIANGLES,
+                // GL_LINE_STRIP,
                 IndexBuffer::GetCount(example_data[2]),
                 GL_UNSIGNED_INT,
                 IndexBuffer::GetOffset((example_data[2])),

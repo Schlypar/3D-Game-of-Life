@@ -60,9 +60,11 @@ public:
     void Configure() {
         glEnable(GL_DEPTH_TEST);
 
-        // glEnable(GL_CULL_FACE);
-        // glFrontFace(GL_CCW);
-        // glCullFace(GL_BACK);
+        glClearColor(0.2, 0.2, 0.2, 1.0);
+
+        glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CCW);
+        glCullFace(GL_BACK);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
