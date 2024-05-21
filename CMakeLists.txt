@@ -10,7 +10,7 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 # --- START PROJECT ---
 
 file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*.cpp")
-file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*" "${SRC_DIR}/renderer/*.cpp")
+file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*" "${SRC_DIR}/renderer/*.cpp" "${SRC_DIR}/core/*.cpp")
 
 add_executable(${PROJECT_NAME} ${source})
 target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/renderer")
