@@ -66,7 +66,6 @@ public:
     }
 
     void OnEvent(Event& e) override {
-        std::cout << "From mainLayer!!!!\n";
         EventDispatcher dispatcher(e);
 
         // probably make it async in the future ?

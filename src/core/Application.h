@@ -1,10 +1,6 @@
 #pragma once
 
 #include "LayerStack.h"
-#include "Models/Cube.h"
-#include "Models/Cursor3D.h"
-#include "Models/Prism.h"
-#include "Renderer.h"
 
 #include "Window.h"
 
@@ -12,12 +8,6 @@
 #include "events/Event.h"
 #include "events/KeyEvent.h"
 #include "events/MouseEvent.h"
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
-#include <iostream>
 
 namespace GoL {
 
@@ -28,24 +18,13 @@ private:
     Window window;
     LayerStack layerStack;
 
-    // Camera camera;
-
-    // bool firstMouse = true;
-    // float lastX = 0, lastY = 0;
-
-    // float currentFrameTime = 0;
-    // float lastFrameTime = 0;
-    // float deltaTime = 0;
-
 public:
     Application(
             std::string title = "Game of Life",
             unsigned int width = 1920,
             unsigned int height = 1080
     )
-        : window(Window::Data(title, width, height))
-    // , camera({ 0.0f, 0.0f, -3.0f }, { 0.0f, 1.0f, 0.0f }, 1920.0f, 1080.0f) {
-    {
+        : window(Window::Data(title, width, height)) {
         this->window.SetEventCallback(
                 [this](Event& e) {
                     this->OnEvent(e);
@@ -57,6 +36,11 @@ public:
     void PushLayer(Layer* layer) {
         this->layerStack.PushLayer(layer);
         layer->OnAttach();
+    }
+
+    void PushOverlay(Layer* overlay) {
+        this->layerStack.PushOverlay(overlay);
+        overlay->OnAttach();
     }
 
     void Run() {
@@ -74,7 +58,6 @@ public:
     }
 
     void OnEvent(Event& e) {
-        std::cout << e << std::endl;
         EventDispatcher dispatcher(e);
 
         // probably make it async in the future ?
@@ -88,8 +71,9 @@ public:
             (*it)->OnEvent(e);
         }
 
+        dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
+
         // TODO
-        // dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
         // dispatcher.Dispatch<MouseMovedEvent>(BIND_MEMBER_EVENT_FN(Application::OnMouseMove));
     }
 
@@ -97,6 +81,16 @@ private:
     bool OnWindowClose(WindowCloseEvent& e) {
         isRunning = false;
         return true;
+    }
+
+    bool OnKeyPress(KeyPressedEvent& e) {
+        if (e.GetKeyCode() == GLFW_KEY_ESCAPE) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPosCallback(window, NULL);
+            return true;
+        }
+
+        return false;
     }
 };
 
