@@ -1,4 +1,5 @@
 #include "Application.h"
+#include <cassert>
 
 namespace GoL {
 
@@ -12,6 +13,9 @@ Application::Application(
     : window(Window::Data(title, width, height))
     , layerStack()
     , imGuiLayer() {
+    // only 1 appplication instance may be
+    assert(!Application::instance);
+
     this->window.SetEventCallback(
             [this](Event& e) {
                 this->OnEvent(e);
