@@ -9,7 +9,13 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
 # --- START PROJECT ---
 
-file(GLOB source CONFIGURE_DEPENDS "${SRC_DIR}/*.cpp" "${SRC_DIR}/renderer/*.cpp" "${SRC_DIR}/core/*.cpp")
+file(GLOB source CONFIGURE_DEPENDS 
+                "${SRC_DIR}/*.cpp" 
+                "${SRC_DIR}/renderer/*.cpp" 
+                "${SRC_DIR}/core/*.cpp"
+                "${SRC_DIR}/core/events/*.cpp"
+                "${SRC_DIR}/core/layers/*.cpp"
+    )
 
 add_executable(${PROJECT_NAME} ${source})
 target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/renderer")

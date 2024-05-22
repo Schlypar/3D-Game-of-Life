@@ -7,10 +7,8 @@ int main() {
     GoL::Application application;
     application.PushLayer(new GoL::MainLayer());
 
-    GoL::ImGuiLayer* imGuiLayer = new GoL::ImGuiLayer();
     bool showDemoWindow = true;
-    imGuiLayer->SubmitDisplay([&showDemoWindow]() { if (showDemoWindow) { ImGui::ShowDemoWindow(&showDemoWindow); } });
-    application.PushOverlay(imGuiLayer);
+    application.SubmitToImgui([&showDemoWindow]() { if (showDemoWindow) { ImGui::ShowDemoWindow(&showDemoWindow); } });
 
     application.Run();
 
