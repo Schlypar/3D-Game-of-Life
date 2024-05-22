@@ -1,4 +1,3 @@
-#include <stdio.h>
 
 #include "Application.h"
 #include "layers/ImGuiLayer.h"
@@ -7,7 +6,12 @@
 int main() {
     GoL::Application application;
     application.PushLayer(new GoL::MainLayer());
-    application.PushOverlay(new GoL::ImGuiLayer());
+
+    GoL::ImGuiLayer* imGuiLayer = new GoL::ImGuiLayer();
+    bool showDemoWindow = true;
+    imGuiLayer->SubmitDisplay([&showDemoWindow]() { if (showDemoWindow) { ImGui::ShowDemoWindow(&showDemoWindow); } });
+    application.PushOverlay(imGuiLayer);
+
     application.Run();
 
     return 0;

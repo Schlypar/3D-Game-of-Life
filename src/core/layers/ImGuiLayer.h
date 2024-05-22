@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
@@ -10,7 +12,11 @@
 namespace GoL {
 
 class ImGuiLayer : public Layer {
+public:
+    using DisplayFn = std::function<void()>;
+
 private:
+    std::vector<DisplayFn> displayFunctions;
     float time = 0.0f;
 
 public:
@@ -40,12 +46,9 @@ public:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // code goes here
-        static bool show_demo = true;
-
-        ImGui::ShowDemoWindow(&show_demo);
-
-        // code end here
+        for (DisplayFn& display : displayFunctions) {
+            display();
+        }
 
         ImGuiIO& io = ImGui::GetIO();
         Application& app = Application::Get();
@@ -54,6 +57,10 @@ public:
         // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+    void SubmitDisplay(DisplayFn display) {
+        displayFunctions.push_back(display);
     }
 };
 
