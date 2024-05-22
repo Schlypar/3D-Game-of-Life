@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "layers/ImGuiLayer.h"
 #include <cassert>
 
 namespace GoL {
@@ -12,9 +13,10 @@ Application::Application(
 )
     : window(Window::Data(title, width, height))
     , layerStack()
-    , imGuiLayer() {
+    , imGuiLayer(new ImGuiLayer()) {
     // only 1 appplication instance may be
     assert(!Application::instance);
+    Application::instance = this;
 
     this->window.SetEventCallback(
             [this](Event& e) {
@@ -23,8 +25,7 @@ Application::Application(
     );
     this->window.Configure();
     this->layerStack.PushOverlay(this->imGuiLayer);
-
-    Application::instance = this;
+    this->imGuiLayer->OnAttach();
 }
 
 Application::~Application() {
