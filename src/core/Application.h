@@ -11,6 +11,10 @@
 
 namespace GoL {
 
+class Application;
+
+static Application* ApplicationInstance = nullptr;
+
 class Application {
 public:
 private:
@@ -31,6 +35,20 @@ public:
                 }
         );
         this->window.Configure();
+
+        ApplicationInstance = this;
+    }
+
+    ~Application() {
+        ApplicationInstance = nullptr;
+    }
+
+    static Application& Get() {
+        return *ApplicationInstance;
+    }
+
+    Window& GetWindow() {
+        return this->window;
     }
 
     void PushLayer(Layer* layer) {
@@ -63,6 +81,10 @@ public:
         // probably make it async in the future ?
         dispatcher.Dispatch<WindowCloseEvent>(BIND_MEMBER_EVENT_FN(Application::OnWindowClose));
 
+        dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
+        // TODO
+        // dispatcher.Dispatch<MouseMovedEvent>(BIND_MEMBER_EVENT_FN(Application::OnMouseMove));
+
         for (auto it = layerStack.rbegin(); it != layerStack.rend(); it++) {
             if (e.Handled) {
                 break;
@@ -70,11 +92,6 @@ public:
 
             (*it)->OnEvent(e);
         }
-
-        dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
-
-        // TODO
-        // dispatcher.Dispatch<MouseMovedEvent>(BIND_MEMBER_EVENT_FN(Application::OnMouseMove));
     }
 
 private:

@@ -1,12 +1,13 @@
 #include <stdio.h>
 
 #include "Application.h"
+#include "layers/ImGuiLayer.h"
 #include "layers/MainLayer.h"
 
 int main() {
     GoL::Application application;
-    GoL::Layer* mainLayer = new GoL::MainLayer();
-    application.PushLayer(mainLayer);
+    application.PushLayer(new GoL::MainLayer());
+    application.PushOverlay(new GoL::ImGuiLayer());
     application.Run();
 
     return 0;
