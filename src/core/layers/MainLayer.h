@@ -1,11 +1,14 @@
 #pragma once
 
-#include "../Layer.h"
+#include "Renderer.h"
+
 #include "Models/Cube.h"
 #include "Models/Prism.h"
-#include "Renderer.h"
-#include "Window.h"
-#include <iostream>
+
+#include "../Layer.h"
+
+#include "events/KeyEvent.h"
+#include "events/MouseEvent.h"
 
 namespace GoL {
 

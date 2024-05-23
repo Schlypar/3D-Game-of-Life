@@ -4,12 +4,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Camera.h"
-
-#include "events/ApplicationEvent.h"
 #include "events/Event.h"
-#include "events/KeyEvent.h"
-#include "events/MouseEvent.h"
 
 #include <functional>
 #include <string>
@@ -49,160 +44,41 @@ private:
     bool isVsync;
 
 public:
-    Window(const Data& settings) {
-        if (!glfwInit()) {
-            exit(EXIT_FAILURE);
-        }
-        data.Title = settings.Title;
-        data.Width = settings.Width;
-        data.Height = settings.Height;
+    Window(const Data& settings);
+    ~Window();
 
-        glfwSetErrorCallback(error_callback);
-        this->window = glfwCreateWindow(
-                settings.Width,
-                settings.Height,
-                settings.Title.c_str(),
-                NULL,
-                NULL
-        );
-        if (!this->window) {
-            glfwTerminate();
-            exit(EXIT_FAILURE);
-        }
-        glfwMakeContextCurrent(this->window);
-        gladLoadGL(glfwGetProcAddress);
-        glfwSetWindowUserPointer(this->window, &this->data);
+    void Configure();
 
-        glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-            Data& data = *(Data*) glfwGetWindowUserPointer(window);
-            data.Width = width;
-            data.Height = height;
+    void OnUpdate();
 
-            WindowResizeEvent event(width, height);
-            data.EventCallback(event);
-        });
+    void SetEventCallback(const EventCallbackFn& callback);
 
-        glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
-            Data& data = *(Data*) glfwGetWindowUserPointer(window);
-            WindowCloseEvent event;
-            data.EventCallback(event);
-        });
-
-        glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-            Data& data = *(Data*) glfwGetWindowUserPointer(window);
-
-            switch (action) {
-                case GLFW_PRESS:
-                    {
-                        KeyPressedEvent event(key, 0);
-                        data.EventCallback(event);
-                        break;
-                    }
-                case GLFW_RELEASE:
-                    {
-                        KeyReleasedEvent event(key);
-                        data.EventCallback(event);
-                        break;
-                    }
-                case GLFW_REPEAT:
-                    {
-                        KeyPressedEvent event(key, true);
-                        data.EventCallback(event);
-                        break;
-                    }
-            }
-        });
-
-        glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int keycode) {
-            Data& data = *(Data*) glfwGetWindowUserPointer(window);
-
-            KeyTypedEvent event(keycode);
-            data.EventCallback(event);
-        });
-
-        glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
-            Data& data = *(Data*) glfwGetWindowUserPointer(window);
-
-            switch (action) {
-                case GLFW_PRESS:
-                    {
-                        MouseButtonPressedEvent event(button);
-                        data.EventCallback(event);
-                        break;
-                    }
-                case GLFW_RELEASE:
-                    {
-                        MouseButtonReleasedEvent event(button);
-                        data.EventCallback(event);
-                        break;
-                    }
-            }
-        });
-
-        glfwSetScrollCallback(window, [](GLFWwindow* window, double xOffset, double yOffset) {
-            Data& data = *(Data*) glfwGetWindowUserPointer(window);
-
-            MouseScrolledEvent event((float) xOffset, (float) yOffset);
-            data.EventCallback(event);
-        });
-
-        glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xPos, double yPos) {
-            Data& data = *(Data*) glfwGetWindowUserPointer(window);
-
-            MouseMovedEvent event((float) xPos, (float) yPos);
-            data.EventCallback(event);
-        });
-    }
-
-    ~Window() {
-        Close();
-    }
-
-    void Configure() {
-        glEnable(GL_DEPTH_TEST);
-
-        glEnable(GL_CULL_FACE);
-        glFrontFace(GL_CCW);
-        glCullFace(GL_BACK);
-
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
-    void OnUpdate() {
-        glfwPollEvents();
-        glfwSwapBuffers(this->window);
-    }
-
-    void SetEventCallback(const EventCallbackFn& callback) {
-        this->data.EventCallback = callback;
-    }
-
-    bool ShouldClose() const {
+    inline bool ShouldClose() const {
         return glfwWindowShouldClose(this->window);
     }
 
-    float GetWidth() const {
+    inline float GetWidth() const {
         return data.Width;
     }
 
-    float GetHeight() const {
+    inline float GetHeight() const {
         return data.Height;
     }
 
-    void SetVSync(bool isVsync) {
+    inline void SetVSync(bool isVsync) {
         this->isVsync = isVsync;
         glfwSwapInterval(isVsync ? 1 : 0);
     }
 
-    bool isVSync() const {
+    inline bool isVSync() const {
         return isVsync;
     }
 
-    void Close() {
+    inline void Close() {
         glfwDestroyWindow(this->window);
     }
 
-    operator GLFWwindow*() {
+    inline operator GLFWwindow*() {
         return this->window;
     }
 };

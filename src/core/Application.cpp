@@ -71,8 +71,6 @@ void Application::OnEvent(Event& e) {
     dispatcher.Dispatch<WindowCloseEvent>(BIND_MEMBER_EVENT_FN(Application::OnWindowClose));
 
     dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
-    // TODO
-    // dispatcher.Dispatch<MouseMovedEvent>(BIND_MEMBER_EVENT_FN(Application::OnMouseMove));
 
     for (auto it = layerStack.rbegin(); it != layerStack.rend(); it++) {
         if (e.Handled) {

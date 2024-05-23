@@ -1,5 +1,6 @@
-#include "LayerStack.h"
 #include <algorithm>
+
+#include "LayerStack.h"
 
 namespace GoL {
 
