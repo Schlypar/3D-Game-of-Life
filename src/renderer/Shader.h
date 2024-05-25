@@ -15,10 +15,10 @@ class Shader {
     };
 
 private:
+    unsigned int id;
     std::unordered_map<std::string, int> uniformsCache;
 
 public:
-    unsigned int id;
     Shader(const std::string& shaderFilePath);
     Shader(const std::string& shaderVertexFilePath, const std::string& shaderFragmentFilePath);
     ~Shader();
