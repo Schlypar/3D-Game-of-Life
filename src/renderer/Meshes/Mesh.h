@@ -16,7 +16,7 @@ public:
         , vertexArray() {
     }
 
-    ~Mesh() = default;
+    virtual ~Mesh() = default;
 
     virtual void Bind() const = 0;
     virtual bool IsIndexed() const = 0;
