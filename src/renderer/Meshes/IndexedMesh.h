@@ -1,3 +1,5 @@
+#pragma once
+
 #include "IndexBuffer.h"
 #include "Mesh.h"
 
