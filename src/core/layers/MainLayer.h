@@ -60,7 +60,7 @@ public:
 
         renderer.Clear();
 
-        renderer.DrawTriangles(cube, camera);
+        renderer.Draw(cube, camera);
     }
 
     void OnEvent(Event& e) override {

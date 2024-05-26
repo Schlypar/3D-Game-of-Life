@@ -3,8 +3,9 @@
 #include <iostream>
 #include <memory>
 
-#include "glm/ext/matrix_float4x4.hpp"
-#include "glm/ext/matrix_transform.hpp"
+#include <glad/gl.h>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 #include "Materials/Material.h"
 #include "Meshes/Mesh.h"
@@ -15,6 +16,7 @@ template <typename T>
 using Ref = std::shared_ptr<T>;
 
 struct Surface {
+    unsigned int mode;
     unsigned int vertexCount;
     Ref<Mesh> mesh;
     Ref<Material> material;
@@ -25,6 +27,7 @@ private:
     Ref<Mesh> mesh;
     Ref<Material> material;
     unsigned int vertexCount;
+    unsigned int mode = GL_TRIANGLES;
 
 public:
     SurfaceBuilder()
@@ -47,12 +50,16 @@ public:
         this->vertexCount = vertexCount;
     }
 
+    void SetMode(GLenum mode) {
+        this->mode = mode;
+    }
+
     Surface Build() const {
         if (mesh == nullptr || material == nullptr || vertexCount == 0) {
             std::cout << "Error: mesh, material or vertex count not set" << std::endl;
-            return Surface { 0, nullptr, nullptr };
+            return Surface { mode, 0, nullptr, nullptr };
         }
-        return Surface { vertexCount, mesh, material };
+        return Surface { mode, vertexCount, mesh, material };
     }
 };
 

@@ -28,23 +28,24 @@ public:
         model.Draw();
     }
 
-    void DrawTriangles(Model* model, const Camera& camera) const {
+    void Draw(Model* model, const Camera& camera) const {
         std::vector<Surface> surfaces = model->GetSurfaces();
         glm::mat4 modelMatrix = model->GetModelMatrix();
+        glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
         for (Surface& surface : surfaces) {
             Mesh* mesh = surface.mesh.get();
             Material* material = surface.material.get();
             material->SetModel(modelMatrix);
-            material->SetProjectionView(camera.GetProjectionMatrix() * camera.GetViewMatrix());
+            material->SetProjectionView(projectionView);
             material->Bind();
             mesh->Bind();
             if (mesh->IsIndexed()) {
                 IndexedMesh* indexedMesh = static_cast<IndexedMesh*>(mesh);
                 const IndexBuffer::Id* indexBuffer = indexedMesh->GetIndexBuffer();
                 // TODO: refactor IndexBuffer::GetCount out
-                glDrawElements(GL_TRIANGLES, IndexBuffer::GetCount(*indexBuffer), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*indexBuffer));
+                glDrawElements(surface.mode, IndexBuffer::GetCount(*indexBuffer), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*indexBuffer));
             } else {
-                glDrawArrays(GL_TRIANGLES, 0, surface.vertexCount);
+                glDrawArrays(surface.mode, 0, surface.vertexCount);
             }
         }
     }
