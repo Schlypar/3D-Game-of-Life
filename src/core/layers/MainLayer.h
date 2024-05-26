@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Models/OneColorCube.h"
 #include "Renderer.h"
 
 #include "Models/SixColorCube.h"
@@ -41,7 +42,7 @@ public:
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , renderer()
         , shader("resources/shaders/plain_color.shader") {
-        cube = new SixColorCube(this->shader);
+        cube = new OneColorCube(this->shader);
     }
 
     ~MainLayer() = default;
