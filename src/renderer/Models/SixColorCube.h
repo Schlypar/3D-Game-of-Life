@@ -30,6 +30,13 @@ public:
     )
         : Model(position, rotation, scaleFactor) {
         if (surfaces == nullptr) {
+            SurfaceBuilder builderFront;
+            SurfaceBuilder builderBack;
+            SurfaceBuilder builderTop;
+            SurfaceBuilder builderBottom;
+            SurfaceBuilder builderLeft;
+            SurfaceBuilder builderRight;
+
             VertexBufferLayout layout;
             layout.Push<float>(3);
 
@@ -42,6 +49,9 @@ public:
                 { { -0.5f, -0.5, -0.5f } },
                 { { -0.5f, 0.5f, -0.5f } },
             };
+            builderFront.SetVertexCount(6);
+            builderFront.SetMesh(std::make_shared<UnindexedMesh>(front, sizeof(front), layout));
+            builderFront.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.8f, 0.2f, 0.3f, 1.0f }));
 
             Vertex back[] = {
                 { { -0.5f, -0.5, 0.5f } },
@@ -52,6 +62,9 @@ public:
                 { { 0.5f, 0.5f, 0.5f } },
                 { { -0.5f, 0.5f, 0.5f } },
             };
+            builderBack.SetVertexCount(6);
+            builderBack.SetMesh(std::make_shared<UnindexedMesh>(back, sizeof(back), layout));
+            builderBack.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.2f, 0.8f, 0.3f, 1.0f }));
 
             Vertex up[] = {
                 { { 0.5f, 0.5f, -0.5f } },
@@ -62,6 +75,9 @@ public:
                 { { -0.5f, 0.5f, -0.5f } },
                 { { -0.5f, 0.5f, 0.5f } },
             };
+            builderTop.SetVertexCount(6);
+            builderTop.SetMesh(std::make_shared<UnindexedMesh>(up, sizeof(up), layout));
+            builderTop.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.3f, 0.2f, 0.8f, 1.0f }));
 
             Vertex bottom[] = {
                 { { -0.5f, -0.5f, -0.5f } },
@@ -73,6 +89,9 @@ public:
                 { { -0.5f, -0.5f, 0.5f } },
 
             };
+            builderBottom.SetVertexCount(6);
+            builderBottom.SetMesh(std::make_shared<UnindexedMesh>(bottom, sizeof(bottom), layout));
+            builderBottom.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.4f, 0.4f, 0.4f, 1.0f }));
 
             Vertex left[] = {
                 { { -0.5f, 0.5f, -0.5f } },
@@ -83,6 +102,9 @@ public:
                 { { -0.5f, -0.5f, -0.5f } },
                 { { -0.5f, -0.5f, 0.5f } },
             };
+            builderLeft.SetVertexCount(6);
+            builderLeft.SetMesh(std::make_shared<UnindexedMesh>(left, sizeof(left), layout));
+            builderLeft.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.6f, 0.0f, 0.6f, 1.0f }));
 
             Vertex right[] = {
                 { { 0.5f, -0.5f, -0.5f } },
@@ -93,12 +115,16 @@ public:
                 { { 0.5f, 0.5f, 0.5f } },
                 { { 0.5f, -0.5f, 0.5f } },
             };
-            Surface frontSurface = { 6, std::make_shared<UnindexedMesh>(front, sizeof(front), layout), std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.8f, 0.2f, 0.3f, 1.0f }) };
-            Surface backSurface = { 6, std::make_shared<UnindexedMesh>(back, sizeof(back), layout), std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.2f, 0.8f, 0.3f, 1.0f }) };
-            Surface upSurface = { 6, std::make_shared<UnindexedMesh>(up, sizeof(up), layout), std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.3f, 0.2f, 0.8f, 1.0f }) };
-            Surface bottomSurface = { 6, std::make_shared<UnindexedMesh>(bottom, sizeof(bottom), layout), std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.4f, 0.4f, 0.4f, 1.0f }) };
-            Surface leftSurface = { 6, std::make_shared<UnindexedMesh>(left, sizeof(left), layout), std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.6f, 0.0f, 0.6f, 1.0f }) };
-            Surface rightSurface = { 6, std::make_shared<UnindexedMesh>(right, sizeof(right), layout), std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.0f, 0.6f, 0.6f, 1.0f }) };
+            builderRight.SetVertexCount(6);
+            builderRight.SetMesh(std::make_shared<UnindexedMesh>(right, sizeof(right), layout));
+            builderRight.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.0f, 0.6f, 0.6f, 1.0f }));
+
+            Surface frontSurface = builderFront.Build();
+            Surface backSurface = builderBack.Build();
+            Surface upSurface = builderTop.Build();
+            Surface bottomSurface = builderBottom.Build();
+            Surface leftSurface = builderLeft.Build();
+            Surface rightSurface = builderRight.Build();
 
             this->surfaces[0] = frontSurface;
             this->surfaces[1] = backSurface;

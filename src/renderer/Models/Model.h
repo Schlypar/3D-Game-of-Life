@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <memory>
 
 #include "glm/ext/matrix_float4x4.hpp"
@@ -17,6 +18,42 @@ struct Surface {
     unsigned int vertexCount;
     Ref<Mesh> mesh;
     Ref<Material> material;
+};
+
+class SurfaceBuilder {
+private:
+    Ref<Mesh> mesh;
+    Ref<Material> material;
+    unsigned int vertexCount;
+
+public:
+    SurfaceBuilder()
+        : mesh(nullptr)
+        , material(nullptr)
+        , vertexCount(0) {
+    }
+
+    ~SurfaceBuilder() = default;
+
+    void SetMesh(Ref<Mesh> mesh) {
+        this->mesh = mesh;
+    }
+
+    void SetMaterial(Ref<Material> material) {
+        this->material = material;
+    }
+
+    void SetVertexCount(unsigned int vertexCount) {
+        this->vertexCount = vertexCount;
+    }
+
+    Surface Build() const {
+        if (mesh == nullptr || material == nullptr || vertexCount == 0) {
+            std::cout << "Error: mesh, material or vertex count not set" << std::endl;
+            return Surface { 0, nullptr, nullptr };
+        }
+        return Surface { vertexCount, mesh, material };
+    }
 };
 
 class Model {
