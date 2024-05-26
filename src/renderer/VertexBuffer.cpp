@@ -4,10 +4,10 @@
 
 namespace GoL {
 
-VertexBuffer::VertexBuffer(const void* data, const size_t size) {
+VertexBuffer::VertexBuffer(const void* data, const size_t size, GLenum usage) {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
 }
 
 VertexBuffer::VertexBuffer(const VertexBuffer& other)
@@ -33,6 +33,18 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) {
     other.id = 0;
 
     return *this;
+}
+
+void VertexBuffer::Realloc(const size_t size, GLenum usage) {
+    glDeleteBuffers(1, &id);
+    glGenBuffers(1, &id);
+    glBindBuffer(GL_ARRAY_BUFFER, id);
+    glBufferData(GL_ARRAY_BUFFER, size, nullptr, usage);
+}
+
+void VertexBuffer::Write(const void* data, size_t size, unsigned int offset = 0) {
+    Bind();
+    glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 }
 
 void VertexBuffer::Bind() const {

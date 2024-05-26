@@ -6,6 +6,11 @@
 
 namespace GoL {
 
+Shader::Shader(const Shader& other)
+    : id(other.id)
+    , uniformsCache(other.uniformsCache) {
+}
+
 Shader::Shader(const std::string& shaderFilePath)
     : id(0) {
     ProgramSource source = ParseShader(shaderFilePath);
@@ -21,6 +26,10 @@ Shader::Shader(const std::string& shaderVertexFilePath, const std::string& shade
 
 Shader::~Shader() {
     glDeleteProgram(id);
+}
+
+unsigned int Shader::GetShaderId() const {
+    return id;
 }
 
 void Shader::Bind() const {
@@ -126,7 +135,7 @@ unsigned int Shader::GetUniformLocation(const std::string& name) {
 
     int location = glGetUniformLocation(id, name.c_str());
     if (location == -1) {
-        std::cout << "Warinng: uniform " << name << " not found" << std::endl;
+        std::cout << "Warning: uniform " << name << " not found" << std::endl;
     } else {
         uniformsCache[name] = location;
     }

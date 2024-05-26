@@ -15,16 +15,19 @@ class Shader {
     };
 
 private:
+    unsigned int id;
     std::unordered_map<std::string, int> uniformsCache;
 
 public:
-    unsigned int id;
+    Shader(const Shader& other);
     Shader(const std::string& shaderFilePath);
     Shader(const std::string& shaderVertexFilePath, const std::string& shaderFragmentFilePath);
     ~Shader();
 
     void SetUniform4f(const std::string& name, float f1, float f2, float f3, float f4);
     void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
+
+    unsigned int GetShaderId() const;
 
     void Bind() const;
     void Unbind() const;
