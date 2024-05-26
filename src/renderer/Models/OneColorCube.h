@@ -1,10 +1,9 @@
 #pragma once
 
+#include "Models/Model.h"
+
 #include "Materials/PlainColorMaterial.h"
 #include "Meshes/UnindexedMesh.h"
-#include "Models/Model.h"
-#include "VertexBufferLayout.h"
-#include <memory>
 
 namespace GoL {
 
