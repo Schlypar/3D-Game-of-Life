@@ -2,6 +2,7 @@
 
 #include "VertexArray.h"
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 
 namespace GoL {
 
@@ -14,6 +15,16 @@ public:
     Mesh(const void* data, const size_t size)
         : vertexBuffer(data, size)
         , vertexArray() {
+    }
+
+    Mesh(const void* data, const size_t size, const VertexBufferLayout& layout)
+        : vertexBuffer(data, size)
+        , vertexArray() {
+        vertexArray.AddBuffer(vertexBuffer, layout);
+    }
+
+    void AddLayout(const VertexBufferLayout& layout) {
+        vertexArray.AddBuffer(vertexBuffer, layout);
     }
 
     virtual ~Mesh() = default;

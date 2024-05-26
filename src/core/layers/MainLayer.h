@@ -2,8 +2,7 @@
 
 #include "Renderer.h"
 
-#include "Models/Cube.h"
-#include "Models/Prism.h"
+#include "Models/SixColorCube.h"
 
 #include "../Layer.h"
 
@@ -25,8 +24,7 @@ private:
     float deltaTime = 0;
 
     Shader shader;
-    Cube cube = Cube(glm::vec3 { 0.0f }, glm::vec3 { 0.0f }, 0.5f);
-    Prism prism = Prism(glm::vec3 { 1.0f, 1.0f, 0.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, 0.5f);
+    Model* cube;
 
 public:
     MainLayer(
@@ -42,19 +40,17 @@ public:
         : Layer("Game of Life layer")
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , renderer()
-        , shader("resources/shaders/test.shader") {
+        , shader("resources/shaders/plain_color.shader") {
+        cube = new SixColorCube(this->shader);
     }
 
     ~MainLayer() = default;
 
     void OnAttach() override {
-        cube.BindIndices();
-        prism.BindIndices();
-        IndexBuffer::Init();
     }
 
     void OnDetach() override {
-        // do nothing
+        delete cube;
     }
 
     void OnUpdate() override {
@@ -64,8 +60,7 @@ public:
 
         renderer.Clear();
 
-        renderer.Draw<Cube>(cube, camera, shader);
-        renderer.Draw<Prism>(prism, camera, shader);
+        renderer.DrawTriangles(cube, camera);
     }
 
     void OnEvent(Event& e) override {

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <concepts>
+#include <glm/glm.hpp>
 
 namespace GoL {
 
 template <typename T>
-concept Model = requires(T m) {
+concept OldModel = requires(T m) {
     { m.Draw() };
     { m.BindIndices() };
     { m.GetModelMatrix() } -> std::convertible_to<glm::mat4>;

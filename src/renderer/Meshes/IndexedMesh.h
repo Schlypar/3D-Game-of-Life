@@ -2,6 +2,7 @@
 
 #include "IndexBuffer.h"
 #include "Mesh.h"
+#include "VertexBufferLayout.h"
 
 namespace GoL {
 
@@ -12,6 +13,12 @@ private:
 public:
     IndexedMesh(const void* data, const size_t size, const unsigned int* indices, int count)
         : Mesh(data, size)
+        , indexBuffer(new IndexBuffer::Id) {
+        *indexBuffer = IndexBuffer::Register(indices, count);
+    }
+
+    IndexedMesh(const void* data, const size_t size, const unsigned int* indices, int count, const VertexBufferLayout& layout)
+        : Mesh(data, size, layout)
         , indexBuffer(new IndexBuffer::Id) {
         *indexBuffer = IndexBuffer::Register(indices, count);
     }

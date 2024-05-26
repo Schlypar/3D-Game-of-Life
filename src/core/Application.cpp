@@ -2,6 +2,7 @@
 #include "layers/ImGuiLayer.h"
 #include <cassert>
 
+
 namespace GoL {
 
 Application* Application::instance = nullptr;

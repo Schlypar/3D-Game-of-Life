@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Model.h"
+#include "../OldModel.h"
 #include "../Renderer.h"
 #include "Vertex.h"
 #include "IndexBuffer.h"
@@ -91,7 +91,7 @@ public:
 class Cursor3DRenderer : public Renderer {
 public:
 
-    template <Model M>
+    template <OldModel M>
     void Draw(M& model, const Camera& camera, Shader& shader) const {
         auto modelMatrix = model.GetModelMatrix();
         modelMatrix = glm::rotate(modelMatrix, glm::radians(camera.Yaw), glm::vec3(modelMatrix[1][0], modelMatrix[1][1], modelMatrix[1][2]));

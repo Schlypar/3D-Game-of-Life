@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Model.h"
+#include "../OldModel.h"
 #include "Vertex.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
