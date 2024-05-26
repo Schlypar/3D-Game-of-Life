@@ -4,10 +4,10 @@
 
 namespace GoL {
 
-VertexBuffer::VertexBuffer(const void* data, const size_t size) {
+VertexBuffer::VertexBuffer(const void* data, const size_t size, GLenum usage) {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
 }
 
 VertexBuffer::VertexBuffer(const VertexBuffer& other)

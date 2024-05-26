@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Models/OneColorCube.h"
+#include "Models/Prism.h"
 #include "Renderer.h"
 
 #include "Models/SixColorCube.h"
@@ -24,8 +25,12 @@ private:
     float lastFrameTime = 0;
     float deltaTime = 0;
 
-    Shader shader;
-    Model* cube;
+    Shader prismShader;
+    Shader cubeShader;
+    Model* model1;
+    Model* model2;
+    Model* model3;
+    Model* model4;
 
 public:
     MainLayer(
@@ -41,9 +46,21 @@ public:
         : Layer("Game of Life layer")
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , renderer()
-        , shader("resources/shaders/plain_color.shader") {
-        cube = new SixColorCube(this->shader);
-        cube->SetPosition(glm::vec3(0.5f, 0.0f, 0.0f));
+        , prismShader("resources/shaders/prism.shader")
+        , cubeShader("resources/shaders/plain_color.shader") {
+        model1 = new IndexedPrism(this->prismShader);
+        model1->SetPosition({ -0.5f, 0.25f, -0.2f });
+        model1->SetRotation({ 0.0f, 90.0f, 0.0f });
+        model1->SetScaleFactor(0.3f);
+        model2 = new IndexedPrism(this->prismShader);
+        model2->SetPosition({ 0.65f, 0.3f, 0.0f });
+        model2->SetScaleFactor(0.6);
+        model3 = new SixColorCube(this->cubeShader);
+        model3->SetScaleFactor(0.5f);
+        model3->SetPosition({ -0.25, -0.75f, 0.1f });
+        model4 = new OneColorCube(this->cubeShader);
+        model4->SetScaleFactor(0.43f);
+        model4->SetPosition({ 0.45, -0.45f, -0.1f });
     }
 
     ~MainLayer() = default;
@@ -52,7 +69,10 @@ public:
     }
 
     void OnDetach() override {
-        delete cube;
+        delete model1;
+        delete model2;
+        delete model3;
+        delete model4;
     }
 
     void OnUpdate() override {
@@ -62,7 +82,10 @@ public:
 
         renderer.Clear();
 
-        renderer.Draw(cube, camera);
+        renderer.Draw(model1, camera);
+        renderer.Draw(model2, camera);
+        renderer.Draw(model3, camera);
+        renderer.Draw(model4, camera);
     }
 
     void OnEvent(Event& e) override {
