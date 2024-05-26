@@ -42,7 +42,7 @@ void VertexBuffer::Realloc(const size_t size, GLenum usage) {
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, usage);
 }
 
-void VertexBuffer::Write(const void* data, size_t size, unsigned int offset) {
+void VertexBuffer::Write(const void* data, size_t size, unsigned int offset = 0) {
     Bind();
     glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 }
