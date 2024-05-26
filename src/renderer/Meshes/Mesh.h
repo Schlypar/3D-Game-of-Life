@@ -12,13 +12,13 @@ protected:
     VertexArray vertexArray;
 
 public:
-    Mesh(const void* data, const size_t size)
-        : vertexBuffer(data, size)
+    Mesh(const void* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
+        : vertexBuffer(data, size, usage)
         , vertexArray() {
     }
 
-    Mesh(const void* data, const size_t size, const VertexBufferLayout& layout)
-        : vertexBuffer(data, size)
+    Mesh(const void* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
+        : vertexBuffer(data, size, usage)
         , vertexArray() {
         vertexArray.AddBuffer(vertexBuffer, layout);
     }
