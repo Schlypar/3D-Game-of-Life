@@ -42,7 +42,8 @@ public:
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , renderer()
         , shader("resources/shaders/plain_color.shader") {
-        cube = new OneColorCube(this->shader);
+        cube = new SixColorCube(this->shader);
+        cube->SetPosition(glm::vec3(0.5f, 0.0f, 0.0f));
     }
 
     ~MainLayer() = default;
@@ -74,7 +75,6 @@ public:
 
 private:
     bool OnKeyPress(KeyPressedEvent& e) {
-        float cameraSpeed = static_cast<float>(2.5 * deltaTime);
         if (e.GetKeyCode() == GLFW_KEY_W) {
             camera.ProcessKeyboard(GoL::CameraMovement::FORWARD, deltaTime);
         }

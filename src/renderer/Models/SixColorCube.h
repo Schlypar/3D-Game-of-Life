@@ -11,11 +11,6 @@ namespace GoL {
 
 class SixColorCube : public Model {
 private:
-    struct Vertex {
-        glm::vec3 position;
-    };
-
-private:
     Surface surfaces[6];
 
 public:
@@ -37,80 +32,81 @@ public:
 
         VertexBufferLayout layout;
         layout.Push<float>(3);
+        layout.Push<float>(3);
 
         Vertex front[] = {
-            { { 0.5f, -0.5f, -0.5f } },
-            { { -0.5f, -0.5, -0.5f } },
-            { { 0.5f, 0.5f, -0.5f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
 
-            { { 0.5f, 0.5f, -0.5f } },
-            { { -0.5f, -0.5, -0.5f } },
-            { { -0.5f, 0.5f, -0.5f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
         };
         builderFront.SetVertexCount(6);
         builderFront.SetMesh(std::make_shared<UnindexedMesh>(front, sizeof(front), layout));
         builderFront.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.8f, 0.2f, 0.3f, 1.0f }));
 
         Vertex back[] = {
-            { { -0.5f, -0.5, 0.5f } },
-            { { 0.5f, -0.5f, 0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
+            { { -0.5f, -0.5, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { -0.5f, -0.5, 0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
-            { { -0.5f, 0.5f, 0.5f } },
+            { { -0.5f, -0.5, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
         };
         builderBack.SetVertexCount(6);
         builderBack.SetMesh(std::make_shared<UnindexedMesh>(back, sizeof(back), layout));
         builderBack.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.2f, 0.8f, 0.3f, 1.0f }));
 
         Vertex up[] = {
-            { { 0.5f, 0.5f, -0.5f } },
-            { { -0.5f, 0.5f, -0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { 0.5f, 0.5f, 0.5f } },
-            { { -0.5f, 0.5f, -0.5f } },
-            { { -0.5f, 0.5f, 0.5f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
         };
         builderTop.SetVertexCount(6);
         builderTop.SetMesh(std::make_shared<UnindexedMesh>(up, sizeof(up), layout));
         builderTop.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.3f, 0.2f, 0.8f, 1.0f }));
 
         Vertex bottom[] = {
-            { { -0.5f, -0.5f, -0.5f } },
-            { { 0.5f, -0.5f, -0.5f } },
-            { { 0.5f, -0.5f, 0.5f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { -0.5f, -0.5f, -0.5f } },
-            { { 0.5f, -0.5f, 0.5f } },
-            { { -0.5f, -0.5f, 0.5f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
         };
         builderBottom.SetVertexCount(6);
         builderBottom.SetMesh(std::make_shared<UnindexedMesh>(bottom, sizeof(bottom), layout));
         builderBottom.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.4f, 0.4f, 0.4f, 1.0f }));
 
         Vertex left[] = {
-            { { -0.5f, 0.5f, -0.5f } },
-            { { -0.5f, -0.5f, -0.5f } },
-            { { -0.5f, 0.5f, 0.5f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { -0.5f, 0.5f, 0.5f } },
-            { { -0.5f, -0.5f, -0.5f } },
-            { { -0.5f, -0.5f, 0.5f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
         };
         builderLeft.SetVertexCount(6);
         builderLeft.SetMesh(std::make_shared<UnindexedMesh>(left, sizeof(left), layout));
         builderLeft.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.6f, 0.0f, 0.6f, 1.0f }));
 
         Vertex right[] = {
-            { { 0.5f, -0.5f, -0.5f } },
-            { { 0.5f, 0.5f, -0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { 0.5f, -0.5f, -0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
-            { { 0.5f, -0.5f, 0.5f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
         };
         builderRight.SetVertexCount(6);
         builderRight.SetMesh(std::make_shared<UnindexedMesh>(right, sizeof(right), layout));

@@ -7,6 +7,8 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "Vertex.h"
+
 #include "Materials/Material.h"
 #include "Meshes/Mesh.h"
 
@@ -16,7 +18,7 @@ template <typename T>
 using Ref = std::shared_ptr<T>;
 
 struct Surface {
-    unsigned int mode;
+    GLenum mode;
     unsigned int vertexCount;
     Ref<Mesh> mesh;
     Ref<Material> material;

@@ -9,11 +9,6 @@ namespace GoL {
 
 class OneColorCube : public Model {
 private:
-    struct Vertex {
-        glm::vec3 position;
-    };
-
-private:
     Surface surface;
 
 public:
@@ -29,61 +24,57 @@ public:
         SurfaceBuilder builder;
         VertexBufferLayout layout;
         layout.Push<float>(3);
+        layout.Push<float>(3);
 
         Vertex vertices[] = {
             // front
-            { { 0.5f, -0.5f, -0.5f } },
-            { { -0.5f, -0.5, -0.5f } },
-            { { 0.5f, 0.5f, -0.5f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
 
-            { { 0.5f, 0.5f, -0.5f } },
-            { { -0.5f, -0.5, -0.5f } },
-            { { -0.5f, 0.5f, -0.5f } },
-
+            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
             // back
-            { { -0.5f, -0.5, 0.5f } },
-            { { 0.5f, -0.5f, 0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
+            { { -0.5f, -0.5, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { -0.5f, -0.5, 0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
-            { { -0.5f, 0.5f, 0.5f } },
-
+            { { -0.5f, -0.5, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
             // up
-            { { 0.5f, 0.5f, -0.5f } },
-            { { -0.5f, 0.5f, -0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { 0.5f, 0.5f, 0.5f } },
-            { { -0.5f, 0.5f, -0.5f } },
-            { { -0.5f, 0.5f, 0.5f } },
-
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
             // bottom
-            { { -0.5f, -0.5f, -0.5f } },
-            { { 0.5f, -0.5f, -0.5f } },
-            { { 0.5f, -0.5f, 0.5f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { -0.5f, -0.5f, -0.5f } },
-            { { 0.5f, -0.5f, 0.5f } },
-            { { -0.5f, -0.5f, 0.5f } },
-
+            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
             // left
-            { { -0.5f, 0.5f, -0.5f } },
-            { { -0.5f, -0.5f, -0.5f } },
-            { { -0.5f, 0.5f, 0.5f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { -0.5f, 0.5f, 0.5f } },
-            { { -0.5f, -0.5f, -0.5f } },
-            { { -0.5f, -0.5f, 0.5f } },
-
+            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
             // right
-            { { 0.5f, -0.5f, -0.5f } },
-            { { 0.5f, 0.5f, -0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
 
-            { { 0.5f, -0.5f, -0.5f } },
-            { { 0.5f, 0.5f, 0.5f } },
-            { { 0.5f, -0.5f, 0.5f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
         };
         builder.SetMesh(std::make_shared<UnindexedMesh>(vertices, sizeof(vertices), layout));
         builder.SetVertexCount(6 * 6);
