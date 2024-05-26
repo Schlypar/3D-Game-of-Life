@@ -29,6 +29,10 @@ public:
         }
     }
 
+    const IndexBuffer::Id* GetIndexBuffer() const {
+        return indexBuffer;
+    }
+
     void Bind() const override {
         this->vertexBuffer.Bind();
         this->vertexArray.Bind();

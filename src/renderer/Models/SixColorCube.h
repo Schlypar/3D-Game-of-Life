@@ -119,19 +119,12 @@ public:
             builderRight.SetMesh(std::make_shared<UnindexedMesh>(right, sizeof(right), layout));
             builderRight.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.0f, 0.6f, 0.6f, 1.0f }));
 
-            Surface frontSurface = builderFront.Build();
-            Surface backSurface = builderBack.Build();
-            Surface upSurface = builderTop.Build();
-            Surface bottomSurface = builderBottom.Build();
-            Surface leftSurface = builderLeft.Build();
-            Surface rightSurface = builderRight.Build();
-
-            this->surfaces[0] = frontSurface;
-            this->surfaces[1] = backSurface;
-            this->surfaces[2] = upSurface;
-            this->surfaces[3] = bottomSurface;
-            this->surfaces[4] = leftSurface;
-            this->surfaces[5] = rightSurface;
+            this->surfaces[0] = builderFront.Build();
+            this->surfaces[1] = builderBack.Build();
+            this->surfaces[2] = builderTop.Build();
+            this->surfaces[3] = builderBottom.Build();
+            this->surfaces[4] = builderLeft.Build();
+            this->surfaces[5] = builderRight.Build();
         } else {
             this->surfaces[0] = surfaces[0];
             this->surfaces[1] = surfaces[1];
