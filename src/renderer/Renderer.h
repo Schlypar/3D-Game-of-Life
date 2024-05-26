@@ -7,10 +7,8 @@
 #include "Camera.h"
 #include "IndexBuffer.h"
 #include "Meshes/IndexedMesh.h"
-#include "OldModel.h"
 
 #include "Models/Model.h"
-#include "Shader.h"
 
 namespace GoL {
 
@@ -18,14 +16,6 @@ class Renderer {
 public:
     inline void Clear() const {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
-
-    template <OldModel M>
-    void Draw(M& model, const Camera& camera, Shader& shader) const {
-        shader.Bind();
-        shader.SetUniformMat4f("Model", model.GetModelMatrix());
-        shader.SetUniformMat4f("ProjectionView", camera.GetProjectionMatrix() * camera.GetViewMatrix());
-        model.Draw();
     }
 
     void Draw(Model* model, const Camera& camera) const {
