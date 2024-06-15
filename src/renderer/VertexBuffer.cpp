@@ -14,9 +14,8 @@ VertexBuffer::VertexBuffer(const VertexBuffer& other)
     : id(other.id) {
 }
 
-VertexBuffer::VertexBuffer(VertexBuffer&& other)
-    : id(other.id) {
-    other.id = 0;
+VertexBuffer::VertexBuffer(VertexBuffer&& other) {
+    std::swap(id, other.id);
 }
 
 VertexBuffer::~VertexBuffer() {
@@ -29,8 +28,7 @@ VertexBuffer& VertexBuffer::operator=(const VertexBuffer& other) {
 }
 
 VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) {
-    this->id = other.id;
-    other.id = 0;
+    std::swap(id, other.id);
 
     return *this;
 }
@@ -42,7 +40,7 @@ void VertexBuffer::Realloc(const size_t size, GLenum usage) {
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, usage);
 }
 
-void VertexBuffer::Write(const void* data, size_t size, unsigned int offset = 0) {
+void VertexBuffer::Write(const void* data, size_t size, unsigned int offset) {
     Bind();
     glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 }

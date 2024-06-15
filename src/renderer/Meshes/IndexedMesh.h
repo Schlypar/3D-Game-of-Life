@@ -29,16 +29,24 @@ public:
         }
     }
 
+    IndexedMesh& operator+=(const IndexedMesh& other) {
+        // TODO
+
+        return *this;
+    }
+
     const IndexBuffer::Id* GetIndexBuffer() const {
         return indexBuffer;
     }
 
-    void Bind() const override {
+    void Bind() override {
         this->vertexBuffer.Bind();
+        this->vertexBuffer.Realloc(data.size, data.usage);
+        this->vertexBuffer.Write(data.bytes, data.size);
         this->vertexArray.Bind();
     }
 
-    bool IsIndexed() const override {
+    bool IsIndexed() override {
         return true;
     }
 };
