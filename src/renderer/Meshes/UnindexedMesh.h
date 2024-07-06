@@ -36,9 +36,12 @@ public:
 
     void Bind() override {
         this->vertexBuffer.Bind();
+        this->vertexArray.Bind();
+    }
+
+    void Resize() override {
         this->vertexBuffer.Realloc(data.size, data.usage);
         this->vertexBuffer.Write(data.bytes, data.size);
-        this->vertexArray.Bind();
     }
 
     bool IsIndexed() override {

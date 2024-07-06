@@ -94,6 +94,7 @@ public:
     virtual ~Mesh() = default;
 
     virtual void Bind() = 0;
+    virtual void Resize() = 0;
     virtual bool IsIndexed() = 0;
 };
 

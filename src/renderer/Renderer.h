@@ -25,10 +25,10 @@ public:
         for (Surface& surface : surfaces) {
             Mesh* mesh = surface.mesh.get();
             Material* material = surface.material.get();
+            mesh->Bind();
             material->SetModel(modelMatrix);
             material->SetProjectionView(projectionView);
             material->Bind();
-            mesh->Bind();
             if (mesh->IsIndexed()) {
                 IndexedMesh* indexedMesh = static_cast<IndexedMesh*>(mesh);
                 const IndexBuffer::Id* indexBuffer = indexedMesh->GetIndexBuffer();
