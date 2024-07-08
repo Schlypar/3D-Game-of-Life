@@ -6,14 +6,15 @@
 
 namespace GoL {
 
-class UnindexedMesh : public Mesh {
+template <typename T>
+class UnindexedMesh : public Mesh<T> {
 public:
-    UnindexedMesh(const void* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
-        : Mesh(data, size, usage) {
+    UnindexedMesh(const T* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
+        : Mesh<T>(data, size, usage) {
     }
 
-    UnindexedMesh(const void* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
-        : Mesh(data, size, layout, usage) {
+    UnindexedMesh(const T* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
+        : Mesh<T>(data, size, layout, usage) {
     }
 
     ~UnindexedMesh() = default;
@@ -25,7 +26,7 @@ public:
         layout.Push<float>(3);
 
         size_t newSize = this->data.size + right->data.size;
-        Byte* bytes = new Byte[newSize];
+        T* bytes = new T[newSize];
 
         std::memcpy(bytes, this->data.bytes, this->data.size);
         std::memcpy(bytes + this->data.size, right->data.bytes, right->data.size);
@@ -34,18 +35,18 @@ public:
     }
 
     UnindexedMesh& operator+=(const UnindexedMesh& other) {
-        const Byte* currentBytes = this->data.bytes;
+        const T* currentTs = this->data.bytes;
 
-        size_t newSize = data.size + other.data.size;
-        this->data.bytes = new Byte[newSize];
+        size_t newSize = this->data.size + other.data.size;
+        this->data.bytes = new T[newSize];
 
-        std::memcpy(this->data.bytes, currentBytes, data.size);
-        std::memcpy(this->data.bytes + data.size, other.data.bytes, other.data.size);
+        std::memcpy(this->data.bytes, currentTs, this->data.size);
+        std::memcpy(this->data.bytes + this->data.size, other.data.bytes, other.data.size);
 
         this->data.size = newSize;
         this->data.usage = GL_DYNAMIC_DRAW;
 
-        delete[] currentBytes;
+        delete[] currentTs;
 
         return *this;
     }
@@ -56,15 +57,15 @@ public:
     }
 
     void Resize() override {
-        this->vertexBuffer.Realloc(data.size, data.usage);
-        this->vertexBuffer.Write(data.bytes, data.size);
+        this->vertexBuffer.Realloc(this->data.size, this->data.usage);
+        this->vertexBuffer.Write(this->data.bytes, this->data.size);
     }
 
     bool IsIndexed() override {
         return false;
     }
 
-    Mesh::Data& GetData() override {
+    Mesh<T>::Data& GetData() override {
         return this->data;
     }
 };

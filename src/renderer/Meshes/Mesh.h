@@ -7,23 +7,22 @@
 
 namespace GoL {
 
+template <typename T>
 class Mesh {
 public:
-    using Byte = unsigned char;
-
     struct Data {
-        Byte* bytes;
+        T* bytes;
         size_t size;
         GLenum usage;
 
         Data(const void* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
-            : bytes(new Byte[size])
+            : bytes(new T[size])
             , size(size) {
             std::memcpy(this->bytes, data, size);
         }
 
         Data(const Data& other)
-            : bytes(new Byte[other.size])
+            : bytes(new T[other.size])
             , size(other.size)
             , usage(other.usage) {
             std::memcpy(this->bytes, bytes, size);
@@ -74,13 +73,13 @@ protected:
     VertexArray vertexArray;
 
 public:
-    Mesh(const void* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
+    Mesh(const T* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
         : data(data, size, usage)
         , vertexBuffer(data, size, usage)
         , vertexArray() {
     }
 
-    Mesh(const void* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
+    Mesh(const T* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
         : data(data, size, usage)
         , vertexBuffer(data, size, usage)
         , vertexArray() {

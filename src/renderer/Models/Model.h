@@ -19,19 +19,34 @@ namespace GoL {
 template <typename T>
 using Ref = std::shared_ptr<T>;
 
+template <typename T>
 struct Surface {
     GLenum mode;
     unsigned int vertexCount;
-    Ref<Mesh> mesh;
+    Ref<Mesh<T>> mesh;
     Ref<Material> material;
+
+    Surface()
+        : mode(GL_TRIANGLES)
+        , vertexCount(0)
+        , mesh(nullptr)
+        , material(nullptr) {
+    }
+
+    Surface(GLenum mode, unsigned int vertexCount, Ref<Mesh<T>> mesh, Ref<Material> material)
+        : mode(mode)
+        , vertexCount(vertexCount)
+        , mesh(mesh)
+        , material(material) {
+    }
 
     Surface& operator+=(const Surface& other) {
         if (this->mesh->IsIndexed()) {
             // DEPRECATED
             return *this;
         } else {
-            auto thisMesh = static_cast<UnindexedMesh*>(this->mesh.get());
-            auto otherMesh = static_cast<UnindexedMesh*>(other.mesh.get());
+            auto thisMesh = static_cast<UnindexedMesh<T>*>(this->mesh.get());
+            auto otherMesh = static_cast<UnindexedMesh<T>*>(other.mesh.get());
 
             *thisMesh += *otherMesh;
 
@@ -44,17 +59,18 @@ struct Surface {
             // DEPRECATED
             return left;
         } else {
-            auto leftMesh = static_cast<UnindexedMesh*>(left.mesh.get());
-            auto rightMesh = static_cast<UnindexedMesh*>(right.mesh.get());
+            auto leftMesh = static_cast<UnindexedMesh<T>*>(left.mesh.get());
+            auto rightMesh = static_cast<UnindexedMesh<T>*>(right.mesh.get());
 
             return Surface { left.mode, left.vertexCount + right.vertexCount, *leftMesh + rightMesh, left.material };
         }
     }
 };
 
+template <typename T>
 class SurfaceBuilder {
 private:
-    Ref<Mesh> mesh;
+    Ref<Mesh<T>> mesh;
     Ref<Material> material;
     unsigned int vertexCount;
     unsigned int mode = GL_TRIANGLES;
@@ -68,7 +84,7 @@ public:
 
     ~SurfaceBuilder() = default;
 
-    void SetMesh(Ref<Mesh> mesh) {
+    void SetMesh(Ref<Mesh<T>> mesh) {
         this->mesh = mesh;
     }
 
@@ -84,15 +100,16 @@ public:
         this->mode = mode;
     }
 
-    Surface Build() const {
+    Surface<T> Build() const {
         if (mesh == nullptr || material == nullptr || vertexCount == 0) {
             std::cout << "Error: mesh, material or vertex count not set" << std::endl;
-            return Surface { mode, 0, nullptr, nullptr };
+            return Surface<T> { mode, 0, nullptr, nullptr };
         }
-        return Surface { mode, vertexCount, mesh, material };
+        return Surface<T> { mode, vertexCount, mesh, material };
     }
 };
 
+template <typename T>
 class Model {
 protected:
     glm::vec3 position;
@@ -132,6 +149,6 @@ public:
         return modelMatrix;
     }
 
-    virtual std::vector<Surface> GetSurfaces() const = 0;
+    virtual std::vector<Surface<T>> GetSurfaces() const = 0;
 };
 }

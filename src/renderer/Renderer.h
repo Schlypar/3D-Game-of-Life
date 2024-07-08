@@ -13,8 +13,6 @@
 #include <GLFW/glfw3.h>
 
 #include "Camera.h"
-#include "IndexBuffer.h"
-#include "Meshes/IndexedMesh.h"
 
 #include "Meshes/Mesh.h"
 #include "Models/Model.h"
@@ -25,7 +23,7 @@ namespace GoL {
 class Renderer {
 private:
     struct SurfaceBundle {
-        Surface surface;
+        Surface<Vertex> surface;
         glm::mat4 matrix;
     };
 
@@ -38,9 +36,9 @@ public:
         surfaces.clear();
     }
 
-    void Submit(Model* model) {
+    void Submit(Model<Vertex>* model) {
         auto modelSurfaces = model->GetSurfaces()
-                           | std::ranges::views::transform([model](Surface& s) -> SurfaceBundle {
+                           | std::ranges::views::transform([model](Surface<Vertex>& s) -> SurfaceBundle {
                                  return SurfaceBundle { s, model->GetModelMatrix() };
                              })
                            | std::ranges::to<std::vector<SurfaceBundle>>();
@@ -48,49 +46,42 @@ public:
     }
 
     void DrawSubmitted(const Camera& camera) {
-        std::vector<Surface> optimized = this->ConcatenateGeometry();
+        std::vector<Surface<Vertex>> optimized = this->ConcatenateGeometry();
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
         DrawSurfaces(optimized, modelMatrix, projectionView);
     }
 
-    void Draw(Model* model, const Camera& camera) const {
-        std::vector<Surface> surfaces = model->GetSurfaces();
+    void Draw(Model<Vertex>* model, const Camera& camera) const {
+        std::vector<Surface<Vertex>> surfaces = model->GetSurfaces();
         glm::mat4 modelMatrix = model->GetModelMatrix();
         glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
         DrawSurfaces(surfaces, modelMatrix, projectionView);
     }
 
 private:
-    void DrawSurfaces(std::vector<Surface>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
-        for (Surface& surface : surfaces) {
-            Mesh* mesh = surface.mesh.get();
+    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
+        for (Surface<Vertex>& surface : surfaces) {
+            Mesh<Vertex>* mesh = surface.mesh.get();
             Material* material = surface.material.get();
             mesh->Bind();
             material->SetModel(modelMatrix);
             material->SetProjectionView(projectionView);
             material->Bind();
-            if (mesh->IsIndexed()) {
-                // DEPRECATED
-                IndexedMesh* indexedMesh = static_cast<IndexedMesh*>(mesh);
-                const IndexBuffer::Id* indexBuffer = indexedMesh->GetIndexBuffer();
-                glDrawElements(surface.mode, IndexBuffer::GetCount(*indexBuffer), GL_UNSIGNED_INT, IndexBuffer::GetOffset(*indexBuffer));
-            } else {
-                glDrawArrays(surface.mode, 0, surface.vertexCount);
-            }
+            glDrawArrays(surface.mode, 0, surface.vertexCount);
         }
     }
 
-    std::vector<Surface> ConcatenateGeometry() {
-        const auto projection = [](Surface& s) -> int {
+    std::vector<Surface<Vertex>> ConcatenateGeometry() {
+        const auto projection = [](Surface<Vertex>& s) -> int {
             return s.material.get()->GetId();
         };
-        const auto groupByMaterial = [projection](Surface& l, Surface& r) -> bool {
+        const auto groupByMaterial = [projection](Surface<Vertex>& l, Surface<Vertex>& r) -> bool {
             auto left = projection(l);
             auto right = projection(r);
             return left == right;
         };
-        const auto computeSurface = [](SurfaceBundle& sb) -> Surface& {
+        const auto computeSurface = [](SurfaceBundle& sb) -> Surface<Vertex>& {
             auto& data = sb.surface.mesh->GetData();
             Vertex* vertexData = (Vertex*) data.bytes;
             for (int i = 0; i < data.size / sizeof(Vertex); i++) {
@@ -99,10 +90,10 @@ private:
             }
             return sb.surface;
         };
-        const auto concat = [](std::vector<Surface>& vec) -> Surface {
+        const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex> {
             std::cout << "LOOK\n";
-            Surface& res = vec[0];
-            std::for_each(vec.begin() + 1, vec.end(), [&res](Surface& s) -> void {
+            Surface<Vertex>& res = vec[0];
+            std::for_each(vec.begin() + 1, vec.end(), [&res](Surface<Vertex>& s) -> void {
                 res += s;
             });
             return res;
@@ -112,10 +103,10 @@ private:
         return this->surfaces
              | std::ranges::views::transform(computeSurface)
              | std::ranges::views::chunk_by(groupByMaterial)
-             | std::ranges::to<std::vector<std::vector<Surface>>>()
+             | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
              | std::ranges::views::transform(concat)
              | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
-             | std::ranges::to<std::vector<Surface>>();
+             | std::ranges::to<std::vector<Surface<Vertex>>>();
     }
 };
 

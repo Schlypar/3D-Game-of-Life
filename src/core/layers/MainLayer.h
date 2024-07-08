@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Models/OneColorCube.h"
-#include "Models/Prism.h"
 #include "Renderer.h"
 
 #include "Models/SixColorCube.h"
@@ -27,8 +26,8 @@ private:
 
     Shader prismShader;
     Shader cubeShader;
-    Model* model1;
-    Model* model2;
+    Model<Vertex>* model1;
+    Model<Vertex>* model2;
 
 public:
     MainLayer(
