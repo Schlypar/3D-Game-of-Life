@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 
@@ -7,6 +8,7 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "Meshes/UnindexedMesh.h"
 #include "Vertex.h"
 
 #include "Materials/Material.h"
@@ -22,6 +24,32 @@ struct Surface {
     unsigned int vertexCount;
     Ref<Mesh> mesh;
     Ref<Material> material;
+
+    Surface& operator+=(const Surface& other) {
+        if (this->mesh->IsIndexed()) {
+            // DEPRECATED
+            return *this;
+        } else {
+            auto thisMesh = static_cast<UnindexedMesh*>(this->mesh.get());
+            auto otherMesh = static_cast<UnindexedMesh*>(other.mesh.get());
+
+            *thisMesh += *otherMesh;
+
+            return *this;
+        }
+    }
+
+    friend Surface operator+(const Surface& left, const Surface& right) {
+        if (left.mesh->IsIndexed()) {
+            // DEPRECATED
+            return left;
+        } else {
+            auto leftMesh = static_cast<UnindexedMesh*>(left.mesh.get());
+            auto rightMesh = static_cast<UnindexedMesh*>(right.mesh.get());
+
+            return Surface { left.mode, left.vertexCount + right.vertexCount, *leftMesh + rightMesh, left.material };
+        }
+    }
 };
 
 class SurfaceBuilder {

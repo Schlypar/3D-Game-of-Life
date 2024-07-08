@@ -52,6 +52,10 @@ public:
     bool IsIndexed() override {
         return true;
     }
+
+    Mesh::Data& GetData() override {
+        return this->data;
+    }
 };
 
 }

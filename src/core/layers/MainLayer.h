@@ -29,8 +29,6 @@ private:
     Shader cubeShader;
     Model* model1;
     Model* model2;
-    Model* model3;
-    Model* model4;
 
 public:
     MainLayer(
@@ -48,19 +46,14 @@ public:
         , renderer()
         , prismShader("resources/shaders/prism.shader")
         , cubeShader("resources/shaders/plain_color.shader") {
-        model1 = new IndexedPrism(this->prismShader);
-        model1->SetPosition({ -0.5f, 0.25f, -0.2f });
-        model1->SetRotation({ 0.0f, 90.0f, 0.0f });
-        model1->SetScaleFactor(0.3f);
-        model2 = new IndexedPrism(this->prismShader);
-        model2->SetPosition({ 0.65f, 0.3f, 0.0f });
-        model2->SetScaleFactor(0.6);
-        model3 = new SixColorCube(this->cubeShader);
-        model3->SetScaleFactor(0.5f);
-        model3->SetPosition({ -0.25, -0.75f, 0.1f });
-        model4 = new OneColorCube(this->cubeShader);
-        model4->SetScaleFactor(0.43f);
-        model4->SetPosition({ 0.45, -0.45f, -0.1f });
+        model1 = new SixColorCube(this->cubeShader);
+        model1->SetScaleFactor(0.5f);
+        model1->SetPosition({ -0.25, -0.75f, 0.1f });
+        model1->SetRotation(glm::vec3 { 15.0f });
+        // model2 = new OneColorCube(this->cubeShader);
+        // // model2->SetPosition({ 0.5f, 0.25f, 0.0f });
+        // model2->SetScaleFactor(0.5f);
+        // // model2->SetPosition({ 0.45, -0.45f, -0.1f });
     }
 
     ~MainLayer() = default;
@@ -70,9 +63,7 @@ public:
 
     void OnDetach() override {
         delete model1;
-        delete model2;
-        delete model3;
-        delete model4;
+        // delete model2;
     }
 
     void OnUpdate() override {
@@ -80,12 +71,16 @@ public:
         deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
 
+        std::cout << "RESET\n";
         renderer.Clear();
 
-        renderer.Draw(model1, camera);
-        renderer.Draw(model2, camera);
-        renderer.Draw(model3, camera);
-        renderer.Draw(model4, camera);
+        renderer.Submit(model1);
+        // renderer.Submit(model2);
+        renderer.DrawSubmitted(camera);
+        // renderer.Draw(model1, camera);
+        // renderer.Draw(model2, camera);
+        // renderer.Draw(model3, camera);
+        // renderer.Draw(model4, camera);
     }
 
     void OnEvent(Event& e) override {

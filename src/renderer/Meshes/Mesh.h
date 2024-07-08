@@ -8,7 +8,7 @@
 namespace GoL {
 
 class Mesh {
-protected:
+public:
     using Byte = unsigned char;
 
     struct Data {
@@ -96,6 +96,7 @@ public:
     virtual void Bind() = 0;
     virtual void Resize() = 0;
     virtual bool IsIndexed() = 0;
+    virtual Data& GetData() = 0;
 };
 
 }
