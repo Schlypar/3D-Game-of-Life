@@ -27,25 +27,31 @@ public:
             bytes[i] = this->data.bytes[i];
         }
         for (int i = 0; i < otherCount; i++) {
-            bytes[i + thisCount] = this->data.bytes[i];
+            bytes[i + thisCount] = right->data.bytes[i];
         }
 
         return std::make_shared<UnindexedMesh<T>>(bytes, newSize, this->GetLayout(), GL_DYNAMIC_DRAW);
     }
 
     UnindexedMesh<T>& operator+=(const UnindexedMesh<T>& other) {
-        const T* currentTs = this->data.bytes;
+        const T* oldData = this->data.bytes;
 
         size_t newSize = this->data.size + other.data.size;
         this->data.bytes = new T[newSize];
 
-        std::memcpy(this->data.bytes, currentTs, (this->data.size / sizeof(T)));
-        std::memcpy(this->data.bytes + (this->data.size / sizeof(T)), other.data.bytes, other.data.size);
+        auto thisCount = (this->data.size / sizeof(T));
+        auto otherCount = (other.data.size / sizeof(T));
+        for (int i = 0; i < thisCount; i++) {
+            this->data.bytes[i] = oldData[i];
+        }
+        for (int i = 0; i < otherCount; i++) {
+            this->data.bytes[i + thisCount] = other.data.bytes[i];
+        }
 
         this->data.size = newSize;
         this->data.usage = GL_DYNAMIC_DRAW;
 
-        delete[] currentTs;
+        delete[] oldData;
 
         return *this;
     }
