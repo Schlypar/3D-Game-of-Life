@@ -19,6 +19,7 @@ VertexBuffer::VertexBuffer(VertexBuffer&& other) {
 }
 
 VertexBuffer::~VertexBuffer() {
+    Unbind();
     glDeleteBuffers(1, &id);
 }
 

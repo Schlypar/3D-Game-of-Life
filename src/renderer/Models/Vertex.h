@@ -34,7 +34,7 @@ struct Vertex {
         return *this;
     }
 
-    friend std::ostream& operator<<(std::ostream& os, Vertex& v) {
+    friend std::ostream& operator<<(std::ostream& os, const Vertex& v) {
         os << "Pos: "
            << "(x: " << v.position.x
            << ", y: " << v.position.y

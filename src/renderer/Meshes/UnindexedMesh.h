@@ -9,17 +9,15 @@ namespace GoL {
 template <typename T>
 class UnindexedMesh : public Mesh<T> {
 public:
-    UnindexedMesh(const T* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
-        : Mesh<T>(data, size, usage) {
-    }
-
     UnindexedMesh(const T* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
         : Mesh<T>(data, size, layout, usage) {
+        this->vertexArray.Unbind();
+        this->vertexBuffer.Unbind();
     }
 
     ~UnindexedMesh() = default;
 
-    std::shared_ptr<UnindexedMesh> operator+(const UnindexedMesh* right) {
+    std::shared_ptr<UnindexedMesh<T>> operator+(const UnindexedMesh<T>* right) {
         // presume that it is always the case
         VertexBufferLayout layout;
         layout.Push<float>(3);
@@ -28,20 +26,20 @@ public:
         size_t newSize = this->data.size + right->data.size;
         T* bytes = new T[newSize];
 
-        std::memcpy(bytes, this->data.bytes, this->data.size);
-        std::memcpy(bytes + this->data.size, right->data.bytes, right->data.size);
+        std::memcpy(bytes, this->data.bytes, (this->data.size / sizeof(T)));
+        std::memcpy(bytes + (this->data.size / sizeof(T)), right->data.bytes, right->data.size);
 
-        return std::make_shared<UnindexedMesh>((const void*) bytes, newSize, layout, GL_DYNAMIC_DRAW);
+        return std::make_shared<UnindexedMesh<T>>(bytes, newSize, layout, GL_DYNAMIC_DRAW);
     }
 
-    UnindexedMesh& operator+=(const UnindexedMesh& other) {
+    UnindexedMesh<T>& operator+=(const UnindexedMesh<T>& other) {
         const T* currentTs = this->data.bytes;
 
         size_t newSize = this->data.size + other.data.size;
         this->data.bytes = new T[newSize];
 
-        std::memcpy(this->data.bytes, currentTs, this->data.size);
-        std::memcpy(this->data.bytes + this->data.size, other.data.bytes, other.data.size);
+        std::memcpy(this->data.bytes, currentTs, (this->data.size / sizeof(T)));
+        std::memcpy(this->data.bytes + (this->data.size / sizeof(T)), other.data.bytes, other.data.size);
 
         this->data.size = newSize;
         this->data.usage = GL_DYNAMIC_DRAW;
@@ -52,8 +50,13 @@ public:
     }
 
     void Bind() override {
-        this->vertexBuffer.Bind();
         this->vertexArray.Bind();
+        this->vertexBuffer.Bind();
+    }
+
+    void Unbind() override {
+        this->vertexArray.Unbind();
+        this->vertexBuffer.Unbind();
     }
 
     void Resize() override {

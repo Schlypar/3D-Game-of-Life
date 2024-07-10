@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <ostream>
 
 #include <glad/gl.h>
 #include <glm/ext/matrix_float4x4.hpp>
@@ -40,6 +41,50 @@ struct Surface {
         , material(material) {
     }
 
+    Surface(const Surface<T>& other) {
+        this->mode = other.mode;
+        this->vertexCount = other.vertexCount;
+        this->material = other.material;
+
+        auto& otherData = other.mesh->GetData();
+        T* data = new T[other.vertexCount];
+        std::copy(otherData.bytes, otherData.bytes + other.vertexCount, data);
+        this->mesh = std::make_shared<UnindexedMesh<T>>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
+        // this->mesh->Resize();
+    }
+
+    Surface(Surface<T>&& other)
+        : mode(other.mode)
+        , vertexCount(other.vertexCount)
+        , mesh(other.mesh)
+        , material(other.material) {
+    }
+
+    ~Surface() = default;
+
+    Surface<T>& operator=(const Surface<T>& other) {
+        this->mode = other.mode;
+        this->vertexCount = other.vertexCount;
+        this->material = other.material;
+
+        auto& otherData = other.mesh->GetData();
+        T* data = new T[other.vertexCount];
+        std::copy(otherData.bytes, otherData.bytes + other.vertexCount, data);
+        this->mesh = std::make_shared<UnindexedMesh<T>>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
+        // this->mesh->Resize();
+
+        return *this;
+    }
+
+    Surface<T>& operator=(Surface<T>&& other) {
+        this->mode = other.mode;
+        this->vertexCount = other.vertexCount;
+        this->material = other.material;
+        this->mesh = other.mesh;
+
+        return *this;
+    }
+
     Surface& operator+=(const Surface& other) {
         if (this->mesh->IsIndexed()) {
             // DEPRECATED
@@ -49,6 +94,7 @@ struct Surface {
             auto otherMesh = static_cast<UnindexedMesh<T>*>(other.mesh.get());
 
             *thisMesh += *otherMesh;
+            this->vertexCount += other.vertexCount;
 
             return *this;
         }
@@ -64,6 +110,19 @@ struct Surface {
 
             return Surface { left.mode, left.vertexCount + right.vertexCount, *leftMesh + rightMesh, left.material };
         }
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Surface<T>& s) {
+        os << "Surface {\n\tMode: " << s.mode
+           << "\n\tVertex Count: " << s.vertexCount
+           << "\n\tVertices: {\n";
+        std::ranges::for_each(
+                s.mesh->GetData().bytes,
+                s.mesh->GetData().bytes + s.vertexCount,
+                [&os](const Vertex& x) { os << "\t\t" << x << "\n"; }
+        );
+        os << "\t}\n}\n";
+        return os;
     }
 };
 

@@ -69,17 +69,13 @@ private:
             material->SetProjectionView(projectionView);
             material->Bind();
             glDrawArrays(surface.mode, 0, surface.vertexCount);
+            mesh->Unbind();
         }
     }
 
     std::vector<Surface<Vertex>> ConcatenateGeometry() {
-        const auto projection = [](Surface<Vertex>& s) -> int {
+        const auto projection = [](const Surface<Vertex>& s) -> int {
             return s.material.get()->GetId();
-        };
-        const auto groupByMaterial = [projection](Surface<Vertex>& l, Surface<Vertex>& r) -> bool {
-            auto left = projection(l);
-            auto right = projection(r);
-            return left == right;
         };
         const auto computeSurface = [](SurfaceBundle& sb) -> Surface<Vertex>& {
             auto& data = sb.surface.mesh->GetData();
@@ -91,18 +87,17 @@ private:
             return sb.surface;
         };
         const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex> {
-            std::cout << "LOOK\n";
             Surface<Vertex>& res = vec[0];
             std::for_each(vec.begin() + 1, vec.end(), [&res](Surface<Vertex>& s) -> void {
-                res += s;
+                res = res + s;
             });
             return res;
         };
 
-        std::ranges::sort(this->surfaces, {}, [projection](SurfaceBundle& sb) -> int { return projection(sb.surface); });
-        return this->surfaces
-             | std::ranges::views::transform(computeSurface)
-             | std::ranges::views::chunk_by(groupByMaterial)
+        std::cout << "LOOK\n";
+        auto computed = this->surfaces | std::ranges::views::transform(computeSurface);
+        return computed
+             | std::ranges::views::chunk(4)
              | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
              | std::ranges::views::transform(concat)
              | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })

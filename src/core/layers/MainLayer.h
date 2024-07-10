@@ -26,8 +26,8 @@ private:
 
     Shader prismShader;
     Shader cubeShader;
-    Model<Vertex>* model1;
-    Model<Vertex>* model2;
+    Model<Vertex>* sixColor;
+    Model<Vertex>* oneColor;
 
 public:
     MainLayer(
@@ -45,14 +45,13 @@ public:
         , renderer()
         , prismShader("resources/shaders/prism.shader")
         , cubeShader("resources/shaders/plain_color.shader") {
-        model1 = new SixColorCube(this->cubeShader);
-        model1->SetScaleFactor(0.5f);
-        model1->SetPosition({ -0.25, -0.75f, 0.1f });
-        model1->SetRotation(glm::vec3 { 15.0f });
-        // model2 = new OneColorCube(this->cubeShader);
-        // // model2->SetPosition({ 0.5f, 0.25f, 0.0f });
-        // model2->SetScaleFactor(0.5f);
-        // // model2->SetPosition({ 0.45, -0.45f, -0.1f });
+        sixColor = new SixColorCube(this->cubeShader);
+        sixColor->SetScaleFactor(0.5f);
+        sixColor->SetRotation(glm::vec3 { 15.0f });
+        oneColor = new OneColorCube(this->cubeShader);
+        oneColor->SetPosition({ 0.5f, 0.25f, 0.0f });
+        oneColor->SetScaleFactor(0.5f);
+        oneColor->SetPosition({ 0.45, -0.45f, -0.1f });
     }
 
     ~MainLayer() = default;
@@ -61,8 +60,8 @@ public:
     }
 
     void OnDetach() override {
-        delete model1;
-        // delete model2;
+        delete sixColor;
+        // delete oneColor;
     }
 
     void OnUpdate() override {
@@ -70,16 +69,16 @@ public:
         deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
 
-        std::cout << "RESET\n";
         renderer.Clear();
 
-        renderer.Submit(model1);
-        // renderer.Submit(model2);
-        renderer.DrawSubmitted(camera);
-        // renderer.Draw(model1, camera);
-        // renderer.Draw(model2, camera);
-        // renderer.Draw(model3, camera);
-        // renderer.Draw(model4, camera);
+        // renderer.Submit(sixColor);
+        // renderer.Submit(oneColor);
+
+        // renderer.DrawSubmitted(camera);
+        renderer.Draw(oneColor, camera);
+        renderer.Draw(sixColor, camera);
+
+        // std::cout << "RESET\n";
     }
 
     void OnEvent(Event& e) override {

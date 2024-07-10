@@ -69,30 +69,38 @@ public:
 
 protected:
     Data data;
-    VertexBuffer vertexBuffer;
     VertexArray vertexArray;
+    VertexBuffer vertexBuffer;
+    VertexBufferLayout layout;
 
 public:
-    Mesh(const T* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
-        : data(data, size, usage)
-        , vertexBuffer(data, size, usage)
-        , vertexArray() {
-    }
-
     Mesh(const T* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
         : data(data, size, usage)
-        , vertexBuffer(data, size, usage)
-        , vertexArray() {
+        , vertexArray()
+        , vertexBuffer(nullptr, 1, usage) {
+        this->vertexArray = VertexArray();
+        this->vertexArray.Bind();
+
+        this->vertexBuffer = VertexBuffer(data, size, usage);
+
         vertexArray.AddBuffer(vertexBuffer, layout);
+        this->vertexBuffer.Unbind();
+
+        this->layout = layout;
     }
+
+    virtual ~Mesh() = default;
 
     void AddLayout(const VertexBufferLayout& layout) {
         vertexArray.AddBuffer(vertexBuffer, layout);
     }
 
-    virtual ~Mesh() = default;
+    const VertexBufferLayout& GetLayout() const {
+        return this->layout;
+    }
 
     virtual void Bind() = 0;
+    virtual void Unbind() = 0;
     virtual void Resize() = 0;
     virtual bool IsIndexed() = 0;
     virtual Data& GetData() = 0;

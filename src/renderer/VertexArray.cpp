@@ -1,4 +1,6 @@
 #include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "glad/gl.h"
 
 namespace GoL {
@@ -17,6 +19,7 @@ VertexArray::VertexArray(VertexArray&& other)
 }
 
 VertexArray::~VertexArray() {
+    Unbind();
     glDeleteVertexArrays(1, &id);
 }
 
