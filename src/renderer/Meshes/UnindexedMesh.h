@@ -18,18 +18,19 @@ public:
     ~UnindexedMesh() = default;
 
     std::shared_ptr<UnindexedMesh<T>> operator+(const UnindexedMesh<T>* right) {
-        // presume that it is always the case
-        VertexBufferLayout layout;
-        layout.Push<float>(3);
-        layout.Push<float>(3);
-
         size_t newSize = this->data.size + right->data.size;
         T* bytes = new T[newSize];
 
-        std::memcpy(bytes, this->data.bytes, (this->data.size / sizeof(T)));
-        std::memcpy(bytes + (this->data.size / sizeof(T)), right->data.bytes, right->data.size);
+        auto thisCount = (this->data.size / sizeof(T));
+        auto otherCount = (right->data.size / sizeof(T));
+        for (int i = 0; i < thisCount; i++) {
+            bytes[i] = this->data.bytes[i];
+        }
+        for (int i = 0; i < otherCount; i++) {
+            bytes[i + thisCount] = this->data.bytes[i];
+        }
 
-        return std::make_shared<UnindexedMesh<T>>(bytes, newSize, layout, GL_DYNAMIC_DRAW);
+        return std::make_shared<UnindexedMesh<T>>(bytes, newSize, this->GetLayout(), GL_DYNAMIC_DRAW);
     }
 
     UnindexedMesh<T>& operator+=(const UnindexedMesh<T>& other) {
