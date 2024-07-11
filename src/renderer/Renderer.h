@@ -26,6 +26,7 @@ private:
 
 private:
     std::vector<SurfaceBundle> surfaces;
+    std::vector<Surface<Vertex>> batched;
 
 public:
     inline void Clear() {
@@ -42,11 +43,14 @@ public:
         this->surfaces.insert(this->surfaces.end(), modelSurfaces.begin(), modelSurfaces.end());
     }
 
+    void ResetBatched() {
+        this->batched.clear();
+    }
+
     void DrawSubmitted(const Camera& camera) {
-        std::vector<Surface<Vertex>> optimized = this->ConcatenateGeometry();
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
-        DrawSurfaces(optimized, modelMatrix, projectionView);
+        DrawSurfaces(this->batched, modelMatrix, projectionView);
     }
 
     void Draw(Model<Vertex>* model, const Camera& camera) const {
@@ -56,21 +60,7 @@ public:
         DrawSurfaces(surfaces, modelMatrix, projectionView);
     }
 
-private:
-    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
-        for (Surface<Vertex>& surface : surfaces) {
-            Mesh<Vertex>* mesh = surface.mesh.get();
-            Material* material = surface.material;
-            mesh->Bind();
-            material->SetModel(modelMatrix);
-            material->SetProjectionView(projectionView);
-            material->Bind();
-            glDrawArrays(surface.mode, 0, surface.vertexCount);
-            mesh->Unbind();
-        }
-    }
-
-    std::vector<Surface<Vertex>> ConcatenateGeometry() {
+    void ConcatenateGeometry() {
         const auto projection = [](const Surface<Vertex>& s) -> int {
             return s.material->GetId();
         };
@@ -101,12 +91,26 @@ private:
                       | std::ranges::to<std::vector<Surface<Vertex>>>();
         std::ranges::sort(computed, {}, projection);
 
-        return computed
-             | std::ranges::views::chunk_by(material)
-             | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
-             | std::ranges::views::transform(concat)
-             | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
-             | std::ranges::to<std::vector<Surface<Vertex>>>();
+        this->batched = computed
+                      | std::ranges::views::chunk_by(material)
+                      | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
+                      | std::ranges::views::transform(concat)
+                      | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
+                      | std::ranges::to<std::vector<Surface<Vertex>>>();
+    }
+
+private:
+    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
+        for (Surface<Vertex>& surface : surfaces) {
+            Mesh<Vertex>* mesh = surface.mesh.get();
+            Material* material = surface.material;
+            mesh->Bind();
+            material->SetModel(modelMatrix);
+            material->SetProjectionView(projectionView);
+            material->Bind();
+            glDrawArrays(surface.mode, 0, surface.vertexCount);
+            mesh->Unbind();
+        }
     }
 };
 
