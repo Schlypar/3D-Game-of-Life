@@ -1,8 +1,5 @@
 #pragma once
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
-
 #include <algorithm>
 #include <bits/ranges_algo.h>
 #include <ranges>
@@ -63,7 +60,7 @@ private:
     void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
         for (Surface<Vertex>& surface : surfaces) {
             Mesh<Vertex>* mesh = surface.mesh.get();
-            Material* material = surface.material.get();
+            Material* material = surface.material;
             mesh->Bind();
             material->SetModel(modelMatrix);
             material->SetProjectionView(projectionView);
@@ -75,7 +72,12 @@ private:
 
     std::vector<Surface<Vertex>> ConcatenateGeometry() {
         const auto projection = [](const Surface<Vertex>& s) -> int {
-            return s.material.get()->GetId();
+            return s.material->GetId();
+        };
+        const auto material = [projection](Surface<Vertex>& l, Surface<Vertex>& r) -> bool {
+            auto left = projection(l);
+            auto right = projection(r);
+            return left == right;
         };
         const auto computeSurface = [](SurfaceBundle& sb) -> Surface<Vertex>& {
             auto& data = sb.surface.mesh->GetData();
@@ -89,15 +91,18 @@ private:
         const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex> {
             Surface<Vertex>& res = vec[0];
             std::for_each(vec.begin() + 1, vec.end(), [&res](Surface<Vertex>& s) -> void {
-                res = res + s;
+                res += s;
             });
             return res;
         };
 
-        std::cout << "LOOK\n";
-        auto computed = this->surfaces | std::ranges::views::transform(computeSurface);
+        auto computed = this->surfaces
+                      | std::ranges::views::transform(computeSurface)
+                      | std::ranges::to<std::vector<Surface<Vertex>>>();
+        std::ranges::sort(computed, {}, projection);
+
         return computed
-             | std::ranges::views::chunk(4)
+             | std::ranges::views::chunk_by(material)
              | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
              | std::ranges::views::transform(concat)
              | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })

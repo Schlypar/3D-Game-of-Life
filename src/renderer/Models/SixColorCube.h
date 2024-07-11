@@ -34,6 +34,8 @@ public:
         layout.Push<float>(3);
         layout.Push<float>(3);
 
+        MaterialLibrary::AddMaterial({ "PlainColorMaterial", new PlainColorMaterial(shader, glm::vec4 { 0.2f, 0.3f, 0.6f, 1.0f }) });
+
         Vertex front[] = {
             { { 0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
             { { -0.5f, -0.5, -0.5f }, glm::vec3 { 0.0f } },
@@ -45,7 +47,7 @@ public:
         };
         builderFront.SetVertexCount(6);
         builderFront.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(front, sizeof(front), layout));
-        builderFront.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.8f, 0.2f, 0.3f, 1.0f }));
+        builderFront.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex back[] = {
             { { -0.5f, -0.5, 0.5f }, glm::vec3 { 0.0f } },
@@ -58,7 +60,7 @@ public:
         };
         builderBack.SetVertexCount(6);
         builderBack.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(back, sizeof(back), layout));
-        builderBack.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.2f, 0.8f, 0.3f, 1.0f }));
+        builderBack.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex up[] = {
             { { 0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
@@ -71,7 +73,7 @@ public:
         };
         builderTop.SetVertexCount(6);
         builderTop.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(up, sizeof(up), layout));
-        builderTop.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.3f, 0.2f, 0.8f, 1.0f }));
+        builderTop.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex bottom[] = {
             { { -0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
@@ -84,7 +86,7 @@ public:
         };
         builderBottom.SetVertexCount(6);
         builderBottom.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(bottom, sizeof(bottom), layout));
-        builderBottom.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.4f, 0.4f, 0.4f, 1.0f }));
+        builderBottom.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex left[] = {
             { { -0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
@@ -97,7 +99,7 @@ public:
         };
         builderLeft.SetVertexCount(6);
         builderLeft.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(left, sizeof(left), layout));
-        builderLeft.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.6f, 0.0f, 0.6f, 1.0f }));
+        builderLeft.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex right[] = {
             { { 0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
@@ -110,7 +112,7 @@ public:
         };
         builderRight.SetVertexCount(6);
         builderRight.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(right, sizeof(right), layout));
-        builderRight.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.0f, 0.6f, 0.6f, 1.0f }));
+        builderRight.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         this->surfaces[0] = builderFront.Build();
         this->surfaces[1] = builderBack.Build();

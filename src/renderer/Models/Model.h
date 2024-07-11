@@ -12,8 +12,8 @@
 #include "Meshes/UnindexedMesh.h"
 #include "Vertex.h"
 
+#include "MaterialLibrary.h"
 #include "Materials/Material.h"
-#include "Meshes/Mesh.h"
 
 namespace GoL {
 
@@ -25,7 +25,7 @@ struct Surface {
     GLenum mode;
     unsigned int vertexCount;
     Ref<Mesh<T>> mesh;
-    Ref<Material> material;
+    Material* material;
 
     Surface()
         : mode(GL_TRIANGLES)
@@ -34,7 +34,7 @@ struct Surface {
         , material(nullptr) {
     }
 
-    Surface(GLenum mode, unsigned int vertexCount, Ref<Mesh<T>> mesh, Ref<Material> material)
+    Surface(GLenum mode, unsigned int vertexCount, Ref<Mesh<T>> mesh, Material* material)
         : mode(mode)
         , vertexCount(vertexCount)
         , mesh(mesh)
@@ -130,7 +130,7 @@ template <typename T>
 class SurfaceBuilder {
 private:
     Ref<Mesh<T>> mesh;
-    Ref<Material> material;
+    Material* material;
     unsigned int vertexCount;
     unsigned int mode = GL_TRIANGLES;
 
@@ -147,7 +147,7 @@ public:
         this->mesh = mesh;
     }
 
-    void SetMaterial(Ref<Material> material) {
+    void SetMaterial(Material* material) {
         this->material = material;
     }
 

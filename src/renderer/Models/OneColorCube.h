@@ -26,6 +26,8 @@ public:
         layout.Push<float>(3);
         layout.Push<float>(3);
 
+        MaterialLibrary::AddMaterial({ "PlainColorMaterial", new PlainColorMaterial(shader, glm::vec4 { 0.2f, 0.3f, 0.6f, 1.0f }) });
+
         Vertex vertices[] = {
             // front
             { { 0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
@@ -78,7 +80,7 @@ public:
         };
         builder.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(vertices, sizeof(vertices), layout));
         builder.SetVertexCount(6 * 6);
-        builder.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.8f, 0.2f, 0.3f, 1.0f }));
+        builder.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
         this->surface = builder.Build();
     }
 

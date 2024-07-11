@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Shader.h"
 #include <cassert>
 #include <string>
+
+#include "MaterialLibrary.h"
+#include "Shader.h"
 
 namespace GoL {
 

@@ -1,7 +1,8 @@
+#include <cassert>
+#include <cstdlib>
+
 #include "Application.h"
 #include "layers/ImGuiLayer.h"
-#include <cassert>
-
 
 namespace GoL {
 
