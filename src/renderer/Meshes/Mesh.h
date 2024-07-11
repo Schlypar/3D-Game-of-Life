@@ -1,9 +1,10 @@
 #pragma once
 
+#include <cstring>
+
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
-#include <cstring>
 
 namespace GoL {
 

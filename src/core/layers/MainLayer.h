@@ -46,12 +46,11 @@ public:
         , prismShader("resources/shaders/prism.shader")
         , cubeShader("resources/shaders/plain_color.shader") {
         sixColor = new SixColorCube(this->cubeShader);
-        sixColor->SetScaleFactor(0.5f);
+        sixColor->SetScaleFactor(0.25f);
         sixColor->SetRotation(glm::vec3 { 15.0f });
         oneColor = new OneColorCube(this->cubeShader);
         oneColor->SetPosition({ 0.5f, 0.25f, 0.0f });
-        oneColor->SetScaleFactor(0.5f);
-        oneColor->SetPosition({ 0.45, -0.45f, -0.1f });
+        oneColor->SetScaleFactor(0.25f);
     }
 
     ~MainLayer() = default;
@@ -71,12 +70,12 @@ public:
 
         renderer.Clear();
 
-        // renderer.Submit(sixColor);
-        // renderer.Submit(oneColor);
+        renderer.Submit(sixColor);
+        renderer.Submit(oneColor);
 
-        // renderer.DrawSubmitted(camera);
-        renderer.Draw(oneColor, camera);
-        renderer.Draw(sixColor, camera);
+        renderer.DrawSubmitted(camera);
+        // renderer.Draw(oneColor, camera);
+        // renderer.Draw(sixColor, camera);
 
         // std::cout << "RESET\n";
     }
