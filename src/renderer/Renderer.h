@@ -9,6 +9,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "Batcher.h"
 #include "Camera.h"
 
 #include "Meshes/Mesh.h"

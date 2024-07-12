@@ -33,6 +33,9 @@ private:
     Model<Vertex>* sixColor;
     Model<Vertex>* oneColor;
 
+    Batcher batcher = Batcher(Batcher::Config {});
+    std::vector<Surface<Vertex>> batches;
+
 public:
     MainLayer(
             glm::vec3 position = glm::vec3(0.0f, 0.0f, -3.0f),
@@ -78,6 +81,18 @@ public:
             }
         }
         renderer.ConcatenateGeometry();
+
+        // for (int x = 0; x < 10; x++) {
+        //     for (int y = 0; y < 10; y++) {
+        //         for (int z = 0; z < 10; z++) {
+        //             oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
+        //             oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+        //             // renderer.Submit(oneColor);
+        //             batcher.Submit(oneColor);
+        //         }
+        //     }
+        // }
+        // this->batches = batcher.ComputeBatches();
     }
 
     void OnDetach() override {
@@ -94,10 +109,7 @@ public:
 
         // renderer.DrawTest(this->batches, camera);
         renderer.DrawSubmitted(camera);
-        // renderer.Draw(oneColor, camera);
-        // renderer.Draw(sixColor, camera);
-
-        // std::cout << "RESET\n";
+        // batcher.Reset();
     }
 
     void OnEvent(Event& e) override {
