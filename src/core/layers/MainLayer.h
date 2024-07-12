@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Application.h"
+#include "Batcher.h"
+#include "MaterialLibrary.h"
+#include "Materials/PlainColorMaterial.h"
 #include "Models/OneColorCube.h"
 #include "Renderer.h"
 
@@ -55,6 +59,15 @@ public:
     ~MainLayer() = default;
 
     void OnAttach() override {
+        Application& app = Application::Get();
+        app.SubmitToImgui([this]() {
+            if (ImGui::Button("Press me")) {
+                // this->batcher.Reset();
+                // this->batches = std::move(this->batcher.ComputeBatches());
+                this->renderer.ResetBatched();
+                this->renderer.ConcatenateGeometry();
+            }
+        });
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 for (int z = 0; z < 10; z++) {
@@ -79,9 +92,7 @@ public:
 
         renderer.Clear();
 
-        // renderer.Submit(sixColor);
-        // renderer.Submit(oneColor);
-
+        // renderer.DrawTest(this->batches, camera);
         renderer.DrawSubmitted(camera);
         // renderer.Draw(oneColor, camera);
         // renderer.Draw(sixColor, camera);

@@ -78,7 +78,7 @@ public:
             { { 0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
             { { 0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
         };
-        builder.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(vertices, sizeof(vertices), layout));
+        builder.SetMesh(new UnindexedMesh<Vertex>(vertices, sizeof(vertices), layout));
         builder.SetVertexCount(6 * 6);
         builder.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
         this->surface = builder.Build();

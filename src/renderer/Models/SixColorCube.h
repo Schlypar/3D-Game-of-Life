@@ -46,7 +46,7 @@ public:
             { { -0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
         };
         builderFront.SetVertexCount(6);
-        builderFront.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(front, sizeof(front), layout));
+        builderFront.SetMesh(new UnindexedMesh<Vertex>(front, sizeof(front), layout));
         builderFront.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex back[] = {
@@ -59,7 +59,7 @@ public:
             { { -0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
         };
         builderBack.SetVertexCount(6);
-        builderBack.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(back, sizeof(back), layout));
+        builderBack.SetMesh(new UnindexedMesh<Vertex>(back, sizeof(back), layout));
         builderBack.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex up[] = {
@@ -72,7 +72,7 @@ public:
             { { -0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
         };
         builderTop.SetVertexCount(6);
-        builderTop.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(up, sizeof(up), layout));
+        builderTop.SetMesh(new UnindexedMesh<Vertex>(up, sizeof(up), layout));
         builderTop.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex bottom[] = {
@@ -85,7 +85,7 @@ public:
             { { -0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
         };
         builderBottom.SetVertexCount(6);
-        builderBottom.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(bottom, sizeof(bottom), layout));
+        builderBottom.SetMesh(new UnindexedMesh<Vertex>(bottom, sizeof(bottom), layout));
         builderBottom.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex left[] = {
@@ -98,7 +98,7 @@ public:
             { { -0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
         };
         builderLeft.SetVertexCount(6);
-        builderLeft.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(left, sizeof(left), layout));
+        builderLeft.SetMesh(new UnindexedMesh<Vertex>(left, sizeof(left), layout));
         builderLeft.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         Vertex right[] = {
@@ -111,7 +111,7 @@ public:
             { { 0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
         };
         builderRight.SetVertexCount(6);
-        builderRight.SetMesh(std::make_shared<UnindexedMesh<Vertex>>(right, sizeof(right), layout));
+        builderRight.SetMesh(new UnindexedMesh<Vertex>(right, sizeof(right), layout));
         builderRight.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
 
         this->surfaces[0] = builderFront.Build();

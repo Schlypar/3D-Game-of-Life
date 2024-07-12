@@ -31,7 +31,6 @@ private:
 public:
     inline void Clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        surfaces.clear();
     }
 
     void Submit(Model<Vertex>* model) {
@@ -89,20 +88,21 @@ public:
         auto computed = this->surfaces
                       | std::ranges::views::transform(computeSurface)
                       | std::ranges::to<std::vector<Surface<Vertex>>>();
-        std::ranges::sort(computed, {}, projection);
+        this->batched = std::move(computed);
+        // std::ranges::sort(computed, {}, projection);
 
-        this->batched = computed
-                      | std::ranges::views::chunk_by(material)
-                      | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
-                      | std::ranges::views::transform(concat)
-                      | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
-                      | std::ranges::to<std::vector<Surface<Vertex>>>();
+        // this->batched = computed
+        //               | std::ranges::views::chunk_by(material)
+        //               | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
+        //               | std::ranges::views::transform(concat)
+        //               | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
+        //               | std::ranges::to<std::vector<Surface<Vertex>>>();
     }
 
 private:
     void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
         for (Surface<Vertex>& surface : surfaces) {
-            Mesh<Vertex>* mesh = surface.mesh.get();
+            Mesh<Vertex>* mesh = surface.mesh;
             Material* material = surface.material;
             mesh->Bind();
             material->SetModel(modelMatrix);

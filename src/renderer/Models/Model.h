@@ -24,7 +24,7 @@ template <typename T>
 struct Surface {
     GLenum mode;
     unsigned int vertexCount;
-    Ref<Mesh<T>> mesh;
+    Mesh<T>* mesh;
     Material* material;
 
     Surface()
@@ -34,7 +34,7 @@ struct Surface {
         , material(nullptr) {
     }
 
-    Surface(GLenum mode, unsigned int vertexCount, Ref<Mesh<T>> mesh, Material* material)
+    Surface(GLenum mode, unsigned int vertexCount, Mesh<T>* mesh, Material* material)
         : mode(mode)
         , vertexCount(vertexCount)
         , mesh(mesh)
@@ -49,7 +49,7 @@ struct Surface {
         auto& otherData = other.mesh->GetData();
         T* data = new T[other.vertexCount];
         std::copy(otherData.bytes, otherData.bytes + other.vertexCount, data);
-        this->mesh = std::make_shared<UnindexedMesh<T>>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
+        this->mesh = new UnindexedMesh<T>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
         // this->mesh->Resize();
     }
 
@@ -60,7 +60,13 @@ struct Surface {
         , material(other.material) {
     }
 
-    ~Surface() = default;
+    ~Surface() {
+        mode = 0;
+        vertexCount = 0;
+
+        delete mesh;
+        mesh = nullptr;
+    }
 
     Surface<T>& operator=(const Surface<T>& other) {
         this->mode = other.mode;
@@ -70,7 +76,7 @@ struct Surface {
         auto& otherData = other.mesh->GetData();
         T* data = new T[other.vertexCount];
         std::copy(otherData.bytes, otherData.bytes + other.vertexCount, data);
-        this->mesh = std::make_shared<UnindexedMesh<T>>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
+        this->mesh = new UnindexedMesh<T>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
         // this->mesh->Resize();
 
         return *this;
@@ -90,8 +96,8 @@ struct Surface {
             // DEPRECATED
             return *this;
         } else {
-            auto thisMesh = static_cast<UnindexedMesh<T>*>(this->mesh.get());
-            auto otherMesh = static_cast<UnindexedMesh<T>*>(other.mesh.get());
+            auto thisMesh = static_cast<UnindexedMesh<T>*>(this->mesh);
+            auto otherMesh = static_cast<UnindexedMesh<T>*>(other.mesh);
 
             *thisMesh += *otherMesh;
             this->vertexCount += other.vertexCount;
@@ -105,8 +111,8 @@ struct Surface {
             // DEPRECATED
             return left;
         } else {
-            auto leftMesh = static_cast<UnindexedMesh<T>*>(left.mesh.get());
-            auto rightMesh = static_cast<UnindexedMesh<T>*>(right.mesh.get());
+            auto leftMesh = static_cast<UnindexedMesh<T>*>(left.mesh);
+            auto rightMesh = static_cast<UnindexedMesh<T>*>(right.mesh);
 
             return Surface { left.mode, left.vertexCount + right.vertexCount, *leftMesh + rightMesh, left.material };
         }
@@ -129,7 +135,7 @@ struct Surface {
 template <typename T>
 class SurfaceBuilder {
 private:
-    Ref<Mesh<T>> mesh;
+    Mesh<T>* mesh;
     Material* material;
     unsigned int vertexCount;
     unsigned int mode = GL_TRIANGLES;
@@ -143,7 +149,7 @@ public:
 
     ~SurfaceBuilder() = default;
 
-    void SetMesh(Ref<Mesh<T>> mesh) {
+    void SetMesh(Mesh<T>* mesh) {
         this->mesh = mesh;
     }
 
@@ -164,7 +170,7 @@ public:
             std::cout << "Error: mesh, material or vertex count not set" << std::endl;
             return Surface<T> { mode, 0, nullptr, nullptr };
         }
-        return Surface<T> { mode, vertexCount, mesh, material };
+        return Surface<T>(mode, vertexCount, mesh, material);
     }
 };
 
