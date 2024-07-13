@@ -5,9 +5,9 @@
 namespace GoL {
 
 VertexBuffer::VertexBuffer(const void* data, const size_t size, GLenum usage) {
-    glGenBuffers(1, &id);
-    glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
+    // glGenBuffers(1, &id);
+    // glBindBuffer(GL_ARRAY_BUFFER, id);
+    // glBufferData(GL_ARRAY_BUFFER, size, data, usage);
 }
 
 VertexBuffer::VertexBuffer(const VertexBuffer& other)
@@ -19,8 +19,8 @@ VertexBuffer::VertexBuffer(VertexBuffer&& other) {
 }
 
 VertexBuffer::~VertexBuffer() {
-    Unbind();
-    glDeleteBuffers(1, &id);
+    // Unbind();
+    // glDeleteBuffers(1, &id);
 }
 
 VertexBuffer& VertexBuffer::operator=(const VertexBuffer& other) {
@@ -35,23 +35,23 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) {
 }
 
 void VertexBuffer::Realloc(const size_t size, GLenum usage) {
-    glDeleteBuffers(1, &id);
-    glGenBuffers(1, &id);
-    glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, size, nullptr, usage);
+    // glDeleteBuffers(1, &id);
+    // glGenBuffers(1, &id);
+    // glBindBuffer(GL_ARRAY_BUFFER, id);
+    // glBufferData(GL_ARRAY_BUFFER, size, nullptr, usage);
 }
 
 void VertexBuffer::Write(const void* data, size_t size, unsigned int offset) {
-    Bind();
-    glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+    // Bind();
+    // glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 }
 
 void VertexBuffer::Bind() const {
-    glBindBuffer(GL_ARRAY_BUFFER, id);
+    // glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 
 void VertexBuffer::Unbind() const {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 }

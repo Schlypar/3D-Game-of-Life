@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "Application.h"
 #include "Batcher.h"
 #include "MaterialLibrary.h"
@@ -36,6 +38,8 @@ private:
     Batcher batcher = Batcher(Batcher::Config {});
     std::vector<Surface<Vertex>> batches;
 
+    Surface<Vertex> a, b;
+
 public:
     MainLayer(
             glm::vec3 position = glm::vec3(0.0f, 0.0f, -3.0f),
@@ -68,7 +72,20 @@ public:
                 // this->batcher.Reset();
                 // this->batches = std::move(this->batcher.ComputeBatches());
                 // this->renderer.ResetBatched();
-                this->renderer.ConcatenateGeometry();
+                // this->renderer.ConcatenateGeometry();
+                // auto sf = std::move(renderer.surfaces);
+                // auto p = new Surface<Vertex>[sf.size()];
+                
+                for (int i = 0; i < 500; i++) {
+                    auto t(a);
+                    a = b;
+                    b = t;
+                    // for (auto& s : sf) {
+                    //     p[j++] = s.surface;
+                    // }
+                }
+                // std::cout << (double)sf.size() * sizeof(Surface<Vertex>) / (1024 * 1024) << std::endl;
+                // delete[] p;
             }
         });
         for (int x = 0; x < 15; x++) {
@@ -81,7 +98,8 @@ public:
             }
         }
         renderer.ConcatenateGeometry();
-        
+        a = renderer.surfaces[0].surface;
+        b = renderer.surfaces[1].surface;
 
         // for (int x = 0; x < 10; x++) {
         //     for (int y = 0; y < 10; y++) {

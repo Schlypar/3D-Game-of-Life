@@ -91,13 +91,15 @@ protected:
     VertexArray vertexArray;
     VertexBuffer vertexBuffer;
     VertexBufferLayout layout;
+    GLenum usage;
 
 public:
     Mesh() : vertexArray(), vertexBuffer(nullptr, 1, GL_STATIC_DRAW), data() {}
     Mesh(const T* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
         : data(data, size, usage)
         , vertexArray()
-        , vertexBuffer(nullptr, 1, usage) {
+        , vertexBuffer(nullptr, 1, usage)
+        , usage(usage) {
         this->vertexArray = VertexArray();
         this->vertexArray.Bind();
 
@@ -113,6 +115,7 @@ public:
         vertexArray = oth_mesh.vertexArray;
         vertexBuffer = oth_mesh.vertexBuffer;
         layout = oth_mesh.layout;
+        usage = oth_mesh.usage;
         data = std::move(oth_mesh.data);
     }
 
@@ -120,6 +123,7 @@ public:
         vertexArray = oth_mesh.vertexArray;
         vertexBuffer = oth_mesh.vertexBuffer;
         layout = oth_mesh.layout;
+        usage = oth_mesh.usage;
         data = oth_mesh.data;
     }
 
@@ -127,11 +131,15 @@ public:
         vertexArray = oth_mesh.vertexArray;
         vertexBuffer = oth_mesh.vertexBuffer;
         layout = oth_mesh.layout;
+        usage = oth_mesh.usage;
         data = std::move(oth_mesh.data);
     }
 
     virtual ~Mesh() {
         data.~Data();
+        vertexArray.~VertexArray();
+        vertexBuffer.~VertexBuffer();
+        // layout.~VertexBufferLayout();
     }
 
     void AddLayout(const VertexBufferLayout& layout) {

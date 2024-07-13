@@ -6,7 +6,7 @@
 namespace GoL {
 
 VertexArray::VertexArray() {
-    glGenVertexArrays(1, &id);
+    // glGenVertexArrays(1, &id);
 }
 
 VertexArray::VertexArray(const VertexArray& other)
@@ -19,8 +19,8 @@ VertexArray::VertexArray(VertexArray&& other)
 }
 
 VertexArray::~VertexArray() {
-    Unbind();
-    glDeleteVertexArrays(1, &id);
+    // Unbind();
+    // glDeleteVertexArrays(1, &id);
 }
 
 VertexArray& VertexArray::operator=(const VertexArray& other) {
@@ -44,18 +44,18 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
     unsigned int offset = 0;
     for (int i = 0; i < elements.size(); i++) {
         const VertexBufferLayout::Element& element = elements[i];
-        glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*) offset);
+        // glEnableVertexAttribArray(i);
+        // glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*) offset);
         offset += element.count * VertexBufferLayout::Element::GetSizeOfType(element.type);
     }
 }
 
 void VertexArray::Bind() const {
-    glBindVertexArray(id);
+    // glBindVertexArray(id);
 }
 
 void VertexArray::Unbind() const {
-    glBindVertexArray(0);
+    // glBindVertexArray(0);
 }
 
 }

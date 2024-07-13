@@ -27,7 +27,8 @@ private:
 
 public:
     std::vector<SurfaceBundle> surfaces;
-    std::vector<Surface<Vertex>> batched;
+    Surface<Vertex>* batched;
+    size_t batched_len;
 
 public:
     inline void Clear() {
@@ -43,25 +44,34 @@ public:
         this->surfaces.insert(this->surfaces.end(), modelSurfaces.begin(), modelSurfaces.end());
     }
 
+    Renderer() {
+        batched = nullptr;
+        batched_len = 0;
+    }
+
+    ~Renderer() {
+        if (batched != nullptr) delete[] batched;
+    }
+
     void ResetBatched() {
-        for (int i = 0; i < this->batched.size(); i++) {
+        for (int i = 0; i < batched_len; i++) {
             this->batched[i].~Surface();
         }
         // this->batched.resize(0);
-        this->batched.clear();
+        // this->batched.clear();
     }
 
     void DrawSubmitted(const Camera& camera) {
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
-        DrawSurfaces(this->batched, modelMatrix, projectionView);
+        DrawSurfaces(this->batched, batched_len, modelMatrix, projectionView);
     }
 
     void Draw(Model<Vertex>* model, const Camera& camera) const {
         std::vector<Surface<Vertex>> surfaces = model->GetSurfaces();
         glm::mat4 modelMatrix = model->GetModelMatrix();
         glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
-        DrawSurfaces(surfaces, modelMatrix, projectionView);
+        DrawSurfaces(surfaces.data(), surfaces.size(), modelMatrix, projectionView);
     }
 
     void ConcatenateGeometry() {
@@ -94,17 +104,14 @@ public:
         //               | std::ranges::views::transform(computeSurface)
         //               | std::ranges::to<std::vector<Surface<Vertex>>>();
         // this->batched = std::move(computed);
-        if (batched.size() < surfaces.size()) {
-            ResetBatched();
-            for (int i = 0; i < surfaces.size(); i++) {
-                // batched.push_back(computeSurface(surfaces[i]));
-                batched.push_back(computeSurface(surfaces[i]));
-                
-            }
-        } else {
-            for (int i = 0; i < surfaces.size(); i++) {
-                batched[i] = computeSurface(surfaces[i]);
-            }
+
+        if (batched_len < surfaces.size()) {
+            if (batched != nullptr) delete[] batched;
+            batched = new Surface<Vertex>[surfaces.size()];
+            batched_len = surfaces.size();
+        }
+        for (int i = 0; i < surfaces.size(); i++) {
+            batched[i] = computeSurface(surfaces[i]);
         }
         // std::ranges::sort(computed, {}, projection);
 
@@ -117,15 +124,16 @@ public:
     }
 
 private:
-    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
-        for (Surface<Vertex>& surface : surfaces) {
+    void DrawSurfaces(Surface<Vertex>* surfaces, size_t surfaces_len, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
+        for (int i = 0; i < surfaces_len; i++) {
+            Surface<Vertex>& surface = surfaces[i];
             Mesh<Vertex>* mesh = surface.mesh;
             Material* material = surface.material;
             mesh->Bind();
             material->SetModel(modelMatrix);
             material->SetProjectionView(projectionView);
             material->Bind();
-            glDrawArrays(surface.mode, 0, surface.vertexCount);
+            // glDrawArrays(surface.mode, 0, surface.vertexCount);
             mesh->Unbind();
         }
     }

@@ -15,11 +15,13 @@ public:
         this->vertexBuffer.Unbind();
     }
 
-    UnindexedMesh(UnindexedMesh& oth) {
+    UnindexedMesh(UnindexedMesh<T>& oth) 
+        : Mesh<T>(oth.data.bytes, oth.data.size, oth.layout, oth.usage)
+    {
         this->vertexArray = oth.vertexArray;
         this->vertexBuffer = oth.vertexBuffer;
-        this->layout = oth.layout;
-        this->data = oth.data;
+        // this->layout = oth.layout;
+        // this->data = oth.data;
     }
 
     ~UnindexedMesh() = default;
