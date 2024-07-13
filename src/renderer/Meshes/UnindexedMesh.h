@@ -74,10 +74,6 @@ public:
     bool IsIndexed() override {
         return false;
     }
-
-    Mesh<T>::Data& GetData() override {
-        return this->data;
-    }
 };
 
 }

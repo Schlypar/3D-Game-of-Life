@@ -13,17 +13,24 @@ class Mesh {
 public:
     struct Data {
         T* bytes;
-        size_t size;
+        size_t size;    // in BYTES!!!
         GLenum usage;
 
+        Data() {
+            bytes = nullptr;
+            size = 0;
+            usage = 0;
+        }
+
         Data(const void* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
-            : bytes(new T[size])
-            , size(size) {
+            : bytes(new T[size / sizeof(T)])
+            , size(size)
+            , usage(usage) {
             std::memcpy(this->bytes, data, size);
         }
 
         Data(const Data& other)
-            : bytes(new T[other.size])
+            : bytes(new T[other.size / sizeof(T)])
             , size(other.size)
             , usage(other.usage) {
             std::memcpy(this->bytes, bytes, size);
@@ -41,11 +48,16 @@ public:
         ~Data() {
             if (bytes != nullptr) {
                 delete[] bytes;
+                bytes = nullptr;
             }
         }
 
         Data& operator=(const Data& other) {
-            bytes = other.bytes;
+            if (size < other.size || bytes == nullptr) {
+                this->~Data();
+                bytes = new T[other.size / sizeof(T)];
+            }
+            std::memcpy(bytes, other.bytes, other.size);
             size = other.size;
             usage = other.usage;
 
@@ -90,6 +102,28 @@ public:
         this->layout = layout;
     }
 
+    Mesh(Mesh&& oth_mesh) {
+        vertexArray = oth_mesh.vertexArray;
+        vertexBuffer = oth_mesh.vertexBuffer;
+        layout = oth_mesh.layout;
+        data = std::move(oth_mesh.data);
+    }
+
+    Mesh& operator=(Mesh& oth_mesh) {
+        vertexArray = oth_mesh.vertexArray;
+        vertexBuffer = oth_mesh.vertexBuffer;
+        layout = oth_mesh.layout;
+        data = oth_mesh.data;
+    }
+
+    Mesh& operator=(Mesh&& oth_mesh) {
+        vertexArray = oth_mesh.vertexArray;
+        vertexBuffer = oth_mesh.vertexBuffer;
+        layout = oth_mesh.layout;
+        data = std::move(oth_mesh.data);
+        oth_mesh.~Mesh();
+    }
+
     virtual ~Mesh() = default;
 
     void AddLayout(const VertexBufferLayout& layout) {
@@ -104,7 +138,9 @@ public:
     virtual void Unbind() = 0;
     virtual void Resize() = 0;
     virtual bool IsIndexed() = 0;
-    virtual Data& GetData() = 0;
+    virtual Data& GetData() {
+        return this->data;
+    }
 };
 
 }

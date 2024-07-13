@@ -46,10 +46,8 @@ struct Surface {
         this->vertexCount = other.vertexCount;
         this->material = other.material;
 
-        auto& otherData = other.mesh->GetData();
-        T* data = new T[other.vertexCount];
-        std::copy(otherData.bytes, otherData.bytes + other.vertexCount, data);
-        this->mesh = new UnindexedMesh<T>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
+        auto& oth_mesh_data = other.mesh->GetData();
+        this->mesh = new UnindexedMesh<T>(oth_mesh_data.bytes, oth_mesh_data.size, other.mesh->GetLayout(), GL_STATIC_DRAW);
         // this->mesh->Resize();
     }
 
@@ -58,14 +56,19 @@ struct Surface {
         , vertexCount(other.vertexCount)
         , mesh(other.mesh)
         , material(other.material) {
+        
+        other.material = nullptr;
+        other.mesh = nullptr;
     }
 
     ~Surface() {
         mode = 0;
         vertexCount = 0;
-
-        delete mesh;
-        mesh = nullptr;
+        
+        if (mesh != nullptr) {
+            delete mesh;
+            mesh = nullptr;
+        }
     }
 
     Surface<T>& operator=(const Surface<T>& other) {
@@ -87,6 +90,9 @@ struct Surface {
         this->vertexCount = other.vertexCount;
         this->material = other.material;
         this->mesh = other.mesh;
+
+        other.material = nullptr;
+        other.mesh = nullptr;
 
         return *this;
     }
