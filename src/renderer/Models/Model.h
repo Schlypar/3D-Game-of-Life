@@ -70,20 +70,25 @@ struct Surface {
     }
 
     Surface<T>& operator=(const Surface<T>& other) {
+        if (mesh != nullptr) {
+            delete mesh;
+        }
         this->mode = other.mode;
         this->vertexCount = other.vertexCount;
         this->material = other.material;
 
         auto& otherData = other.mesh->GetData();
-        T* data = new T[other.vertexCount];
-        std::copy(otherData.bytes, otherData.bytes + other.vertexCount, data);
-        this->mesh = new UnindexedMesh<T>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
-        // this->mesh->Resize();
+        this->mesh = new UnindexedMesh<T>(*static_cast<UnindexedMesh<T>*>(other.mesh));
+        // this->mesh = new UnindexedMesh<T>(otherData.bytes, otherData.size, other.mesh->GetLayout(), other.mode);
 
         return *this;
     }
 
     Surface<T>& operator=(Surface<T>&& other) {
+        if (mesh != nullptr) {
+            delete mesh;
+        }
+
         this->mode = other.mode;
         this->vertexCount = other.vertexCount;
         this->material = other.material;
@@ -118,7 +123,7 @@ struct Surface {
             auto leftMesh = static_cast<UnindexedMesh<T>*>(left.mesh);
             auto rightMesh = static_cast<UnindexedMesh<T>*>(right.mesh);
 
-            return Surface { left.mode, left.vertexCount + right.vertexCount, *leftMesh + rightMesh, left.material };
+            return Surface { left.mode, left.vertexCount + right.vertexCount, *leftMesh + *rightMesh, left.material };
         }
     }
 

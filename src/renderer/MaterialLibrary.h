@@ -25,7 +25,7 @@ public:
     MaterialLibrary(const MaterialLibrary& other) = delete;
     MaterialLibrary(MaterialLibrary&& other) = delete;
 
-    ~MaterialLibrary() = default;
+    ~MaterialLibrary();
 
     static bool AddMaterial(std::pair<std::string, Material*> entry);
     static Material* GetMaterial(const std::string& name);

@@ -25,6 +25,12 @@ Material* MaterialLibrary::GetMaterial(const std::string& name) {
     }
 }
 
+MaterialLibrary::~MaterialLibrary() {
+    for (auto entry : materials) {
+        delete entry.second;
+    }
+}
+
 const std::vector<std::string>& MaterialLibrary::GetNames() {
     return names;
 }

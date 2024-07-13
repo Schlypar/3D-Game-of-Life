@@ -25,7 +25,7 @@ private:
         glm::mat4 matrix;
     };
 
-private:
+public:
     std::vector<SurfaceBundle> surfaces;
     std::vector<Surface<Vertex>> batched;
 
@@ -44,6 +44,10 @@ public:
     }
 
     void ResetBatched() {
+        for (int i = 0; i < this->batched.size(); i++) {
+            this->batched[i].~Surface();
+        }
+        // this->batched.resize(0);
         this->batched.clear();
     }
 
@@ -61,14 +65,14 @@ public:
     }
 
     void ConcatenateGeometry() {
-        const auto projection = [](const Surface<Vertex>& s) -> int {
-            return s.material->GetId();
-        };
-        const auto material = [projection](Surface<Vertex>& l, Surface<Vertex>& r) -> bool {
-            auto left = projection(l);
-            auto right = projection(r);
-            return left == right;
-        };
+        // const auto projection = [](const Surface<Vertex>& s) -> int {
+        //     return s.material->GetId();
+        // };
+        // const auto material = [projection](Surface<Vertex>& l, Surface<Vertex>& r) -> bool {
+        //     auto left = projection(l);
+        //     auto right = projection(r);
+        //     return left == right;
+        // };
         const auto computeSurface = [](SurfaceBundle& sb) -> Surface<Vertex>& {
             auto& data = sb.surface.mesh->GetData();
             Vertex* vertexData = (Vertex*) data.bytes;
@@ -78,18 +82,30 @@ public:
             }
             return sb.surface;
         };
-        const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex> {
-            Surface<Vertex>& res = vec[0];
-            std::for_each(vec.begin() + 1, vec.end(), [&res](Surface<Vertex>& s) -> void {
-                res += s;
-            });
-            return res;
-        };
+        // const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex> {
+        //     Surface<Vertex>& res = vec[0];
+        //     std::for_each(vec.begin() + 1, vec.end(), [&res](Surface<Vertex>& s) -> void {
+        //         res += s;
+        //     });
+        //     return res;
+        // };
 
-        auto computed = this->surfaces
-                      | std::ranges::views::transform(computeSurface)
-                      | std::ranges::to<std::vector<Surface<Vertex>>>();
-        this->batched = std::move(computed);
+        // auto computed = this->surfaces
+        //               | std::ranges::views::transform(computeSurface)
+        //               | std::ranges::to<std::vector<Surface<Vertex>>>();
+        // this->batched = std::move(computed);
+        if (batched.size() < surfaces.size()) {
+            ResetBatched();
+            for (int i = 0; i < surfaces.size(); i++) {
+                // batched.push_back(computeSurface(surfaces[i]));
+                batched.push_back(computeSurface(surfaces[i]));
+                
+            }
+        } else {
+            for (int i = 0; i < surfaces.size(); i++) {
+                batched[i] = computeSurface(surfaces[i]);
+            }
+        }
         // std::ranges::sort(computed, {}, projection);
 
         // this->batched = computed

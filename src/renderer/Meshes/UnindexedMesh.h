@@ -42,8 +42,8 @@ public:
         size_t newSize = this->data.size + other.data.size;
         this->data.bytes = new T[newSize / sizeof(T)];
 
-        std::memcpy(bytes, this->data.bytes, this->data.size);
-        std::memcpy((char*)bytes + this->data.size, right->data.bytes, right->data.size);
+        std::memcpy(this->data.bytes, oldData, this->data.size);
+        std::memcpy((char*)this->data.bytes + this->data.size, other.data.bytes, other.data.size);
 
         this->data.size = newSize;
         this->data.usage = GL_DYNAMIC_DRAW;

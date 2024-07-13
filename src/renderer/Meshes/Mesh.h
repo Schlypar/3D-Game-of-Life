@@ -1,5 +1,5 @@
 #pragma once
-
+#include <iostream>
 #include <cstring>
 
 #include "VertexArray.h"
@@ -54,7 +54,9 @@ public:
 
         Data& operator=(const Data& other) {
             if (size < other.size || bytes == nullptr) {
-                this->~Data();
+                if (bytes != nullptr) {
+                    delete[] bytes;
+                }
                 bytes = new T[other.size / sizeof(T)];
             }
             std::memcpy(bytes, other.bytes, other.size);
@@ -68,6 +70,10 @@ public:
             if (this == &other) {
                 return *this;
             }
+            if (bytes != nullptr) {
+                delete[] bytes;
+            }
+            
             bytes = other.bytes;
             size = other.size;
             usage = other.usage;
@@ -122,10 +128,11 @@ public:
         vertexBuffer = oth_mesh.vertexBuffer;
         layout = oth_mesh.layout;
         data = std::move(oth_mesh.data);
-        oth_mesh.~Mesh();
     }
 
-    virtual ~Mesh() = default;
+    virtual ~Mesh() {
+        data.~Data();
+    }
 
     void AddLayout(const VertexBufferLayout& layout) {
         vertexArray.AddBuffer(vertexBuffer, layout);

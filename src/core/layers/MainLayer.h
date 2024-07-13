@@ -67,13 +67,13 @@ public:
             if (ImGui::Button("Press me")) {
                 // this->batcher.Reset();
                 // this->batches = std::move(this->batcher.ComputeBatches());
-                this->renderer.ResetBatched();
+                // this->renderer.ResetBatched();
                 this->renderer.ConcatenateGeometry();
             }
         });
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                for (int z = 0; z < 10; z++) {
+        for (int x = 0; x < 15; x++) {
+            for (int y = 0; y < 15; y++) {
+                for (int z = 0; z < 15; z++) {
                     oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
                     oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
                     renderer.Submit(oneColor);
@@ -81,6 +81,7 @@ public:
             }
         }
         renderer.ConcatenateGeometry();
+        
 
         // for (int x = 0; x < 10; x++) {
         //     for (int y = 0; y < 10; y++) {
