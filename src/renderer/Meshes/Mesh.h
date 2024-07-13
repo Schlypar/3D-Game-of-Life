@@ -87,6 +87,7 @@ protected:
     VertexBufferLayout layout;
 
 public:
+    Mesh() : vertexArray(), vertexBuffer(nullptr, 1, GL_STATIC_DRAW), data() {}
     Mesh(const T* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
         : data(data, size, usage)
         , vertexArray()

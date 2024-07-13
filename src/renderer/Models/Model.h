@@ -45,9 +45,7 @@ struct Surface {
         this->mode = other.mode;
         this->vertexCount = other.vertexCount;
         this->material = other.material;
-
-        auto& oth_mesh_data = other.mesh->GetData();
-        this->mesh = new UnindexedMesh<T>(oth_mesh_data.bytes, oth_mesh_data.size, other.mesh->GetLayout(), GL_STATIC_DRAW);
+        this->mesh = new UnindexedMesh<T>(*static_cast<UnindexedMesh<T>*>(other.mesh));
         // this->mesh->Resize();
     }
 

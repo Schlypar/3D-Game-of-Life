@@ -15,38 +15,35 @@ public:
         this->vertexBuffer.Unbind();
     }
 
+    UnindexedMesh(UnindexedMesh& oth) {
+        this->vertexArray = oth.vertexArray;
+        this->vertexBuffer = oth.vertexBuffer;
+        this->layout = oth.layout;
+        this->data = oth.data;
+    }
+
     ~UnindexedMesh() = default;
 
     std::shared_ptr<UnindexedMesh<T>> operator+(const UnindexedMesh<T>* right) {
         size_t newSize = this->data.size + right->data.size;
-        T* bytes = new T[newSize];
+        T* bytes = new T[newSize / sizeof(T)];
 
-        auto thisCount = (this->data.size / sizeof(T));
-        auto otherCount = (right->data.size / sizeof(T));
-        for (int i = 0; i < thisCount; i++) {
-            bytes[i] = this->data.bytes[i];
-        }
-        for (int i = 0; i < otherCount; i++) {
-            bytes[i + thisCount] = right->data.bytes[i];
-        }
+        std::memcpy(bytes, this->data.bytes, this->data.size);
+        std::memcpy((char*)bytes + this->data.size, right->data.bytes, right->data.size);
 
-        return std::make_shared<UnindexedMesh<T>>(bytes, newSize, this->GetLayout(), GL_DYNAMIC_DRAW);
+        auto res = std::make_shared<UnindexedMesh<T>>(bytes, newSize, this->GetLayout(), GL_DYNAMIC_DRAW);
+        delete[] bytes;
+        return res;
     }
 
     UnindexedMesh<T>& operator+=(const UnindexedMesh<T>& other) {
         const T* oldData = this->data.bytes;
 
         size_t newSize = this->data.size + other.data.size;
-        this->data.bytes = new T[newSize];
+        this->data.bytes = new T[newSize / sizeof(T)];
 
-        auto thisCount = (this->data.size / sizeof(T));
-        auto otherCount = (other.data.size / sizeof(T));
-        for (int i = 0; i < thisCount; i++) {
-            this->data.bytes[i] = oldData[i];
-        }
-        for (int i = 0; i < otherCount; i++) {
-            this->data.bytes[i + thisCount] = other.data.bytes[i];
-        }
+        std::memcpy(bytes, this->data.bytes, this->data.size);
+        std::memcpy((char*)bytes + this->data.size, right->data.bytes, right->data.size);
 
         this->data.size = newSize;
         this->data.usage = GL_DYNAMIC_DRAW;
