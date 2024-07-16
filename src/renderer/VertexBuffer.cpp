@@ -24,6 +24,8 @@ VertexBuffer::~VertexBuffer() {
 }
 
 VertexBuffer& VertexBuffer::operator=(const VertexBuffer& other) {
+    Unbind();
+    glDeleteBuffers(1, &id);
     this->id = other.id;
     return *this;
 }

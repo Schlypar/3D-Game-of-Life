@@ -65,9 +65,7 @@ public:
         Application& app = Application::Get();
         app.SubmitToImgui([this]() {
             if (ImGui::Button("Press me")) {
-                // this->batcher.Reset();
-                // this->batches = std::move(this->batcher.ComputeBatches());
-                this->renderer.ResetBatched();
+                // this->renderer.ResetBatched();
                 this->renderer.ConcatenateGeometry();
             }
         });
@@ -106,6 +104,16 @@ public:
         lastFrameTime = currentFrameTime;
 
         renderer.Clear();
+
+        // for (int x = 0; x < 10; x++) {
+        //     for (int y = 0; y < 10; y++) {
+        //         for (int z = 0; z < 10; z++) {
+        //             oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
+        //             oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+        //             renderer.Draw(oneColor, camera);
+        //         }
+        //     }
+        // }
 
         // renderer.DrawTest(this->batches, camera);
         renderer.DrawSubmitted(camera);

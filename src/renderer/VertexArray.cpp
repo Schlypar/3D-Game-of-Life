@@ -13,9 +13,8 @@ VertexArray::VertexArray(const VertexArray& other)
     : id(other.id) {
 }
 
-VertexArray::VertexArray(VertexArray&& other)
-    : id(other.id) {
-    other.id = 0;
+VertexArray::VertexArray(VertexArray&& other) {
+    std::swap(id, other.id);
 }
 
 VertexArray::~VertexArray() {
@@ -24,13 +23,14 @@ VertexArray::~VertexArray() {
 }
 
 VertexArray& VertexArray::operator=(const VertexArray& other) {
+    Unbind();
+    glDeleteVertexArrays(1, &id);
     id = other.id;
     return *this;
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& other) {
-    id = other.id;
-    other.id = 0;
+    std::swap(id, other.id);
 
     return *this;
 }

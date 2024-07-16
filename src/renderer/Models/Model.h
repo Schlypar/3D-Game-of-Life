@@ -47,10 +47,7 @@ struct Surface {
         this->material = other.material;
 
         auto& otherData = other.mesh->GetData();
-        T* data = new T[other.vertexCount];
-        std::copy(otherData.bytes, otherData.bytes + other.vertexCount, data);
-        this->mesh = new UnindexedMesh<T>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
-        // this->mesh->Resize();
+        this->mesh = new UnindexedMesh<T>(otherData.bytes, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
     }
 
     Surface(Surface<T>&& other)
@@ -58,35 +55,52 @@ struct Surface {
         , vertexCount(other.vertexCount)
         , mesh(other.mesh)
         , material(other.material) {
+        other.mode = 0;
+        other.vertexCount = 0;
+        other.mesh = nullptr;
+        other.material = nullptr;
     }
 
     ~Surface() {
         mode = 0;
         vertexCount = 0;
 
-        delete mesh;
-        mesh = nullptr;
+        if (mesh != nullptr) {
+            delete mesh;
+            mesh = nullptr;
+        }
     }
 
     Surface<T>& operator=(const Surface<T>& other) {
+        if (this == &other) {
+            return *this;
+        }
         this->mode = other.mode;
         this->vertexCount = other.vertexCount;
         this->material = other.material;
 
         auto& otherData = other.mesh->GetData();
-        T* data = new T[other.vertexCount];
-        std::copy(otherData.bytes, otherData.bytes + other.vertexCount, data);
-        this->mesh = new UnindexedMesh<T>(data, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
+        delete this->mesh;
+        this->mesh = new UnindexedMesh<T>(otherData.bytes, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
         // this->mesh->Resize();
 
         return *this;
     }
 
     Surface<T>& operator=(Surface<T>&& other) {
+        if (this == &other) {
+            return *this;
+        }
         this->mode = other.mode;
         this->vertexCount = other.vertexCount;
         this->material = other.material;
+        delete this->mesh;
         this->mesh = other.mesh;
+
+        other.mode = 0;
+        other.vertexCount = 0;
+        other.mesh = nullptr;
+        other.material = nullptr;
 
         return *this;
     }

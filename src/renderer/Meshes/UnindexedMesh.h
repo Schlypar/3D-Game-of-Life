@@ -15,9 +15,7 @@ public:
         this->vertexBuffer.Unbind();
     }
 
-    ~UnindexedMesh() = default;
-
-    std::shared_ptr<UnindexedMesh<T>> operator+(const UnindexedMesh<T>* right) {
+    UnindexedMesh<T>* operator+(const UnindexedMesh<T>* right) {
         size_t newSize = this->data.size + right->data.size;
         T* bytes = new T[newSize];
 
@@ -30,7 +28,9 @@ public:
             bytes[i + thisCount] = right->data.bytes[i];
         }
 
-        return std::make_shared<UnindexedMesh<T>>(bytes, newSize, this->GetLayout(), GL_DYNAMIC_DRAW);
+        auto result = new UnindexedMesh<T>(bytes, newSize, this->GetLayout(), GL_DYNAMIC_DRAW);
+        delete[] bytes;
+        return result;
     }
 
     UnindexedMesh<T>& operator+=(const UnindexedMesh<T>& other) {

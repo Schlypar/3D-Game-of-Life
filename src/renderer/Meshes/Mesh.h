@@ -12,18 +12,18 @@ template <typename T>
 class Mesh {
 public:
     struct Data {
-        T* bytes;
+        T* bytes = nullptr;
         size_t size;
         GLenum usage;
 
         Data(const void* data, const size_t size, GLenum usage = GL_STATIC_DRAW)
-            : bytes(new T[size])
+            : bytes(new T[size / sizeof(T)])
             , size(size) {
             std::memcpy(this->bytes, data, size);
         }
 
         Data(const Data& other)
-            : bytes(new T[other.size])
+            : bytes(new T[other.size / sizeof(T)])
             , size(other.size)
             , usage(other.usage) {
             std::memcpy(this->bytes, bytes, size);
@@ -41,11 +41,18 @@ public:
         ~Data() {
             if (bytes != nullptr) {
                 delete[] bytes;
+                bytes = nullptr;
             }
         }
 
         Data& operator=(const Data& other) {
-            bytes = other.bytes;
+            if (this != &other) {
+                return *this;
+            }
+
+            delete this->bytes;
+            this->bytes = new T[other.size / sizeof(T)];
+            std::memcpy(this->bytes, other.bytes, other.size);
             size = other.size;
             usage = other.usage;
 
@@ -78,19 +85,14 @@ public:
     Mesh(const T* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
         : data(data, size, usage)
         , vertexArray()
-        , vertexBuffer(nullptr, 1, usage) {
-        this->vertexArray = VertexArray();
-        this->vertexArray.Bind();
-
-        this->vertexBuffer = VertexBuffer(data, size, usage);
-
+        , vertexBuffer(data, size, usage)
+        , layout(layout) {
         vertexArray.AddBuffer(vertexBuffer, layout);
         this->vertexBuffer.Unbind();
-
-        this->layout = layout;
     }
 
-    virtual ~Mesh() = default;
+    virtual ~Mesh() {
+    }
 
     void AddLayout(const VertexBufferLayout& layout) {
         vertexArray.AddBuffer(vertexBuffer, layout);

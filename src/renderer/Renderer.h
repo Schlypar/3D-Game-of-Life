@@ -86,18 +86,18 @@ public:
             return res;
         };
 
-        auto computed = this->surfaces
+        auto copy = this->surfaces;
+        auto computed = copy
                       | std::ranges::views::transform(computeSurface)
                       | std::ranges::to<std::vector<Surface<Vertex>>>();
-        this->batched = std::move(computed);
-        // std::ranges::sort(computed, {}, projection);
+        std::ranges::sort(computed, {}, projection);
 
-        // this->batched = computed
-        //               | std::ranges::views::chunk_by(material)
-        //               | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
-        //               | std::ranges::views::transform(concat)
-        //               | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
-        //               | std::ranges::to<std::vector<Surface<Vertex>>>();
+        this->batched = computed
+                      | std::ranges::views::chunk_by(material)
+                      | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
+                      | std::ranges::views::transform(concat)
+                      | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
+                      | std::ranges::to<std::vector<Surface<Vertex>>>();
     }
 
 private:
