@@ -16,7 +16,6 @@ public:
     VertexBuffer(VertexBuffer&& other);
     ~VertexBuffer();
 
-    VertexBuffer& operator=(const VertexBuffer& other);
     VertexBuffer& operator=(VertexBuffer&& other);
 
     void Realloc(const size_t size, GLenum usage = GL_STATIC_DRAW);
@@ -24,6 +23,10 @@ public:
 
     void Bind() const;
     void Unbind() const;
+
+    inline void Delete() {
+        glDeleteBuffers(1, &this->id);
+    }
 };
 
 }
