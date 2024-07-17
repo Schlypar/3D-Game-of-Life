@@ -7,9 +7,9 @@
 
 namespace GoL {
 
-class OneColorCube : public Model {
+class OneColorCube : public Model<Vertex> {
 private:
-    Surface surface;
+    Surface<Vertex> surface;
 
 public:
     OneColorCube() = delete;
@@ -21,69 +21,71 @@ public:
             float scaleFactor = 1.0f
     )
         : Model(position, rotation, scaleFactor) {
-        SurfaceBuilder builder;
+        SurfaceBuilder<Vertex> builder;
         VertexBufferLayout layout;
         layout.Push<float>(3);
         layout.Push<float>(3);
 
+        MaterialLibrary::AddMaterial({ "PlainColorMaterial", new PlainColorMaterial(shader, glm::vec4 { 0.2f, 0.3f, 0.6f, 1.0f }) });
+
         Vertex vertices[] = {
             // front
-            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, -0.5, -0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, -0.5, -0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
 
-            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, -0.5, -0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, -0.5, -0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
             // back
-            { { -0.5f, -0.5, 0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5, 0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
 
-            { { -0.5f, -0.5, 0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5, 0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
             // up
-            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
 
-            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
             // bottom
-            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
 
-            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
             // left
-            { { -0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
 
-            { { -0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { -0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { -0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { -0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
             // right
-            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, 0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, 0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
 
-            { { 0.5f, -0.5f, -0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, 0.5f, 0.5f }, glm::vec4 { 0.0f } },
-            { { 0.5f, -0.5f, 0.5f }, glm::vec4 { 0.0f } },
+            { { 0.5f, -0.5f, -0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, 0.5f, 0.5f }, glm::vec3 { 0.0f } },
+            { { 0.5f, -0.5f, 0.5f }, glm::vec3 { 0.0f } },
         };
-        builder.SetMesh(std::make_shared<UnindexedMesh>(vertices, sizeof(vertices), layout));
+        builder.SetMesh(new UnindexedMesh<Vertex>(vertices, sizeof(vertices), layout));
         builder.SetVertexCount(6 * 6);
-        builder.SetMaterial(std::make_shared<PlainColorMaterial>(shader, glm::vec4 { 0.8f, 0.2f, 0.3f, 1.0f }));
+        builder.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
         this->surface = builder.Build();
     }
 
-    std::vector<Surface> GetSurfaces() const override {
-        return std::vector<Surface> { this->surface };
+    std::vector<Surface<Vertex>> GetSurfaces() const override {
+        return std::vector<Surface<Vertex>> { this->surface };
     }
 };
 

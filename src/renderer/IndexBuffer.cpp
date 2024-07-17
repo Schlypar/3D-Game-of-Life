@@ -1,7 +1,6 @@
 #include "IndexBuffer.h"
 #include "glad/gl.h"
 #include <cstring>
-#include <stdio.h>
 
 namespace GoL {
 
@@ -14,7 +13,6 @@ std::vector<int> IndexBuffer::index_offsets = std::vector<int>();
 IndexBuffer::IndexBuffer() {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    
 }
 
 IndexBuffer::~IndexBuffer() {

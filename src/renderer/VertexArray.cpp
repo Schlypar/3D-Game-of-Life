@@ -1,4 +1,6 @@
 #include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "glad/gl.h"
 
 namespace GoL {
@@ -7,27 +9,17 @@ VertexArray::VertexArray() {
     glGenVertexArrays(1, &id);
 }
 
-VertexArray::VertexArray(const VertexArray& other)
-    : id(other.id) {
-}
-
-VertexArray::VertexArray(VertexArray&& other)
-    : id(other.id) {
-    other.id = 0;
+VertexArray::VertexArray(VertexArray&& other) {
+    std::swap(id, other.id);
 }
 
 VertexArray::~VertexArray() {
+    Unbind();
     glDeleteVertexArrays(1, &id);
 }
 
-VertexArray& VertexArray::operator=(const VertexArray& other) {
-    id = other.id;
-    return *this;
-}
-
 VertexArray& VertexArray::operator=(VertexArray&& other) {
-    id = other.id;
-    other.id = 0;
+    std::swap(id, other.id);
 
     return *this;
 }
