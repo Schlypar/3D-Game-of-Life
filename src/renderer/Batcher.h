@@ -17,7 +17,8 @@ namespace GoL {
 class Batcher {
 public:
     struct Config {
-        unsigned int maxVerticesPerBatch = 128;
+        int maxVerticesPerBatch = 128;
+        unsigned int maxThreads = 8;
         glm::mat4 batchTransform = glm::mat4 { 1.0f };
     };
 
@@ -35,7 +36,7 @@ public:
     Batcher() = delete;
     Batcher(const Batcher& other) = delete;
     Batcher(Batcher&& other) = delete;
-    Batcher(const Config& config = Config { 128, glm::mat4 { 1.0f } });
+    Batcher(const Config& config = Config { 128, 8, glm::mat4 { 1.0f } });
     ~Batcher() = default;
 
     void SetConfig(const Config& config);

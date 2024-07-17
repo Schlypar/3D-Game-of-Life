@@ -1,6 +1,8 @@
 #include "Batcher.h"
+
 #include <algorithm>
 #include <ranges>
+#include <thread>
 
 namespace GoL {
 
@@ -27,6 +29,9 @@ void Batcher::Reset() {
 }
 
 std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
+    std::mutex mutex;
+    std::vector<Surface<Vertex>> result;
+
     const auto projection = [](const Surface<Vertex>& s) -> int {
         return s.material->GetId();
     };
@@ -35,7 +40,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         auto right = projection(r);
         return left == right;
     };
-    const auto computeSurface = [](SurfaceBundle& sb) -> Surface<Vertex>& {
+    const auto computeSurface = [](const SurfaceBundle& sb) -> const Surface<Vertex>& {
         auto& data = sb.surface.mesh->GetData();
         Vertex* vertexData = (Vertex*) data.bytes;
         for (int i = 0; i < data.size / sizeof(Vertex); i++) {
@@ -44,50 +49,76 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         }
         return sb.surface;
     };
-    const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex> {
+    const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex>& {
         Surface<Vertex>& res = vec[0];
-        std::for_each(vec.begin() + 1, vec.end(), [&res](Surface<Vertex>& s) -> void {
+        std::for_each(vec.begin() + 1, vec.end(), [&res](const Surface<Vertex>& s) -> void {
             res += s;
         });
         return res;
     };
-    const auto optimize = [material, concat](std::vector<Surface<Vertex>>& surfaces) -> std::vector<Surface<Vertex>> {
-        return surfaces
-             | std::ranges::views::chunk_by(material)
-             | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
-             | std::ranges::views::transform(concat)
-             | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
-             | std::ranges::to<std::vector<Surface<Vertex>>>();
+
+    const auto optimize = [computeSurface, material, concat, &result, &mutex](const std::vector<SurfaceBundle>& vec) {
+        auto transformed = vec
+                         | std::ranges::views::transform(computeSurface)
+                         | std::ranges::to<std::vector<Surface<Vertex>>>();
+
+        transformed = transformed
+                    | std::ranges::views::chunk_by(material)
+                    | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
+                    | std::ranges::views::transform(concat)
+                    | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
+                    | std::ranges::to<std::vector<Surface<Vertex>>>();
+
+        mutex.lock();
+        result.insert(result.end(), transformed.begin(), transformed.end());
+        mutex.unlock();
     };
 
     auto copy = this->surfaces;
-    auto computed = copy
-                  | std::ranges::views::transform(computeSurface)
-                  | std::ranges::to<std::vector<Surface<Vertex>>>();
-    std::ranges::sort(computed, {}, projection);
+    std::ranges::sort(copy, {}, [projection](const auto& sb) -> int { return projection(sb.surface); });
 
-    std::vector<std::vector<Surface<Vertex>>> batches;
-    std::vector<Surface<Vertex>> batch;
+    std::vector<std::vector<SurfaceBundle>> batches;
+    std::vector<SurfaceBundle> batch;
 
     unsigned int vertexCount = 0;
-    for (const auto& surface : computed) {
-        if (vertexCount + surface.vertexCount <= this->config.maxVerticesPerBatch) {
-            vertexCount += surface.vertexCount;
-            batch.push_back(surface);
+    for (const auto& sb : copy) {
+        if (vertexCount + sb.surface.vertexCount <= this->config.maxVerticesPerBatch) {
+            vertexCount += sb.surface.vertexCount;
+            batch.push_back(sb);
         } else {
             batches.push_back(std::move(batch));
-            // batch = std::vector<Surface<Vertex>>();
+            batch = std::vector<SurfaceBundle>();
             vertexCount = 0;
         }
     }
-    if (!batch.empty() && vertexCount == 0) {
+    if (batches.empty()) {
         batches.push_back(std::move(batch));
     }
 
-    return batches
-         | std::ranges::views::transform(optimize)
-         | std::ranges::views::join
-         | std::ranges::to<std::vector<Surface<Vertex>>>();
-}
+    std::thread workers[this->config.maxThreads];
+    int threadComputedTimes = 0;
+    while (batches.size() > threadComputedTimes * this->config.maxThreads) {
+        if (batches.size() - threadComputedTimes * this->config.maxThreads >= this->config.maxThreads) {
+            for (int i = 0; i < this->config.maxThreads; i++) {
+                auto& current = batches[i + threadComputedTimes * this->config.maxThreads];
+                workers[i] = std::thread(optimize, current);
+            }
+            for (int i = 0; i < this->config.maxThreads; i++) {
+                workers[i].join();
+            }
+            threadComputedTimes++;
+        } else {
+            for (int i = 0; i < batches.size() - threadComputedTimes * this->config.maxThreads; i++) {
+                auto& current = batches[i + threadComputedTimes * this->config.maxThreads];
+                workers[i] = std::thread(optimize, current);
+            }
+            for (int i = 0; i < batches.size() - threadComputedTimes * this->config.maxThreads; i++) {
+                workers[i].join();
+            }
+            threadComputedTimes++;
+        }
+    }
 
+    return result;
+}
 }

@@ -2,7 +2,6 @@
 
 #include "Mesh.h"
 #include "VertexBufferLayout.h"
-#include <memory>
 
 namespace GoL {
 

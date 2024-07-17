@@ -43,6 +43,10 @@ public:
         this->surfaces.insert(this->surfaces.end(), modelSurfaces.begin(), modelSurfaces.end());
     }
 
+    void SubmitBatches(std::vector<Surface<Vertex>>&& surfaces) {
+        this->batched = std::move(surfaces);
+    }
+
     void ResetBatched() {
         this->batched.clear();
     }

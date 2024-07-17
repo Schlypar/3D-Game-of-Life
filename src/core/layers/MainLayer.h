@@ -2,14 +2,13 @@
 
 #include "Application.h"
 #include "Batcher.h"
-#include "MaterialLibrary.h"
-#include "Materials/PlainColorMaterial.h"
 #include "Models/OneColorCube.h"
 #include "Renderer.h"
 
 #include "Models/SixColorCube.h"
 
 #include "../Layer.h"
+#include "layers/ImGuiLayer.h"
 
 #include "events/KeyEvent.h"
 #include "events/MouseEvent.h"
@@ -33,8 +32,9 @@ private:
     Model<Vertex>* sixColor;
     Model<Vertex>* oneColor;
 
-    Batcher batcher = Batcher(Batcher::Config {});
-    std::vector<Surface<Vertex>> batches;
+    // TODO: Refactor this to renderer class
+    int vCount = 144;
+    Batcher batcher = Batcher(Batcher::Config { .maxVerticesPerBatch = vCount });
 
 public:
     MainLayer(
@@ -53,44 +53,42 @@ public:
         , prismShader("resources/shaders/prism.shader")
         , cubeShader("resources/shaders/plain_color.shader") {
         sixColor = new SixColorCube(this->cubeShader);
-        sixColor->SetScaleFactor(0.25f);
+        sixColor->SetScaleFactor(0.35f);
+        sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });
         sixColor->SetRotation(glm::vec3 { 15.0f });
         oneColor = new OneColorCube(this->cubeShader);
-        oneColor->SetScaleFactor(0.05f);
+        oneColor->SetPosition({ 0.5f, -0.35f, -0.25f });
+        oneColor->SetScaleFactor(0.455f);
     }
 
     ~MainLayer() = default;
 
     void OnAttach() override {
+        // TODO: Remove ImGui debug buttons
         Application& app = Application::Get();
         app.SubmitToImgui([this]() {
-            if (ImGui::Button("Press me")) {
-                // this->renderer.ResetBatched();
-                this->renderer.ConcatenateGeometry();
+            ImGui::DragInt("Vertices Count", &this->vCount);
+            if (ImGui::Button("Reconfigure")) {
+                this->batcher.SetConfig(Batcher::Config { .maxVerticesPerBatch = this->vCount });
+            }
+            if (ImGui::Button("Resubmit")) {
+                renderer.SubmitBatches(batcher.ComputeBatches());
             }
         });
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                for (int z = 0; z < 10; z++) {
-                    oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
-                    oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                    renderer.Submit(oneColor);
-                }
-            }
-        }
-        renderer.ConcatenateGeometry();
 
         // for (int x = 0; x < 10; x++) {
         //     for (int y = 0; y < 10; y++) {
         //         for (int z = 0; z < 10; z++) {
         //             oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
         //             oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-        //             // renderer.Submit(oneColor);
         //             batcher.Submit(oneColor);
         //         }
         //     }
         // }
-        // this->batches = batcher.ComputeBatches();
+        batcher.Submit(oneColor);
+        // batcher.Submit(sixColor);
+        auto&& batched = batcher.ComputeBatches();
+        renderer.SubmitBatches(std::move(batched));
     }
 
     void OnDetach() override {
@@ -105,19 +103,10 @@ public:
 
         renderer.Clear();
 
-        // for (int x = 0; x < 10; x++) {
-        //     for (int y = 0; y < 10; y++) {
-        //         for (int z = 0; z < 10; z++) {
-        //             oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
-        //             oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-        //             renderer.Draw(oneColor, camera);
-        //         }
-        //     }
-        // }
-
-        // renderer.DrawTest(this->batches, camera);
-        renderer.DrawSubmitted(camera);
-        // batcher.Reset();
+        // TODO: Make possibly to draw submitted through batcher class
+        renderer.Draw(oneColor, camera);
+        renderer.Draw(sixColor, camera);
+        // renderer.DrawSubmitted(camera);
     }
 
     void OnEvent(Event& e) override {
