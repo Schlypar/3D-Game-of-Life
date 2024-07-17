@@ -9,10 +9,6 @@ VertexArray::VertexArray() {
     glGenVertexArrays(1, &id);
 }
 
-VertexArray::VertexArray(const VertexArray& other)
-    : id(other.id) {
-}
-
 VertexArray::VertexArray(VertexArray&& other) {
     std::swap(id, other.id);
 }
@@ -20,13 +16,6 @@ VertexArray::VertexArray(VertexArray&& other) {
 VertexArray::~VertexArray() {
     Unbind();
     glDeleteVertexArrays(1, &id);
-}
-
-VertexArray& VertexArray::operator=(const VertexArray& other) {
-    Unbind();
-    glDeleteVertexArrays(1, &id);
-    id = other.id;
-    return *this;
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& other) {

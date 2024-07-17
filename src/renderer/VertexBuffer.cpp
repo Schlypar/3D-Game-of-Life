@@ -29,9 +29,7 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) {
 }
 
 void VertexBuffer::Realloc(const size_t size, GLenum usage) {
-    glDeleteBuffers(1, &id);
-    glGenBuffers(1, &id);
-    glBindBuffer(GL_ARRAY_BUFFER, id);
+    Bind();
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, usage);
 }
 
