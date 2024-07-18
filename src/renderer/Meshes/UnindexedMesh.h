@@ -10,8 +10,6 @@ class UnindexedMesh : public Mesh<T> {
 public:
     UnindexedMesh(const T* data, const size_t size, const VertexBufferLayout& layout, GLenum usage = GL_STATIC_DRAW)
         : Mesh<T>(data, size, layout, usage) {
-        this->vertexArray.Unbind();
-        this->vertexBuffer.Unbind();
     }
 
     UnindexedMesh<T>* operator+(const UnindexedMesh<T>* right) {
@@ -53,21 +51,6 @@ public:
         delete[] oldData;
 
         return *this;
-    }
-
-    void Bind() override {
-        this->vertexArray.Bind();
-        this->vertexBuffer.Bind();
-    }
-
-    void Unbind() override {
-        this->vertexArray.Unbind();
-        this->vertexBuffer.Unbind();
-    }
-
-    void Resize() override {
-        this->vertexBuffer.Realloc(this->data.size, this->data.usage);
-        this->vertexBuffer.Write(this->data.bytes, this->data.size);
     }
 
     bool IsIndexed() override {
