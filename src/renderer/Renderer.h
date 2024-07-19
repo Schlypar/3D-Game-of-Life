@@ -29,7 +29,27 @@ private:
     std::vector<SurfaceBundle> surfaces;
     std::vector<Surface<Vertex>> batched;
 
+    VertexArray vertexArray;
+    VertexBuffer vertexBuffer;
+    unsigned int dataSize = 0;
+
 public:
+    Renderer()
+        : surfaces()
+        , batched()
+        , vertexArray()
+        , vertexBuffer(nullptr, 0, GL_DYNAMIC_DRAW) {
+        VertexBufferLayout layout;
+        layout.Push<float>(3);
+        layout.Push<float>(3);
+
+        vertexArray.AddBuffer(vertexBuffer, layout);
+        this->vertexBuffer.Unbind();
+
+        this->vertexArray.Unbind();
+        this->vertexBuffer.Unbind();
+    }
+
     inline void Clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
@@ -52,69 +72,85 @@ public:
     }
 
     void DrawSubmitted(const Camera& camera) {
+        this->vertexArray.Bind();
+        this->vertexBuffer.Bind();
+
+        auto modelDataSize = std::ranges::fold_left(this->batched, 0, [](const unsigned int size, const Surface<Vertex>& s) -> int {
+            return size + s.vertexCount * sizeof(Vertex);
+        });
+        if (modelDataSize > this->dataSize) {
+            this->vertexBuffer.Realloc(modelDataSize, GL_DYNAMIC_DRAW);
+            this->dataSize = modelDataSize;
+        }
+        unsigned int offset = 0;
+        for (Surface<Vertex>& surface : this->batched) {
+            Mesh<Vertex>* mesh = surface.mesh;
+
+            auto& data = mesh->GetData();
+            this->vertexBuffer.Write(data.bytes, data.size, offset * sizeof(Vertex));
+            offset += surface.vertexCount;
+        }
+
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
         DrawSurfaces(this->batched, modelMatrix, projectionView);
+
+        this->vertexArray.Unbind();
+        this->vertexBuffer.Unbind();
     }
 
-    void Draw(Model<Vertex>* model, const Camera& camera) const {
+    // that does not work if you try this on 2 different models
+    void Draw(Model<Vertex>* model, const Camera& camera) {
+        this->vertexArray.Bind();
+        this->vertexBuffer.Bind();
+
         std::vector<Surface<Vertex>> surfaces = model->GetSurfaces();
+        auto modelDataSize = std::ranges::fold_left(surfaces, 0, [](const unsigned int size, const Surface<Vertex>& s) -> int {
+            return size + s.vertexCount * sizeof(Vertex);
+        });
+        if (modelDataSize > this->dataSize) {
+            this->vertexBuffer.Realloc(modelDataSize, GL_DYNAMIC_DRAW);
+            this->dataSize = modelDataSize;
+        }
+        unsigned int offset = 0;
+        for (Surface<Vertex>& surface : surfaces) {
+            Mesh<Vertex>* mesh = surface.mesh;
+
+            auto& data = mesh->GetData();
+            this->vertexBuffer.Write(data.bytes, data.size, offset * sizeof(Vertex));
+            offset += surface.vertexCount;
+        }
+
         glm::mat4 modelMatrix = model->GetModelMatrix();
         glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
         DrawSurfaces(surfaces, modelMatrix, projectionView);
-    }
 
-    void ConcatenateGeometry() {
-        const auto projection = [](const Surface<Vertex>& s) -> int {
-            return s.material->GetId();
-        };
-        const auto material = [projection](Surface<Vertex>& l, Surface<Vertex>& r) -> bool {
-            auto left = projection(l);
-            auto right = projection(r);
-            return left == right;
-        };
-        const auto computeSurface = [](SurfaceBundle& sb) -> Surface<Vertex>& {
-            auto& data = sb.surface.mesh->GetData();
-            Vertex* vertexData = (Vertex*) data.bytes;
-            for (int i = 0; i < data.size / sizeof(Vertex); i++) {
-                Vertex& cur = vertexData[i];
-                vertexData[i] = Vertex((sb.matrix * glm::vec4(cur.position, 1)), cur.color);
-            }
-            return sb.surface;
-        };
-        const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex> {
-            Surface<Vertex>& res = vec[0];
-            std::for_each(vec.begin() + 1, vec.end(), [&res](Surface<Vertex>& s) -> void {
-                res += s;
-            });
-            return res;
-        };
-
-        auto copy = this->surfaces;
-        auto computed = copy
-                      | std::ranges::views::transform(computeSurface)
-                      | std::ranges::to<std::vector<Surface<Vertex>>>();
-        std::ranges::sort(computed, {}, projection);
-
-        this->batched = computed
-                      | std::ranges::views::chunk_by(material)
-                      | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
-                      | std::ranges::views::transform(concat)
-                      | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
-                      | std::ranges::to<std::vector<Surface<Vertex>>>();
+        this->vertexArray.Unbind();
+        this->vertexBuffer.Unbind();
     }
 
 private:
-    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) const {
+    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) {
+        unsigned int offset = 0;
         for (Surface<Vertex>& surface : surfaces) {
-            Mesh<Vertex>* mesh = surface.mesh;
+            // Mesh<Vertex>* mesh = surface.mesh;
             Material* material = surface.material;
-            mesh->Bind();
+
+            // auto& data = mesh->GetData();
+            // std::cout << "\n------\n";
+            // for (int i = 0; i < data.size / sizeof(Vertex); i++) {
+            //     std::cout << data.bytes[i] << '\n';
+            // }
+            // std::cout << "\n------\n";
+            // this->vertexBuffer.Write(data.bytes, data.size, offset);
+
+            // mesh->Bind();
             material->SetModel(modelMatrix);
             material->SetProjectionView(projectionView);
             material->Bind();
-            glDrawArrays(surface.mode, 0, surface.vertexCount);
-            mesh->Unbind();
+            glDrawArrays(surface.mode, offset, surface.vertexCount);
+            offset += surface.vertexCount;
+            // mesh->Unbind();
         }
     }
 };

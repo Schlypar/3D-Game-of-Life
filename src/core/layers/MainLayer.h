@@ -58,7 +58,7 @@ public:
         sixColor->SetRotation(glm::vec3 { 15.0f });
         oneColor = new OneColorCube(this->cubeShader);
         oneColor->SetPosition({ 0.5f, -0.35f, -0.25f });
-        oneColor->SetScaleFactor(0.455f);
+        oneColor->SetScaleFactor(0.05f);
     }
 
     ~MainLayer() = default;
@@ -76,16 +76,16 @@ public:
             }
         });
 
-        // for (int x = 0; x < 10; x++) {
-        //     for (int y = 0; y < 10; y++) {
-        //         for (int z = 0; z < 10; z++) {
-        //             oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
-        //             oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-        //             batcher.Submit(oneColor);
-        //         }
-        //     }
-        // }
-        batcher.Submit(oneColor);
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 10; y++) {
+                for (int z = 0; z < 10; z++) {
+                    oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
+                    oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+                    batcher.Submit(oneColor);
+                }
+            }
+        }
+        // batcher.Submit(oneColor);
         // batcher.Submit(sixColor);
         auto&& batched = batcher.ComputeBatches();
         renderer.SubmitBatches(std::move(batched));
@@ -104,9 +104,10 @@ public:
         renderer.Clear();
 
         // TODO: Make possibly to draw submitted through batcher class
-        renderer.Draw(oneColor, camera);
-        renderer.Draw(sixColor, camera);
-        // renderer.DrawSubmitted(camera);
+        // renderer.Draw(oneColor, camera);
+        // renderer.Draw(sixColor, camera);
+        renderer.SubmitBatches(batcher.ComputeBatches());
+        renderer.DrawSubmitted(camera);
     }
 
     void OnEvent(Event& e) override {

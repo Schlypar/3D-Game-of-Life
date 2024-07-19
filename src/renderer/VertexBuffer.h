@@ -24,6 +24,13 @@ public:
     void Bind() const;
     void Unbind() const;
 
+    // for debigging
+    // TODO: remove this function as this is unnecessary
+    inline const void* GetBufferData() const {
+        auto res = glMapNamedBuffer(id, GL_READ_WRITE);
+        return res;
+    }
+
     inline void Delete() {
         glDeleteBuffers(1, &this->id);
     }
