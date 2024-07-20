@@ -77,6 +77,7 @@ public:
             ImGui::DragInt("Vertices Count", &this->vCount);
             if (ImGui::Button("Reconfigure")) {
                 this->batcher.SetConfig(Batcher::Config { .maxVerticesPerBatch = this->vCount });
+                changed = true;
             }
             if (ImGui::Button("Expand")) {
 
