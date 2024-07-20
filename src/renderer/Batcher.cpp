@@ -60,14 +60,12 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
     const auto optimize = [computeSurface, material, concat, &result, &mutex](const std::vector<SurfaceBundle>& vec) {
         auto transformed = vec
                          | std::ranges::views::transform(computeSurface)
+                         | std::ranges::to<std::vector<Surface<Vertex>>>()
+                         | std::ranges::views::chunk_by(material)
+                         | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
+                         | std::ranges::views::transform(concat)
+                         // | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
                          | std::ranges::to<std::vector<Surface<Vertex>>>();
-
-        transformed = transformed
-                    | std::ranges::views::chunk_by(material)
-                    | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
-                    | std::ranges::views::transform(concat)
-                    // | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
-                    | std::ranges::to<std::vector<Surface<Vertex>>>();
 
         mutex.lock();
         result.insert(result.end(), transformed.begin(), transformed.end());
@@ -87,13 +85,22 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
             batch.push_back(sb);
         } else {
             batches.push_back(std::move(batch));
-            batch = std::vector<SurfaceBundle>();
+            batch = { sb };
             vertexCount = 0;
         }
     }
-    if (batches.empty()) {
+    if (batches.empty() || (!batches.empty() && vertexCount == 0)) {
         batches.push_back(std::move(batch));
     }
+
+    std::cout << "Initial size: " << copy.size() << '\n';
+    int count = 0;
+    for (auto& batch : batches) {
+        for (auto& _ : batch) {
+            count++;
+        }
+    }
+    std::cout << "Size within batches: " << count << '\n';
 
     std::thread workers[this->config.maxThreads];
     int threadComputedTimes = 0;
