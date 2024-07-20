@@ -93,15 +93,6 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         batches.push_back(std::move(batch));
     }
 
-    std::cout << "Initial size: " << copy.size() << '\n';
-    int count = 0;
-    for (auto& batch : batches) {
-        for (auto& _ : batch) {
-            count++;
-        }
-    }
-    std::cout << "Size within batches: " << count << '\n';
-
     std::thread workers[this->config.maxThreads];
     int threadComputedTimes = 0;
     while (batches.size() > threadComputedTimes * this->config.maxThreads) {
