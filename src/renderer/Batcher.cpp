@@ -71,15 +71,19 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         mutex.unlock();
     };
 
-    auto copy = this->surfaces;
-    std::ranges::sort(copy, {}, [projection](const auto& sb) -> int { return projection(sb.surface); });
+    this->maxVerticesPerBatch = (std::ranges::fold_left(this->surfaces, 0, [](int acc, const auto& sb) -> int {
+                                     return acc + sb.surface.vertexCount;
+                                 })
+                                 / this->config.maxThreads);
+
+    std::ranges::sort(this->surfaces, {}, [projection](const auto& sb) -> int { return projection(sb.surface); });
 
     std::vector<std::vector<SurfaceBundle>> batches;
     std::vector<SurfaceBundle> batch;
 
     unsigned int vertexCount = 0;
-    for (const auto& sb : copy) {
-        if (vertexCount + sb.surface.vertexCount <= this->config.maxVerticesPerBatch) {
+    for (const auto& sb : this->surfaces) {
+        if (vertexCount + sb.surface.vertexCount <= this->maxVerticesPerBatch) {
             vertexCount += sb.surface.vertexCount;
             batch.push_back(sb);
         } else {

@@ -26,8 +26,9 @@ private:
     };
 
 private:
-    std::vector<SurfaceBundle> surfaces;
+    Batcher batcher;
     std::vector<Surface<Vertex>> batched;
+    bool changed = true;
 
     VertexArray vertexArray;
     VertexBuffer vertexBuffer;
@@ -35,8 +36,7 @@ private:
 
 public:
     Renderer()
-        : surfaces()
-        , batched()
+        : batcher(Batcher::Config { .maxThreads = 8 })
         , vertexArray()
         , vertexBuffer(nullptr, 0, GL_DYNAMIC_DRAW) {
         VertexBufferLayout layout;
@@ -55,23 +55,21 @@ public:
     }
 
     void Submit(Model<Vertex>* model) {
-        auto modelSurfaces = model->GetSurfaces()
-                           | std::ranges::views::transform([model](Surface<Vertex>& s) -> SurfaceBundle {
-                                 return SurfaceBundle { s, model->GetModelMatrix() };
-                             })
-                           | std::ranges::to<std::vector<SurfaceBundle>>();
-        this->surfaces.insert(this->surfaces.end(), modelSurfaces.begin(), modelSurfaces.end());
-    }
-
-    void SubmitBatches(std::vector<Surface<Vertex>>&& surfaces) {
-        this->batched = std::move(surfaces);
+        this->batcher.Submit(model);
+        this->changed = true;
     }
 
     void ResetBatched() {
-        this->batched.clear();
+        this->batcher.Reset();
+        this->changed = true;
     }
 
     void DrawSubmitted(const Camera& camera) {
+        if (changed) {
+            this->batched = std::move(this->batcher.ComputeBatches());
+            this->changed = false;
+        }
+
         this->vertexArray.Bind();
         this->vertexBuffer.Bind();
 

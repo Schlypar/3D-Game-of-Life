@@ -1,13 +1,16 @@
 #pragma once
 
 #include "Application.h"
-#include "Batcher.h"
-#include "Models/OneColorCube.h"
 #include "Renderer.h"
 
+#include "MaterialLibrary.h"
+#include "Materials/PlainColorMaterial.h"
+
+#include "Models/OneColorCube.h"
 #include "Models/SixColorCube.h"
 
 #include "../Layer.h"
+#include "imgui/imgui.h"
 #include "layers/ImGuiLayer.h"
 
 #include "events/KeyEvent.h"
@@ -32,11 +35,13 @@ private:
     Model<Vertex>* sixColor;
     Model<Vertex>* oneColor;
 
-    bool changed;
+    glm::vec4 color = { 0.3f, 0.4f, 0.7f, 1.0f };
 
-    // TODO: Refactor this to renderer class
-    int vCount = 144;
-    Batcher batcher = Batcher(Batcher::Config { .maxVerticesPerBatch = vCount });
+    // bool changed;
+
+    // // TODO: Refactor this to renderer class
+    // int vCount = 144;
+    // Batcher batcher = Batcher(Batcher::Config { .maxVerticesPerBatch = vCount });
 
 public:
     MainLayer(
@@ -66,70 +71,36 @@ public:
     ~MainLayer() = default;
 
     void OnAttach() override {
-        int shift_size = 5;
-        static int shift = shift_size;
-        static int expand = 1;
-        
-
-        // TODO: Remove ImGui debug buttons
-        Application& app = Application::Get();
-        app.SubmitToImgui([this, shift_size]() {
-            ImGui::DragInt("Vertices Count", &this->vCount);
-            if (ImGui::Button("Reconfigure")) {
-                this->batcher.SetConfig(Batcher::Config { .maxVerticesPerBatch = this->vCount });
-                changed = true;
-            }
-            if (ImGui::Button("Expand")) {
-
-                for (int x = 0; x < 10; x++) {
-                    for (int y = 0; y < 10; y++) {
-                        for (int z = 0; z < 10; z++) {
-                            oneColor->SetPosition({ (x + shift_size * expand) * 0.25f, y * 0.25f, z * 0.25f });
-                            oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                            batcher.Submit(oneColor);
-                        }
-                    }
-                }
-
-                expand++;
-                changed = true;
-            }
-            if (ImGui::Button("Move")) {
-                batcher.Reset();
-                
-                for (int i = 0; i < expand; i ++) {
-                    for (int x = 0; x < 10; x++) {
-                        for (int y = 0; y < 10; y++) {
-                            for (int z = 0; z < 10; z++) {
-                                oneColor->SetPosition({ (x + i * shift_size + shift) * 0.25f, y * 0.25f, z * 0.25f });
-                                oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                                batcher.Submit(oneColor);
-                            }
-                        }
-                    }
-                }
-
-                shift += shift_size;
-                changed = true;
-            }
-        });
-
-        // first frame init
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 for (int z = 0; z < 10; z++) {
                     oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
                     oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                    batcher.Submit(oneColor);
+                    renderer.Submit(oneColor);
                 }
             }
         }
-        // batcher.Submit(oneColor);
-        // batcher.Submit(sixColor);
-        auto&& batched = batcher.ComputeBatches();
-        renderer.SubmitBatches(std::move(batched));
 
-        changed = false;
+        Application& app = Application::Get();
+        app.SubmitToImgui([this]() {
+            ImGui::InputFloat("RED", &color.r);
+            ImGui::InputFloat("GREEN", &color.g);
+            ImGui::InputFloat("BLUE", &color.b);
+            ImGui::InputFloat("ALPHA", &color.a);
+
+            if (ImGui::Button("Resubmit")) {
+                this->renderer.ResetBatched();
+                for (int x = 0; x < 10; x++) {
+                    for (int y = 0; y < 10; y++) {
+                        for (int z = 0; z < 10; z++) {
+                            oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
+                            oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+                            renderer.Submit(oneColor);
+                        }
+                    }
+                }
+            };
+        });
     }
 
     void OnDetach() override {
@@ -143,14 +114,9 @@ public:
         lastFrameTime = currentFrameTime;
 
         renderer.Clear();
+        PlainColorMaterial* mat = (PlainColorMaterial*) MaterialLibrary::GetMaterial("PlainColorMaterial");
+        mat->SetColor(color);
 
-        // TODO: Make possibly to draw submitted through batcher class
-        // renderer.Draw(oneColor, camera);
-        // renderer.Draw(sixColor, camera);
-        if (changed) {
-            renderer.SubmitBatches(batcher.ComputeBatches());
-            changed = false;
-        }
         renderer.DrawSubmitted(camera);
     }
 
