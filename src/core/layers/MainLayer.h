@@ -52,8 +52,8 @@ public:
         : Layer("Game of Life layer")
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , renderer()
-        , prismShader("/home/den/Projects/3D-Game-of-Life/resources/shaders/prism.shader")
-        , cubeShader("/home/den/Projects/3D-Game-of-Life/resources/shaders/plain_color.shader") {
+        , prismShader("resources/shaders/prism.shader")
+        , cubeShader("resources/shaders/plain_color.shader") {
         sixColor = new SixColorCube(this->cubeShader);
         sixColor->SetScaleFactor(0.35f);
         sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });
