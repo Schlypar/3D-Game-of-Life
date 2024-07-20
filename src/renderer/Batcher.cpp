@@ -64,7 +64,6 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
                          | std::ranges::views::chunk_by(material)
                          | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
                          | std::ranges::views::transform(concat)
-                         // | std::ranges::views::transform([](auto s) {s.mesh->Resize(); return s; })
                          | std::ranges::to<std::vector<Surface<Vertex>>>();
 
         mutex.lock();
