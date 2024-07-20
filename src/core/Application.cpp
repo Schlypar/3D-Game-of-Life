@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 #include "Application.h"
+#include "layers/MainLayer.h"
 #include "layers/ImGuiLayer.h"
 
 namespace GoL {
@@ -90,12 +91,19 @@ bool Application::OnWindowClose(WindowCloseEvent& e) {
 }
 
 bool Application::OnKeyPress(KeyPressedEvent& e) {
+    static bool mainLayerMouseMoveHandle = true;
+
     if (e.GetKeyCode() == GLFW_KEY_ESCAPE) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetCursorPosCallback(window, NULL);
-        return true;
+        for (auto layer : layerStack) {
+            auto mainlayer = dynamic_cast<MainLayer*>(layer);
+            if (mainlayer) {
+                mainLayerMouseMoveHandle = ! mainLayerMouseMoveHandle;
+                mainlayer->SetMouseMoveHandler(mainLayerMouseMoveHandle);
+            }
+        }
     }
 
     return false;
 }
+
 }

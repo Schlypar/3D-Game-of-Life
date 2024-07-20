@@ -21,6 +21,7 @@ private:
     Renderer renderer;
 
     bool firstMouse = true;
+    bool mouseMoveHandle = true;
     float lastX = 0, lastY = 0;
 
     float currentFrameTime = 0;
@@ -114,7 +115,13 @@ public:
 
         // probably make it async in the future ?
         dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(MainLayer::OnKeyPress));
-        dispatcher.Dispatch<MouseMovedEvent>(BIND_MEMBER_EVENT_FN(MainLayer::OnMouseMove));
+        if (mouseMoveHandle) {
+            dispatcher.Dispatch<MouseMovedEvent>(BIND_MEMBER_EVENT_FN(MainLayer::OnMouseMove));
+        }
+    }
+
+    void SetMouseMoveHandler(bool mouseMove) {
+        mouseMoveHandle = mouseMove;
     }
 
 private:
