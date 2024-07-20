@@ -88,9 +88,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
             vertexCount = 0;
         }
     }
-    if (batches.empty() || (!batches.empty() && vertexCount == 0)) {
-        batches.push_back(std::move(batch));
-    }
+    batches.push_back(std::move(batch));
 
     std::thread workers[this->config.maxThreads];
     int threadComputedTimes = 0;
