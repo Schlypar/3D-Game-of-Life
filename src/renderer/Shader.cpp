@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 namespace GoL {
 
@@ -11,9 +12,15 @@ Shader::Shader(const Shader& other)
     , uniformsCache(other.uniformsCache) {
 }
 
-Shader::Shader(const std::string& shaderFilePath)
+Shader::Shader(const std::string& shaderString)
     : id(0) {
-    ProgramSource source = ParseShader(shaderFilePath);
+    ProgramSource source = ParseShaderStr(shaderString);
+    id = CreateShader(source.vertexSource, source.fragmentSource);
+}
+
+Shader::Shader(std::istream& shaderStream)
+    : id(0) {
+    ProgramSource source = ParseShaderStream(shaderStream);
     id = CreateShader(source.vertexSource, source.fragmentSource);
 }
 
@@ -62,9 +69,7 @@ std::string Shader::ParseFile(const std::string& filePath) {
     return content;
 }
 
-Shader::ProgramSource Shader::ParseShader(const std::string& filePath) {
-    std::ifstream stream(filePath);
-
+Shader::ProgramSource Shader::ParseShaderStream(std::istream& stream) {
     enum class ShaderType {
         NONE = -1,
         VERTEX = 0,
@@ -75,7 +80,7 @@ Shader::ProgramSource Shader::ParseShader(const std::string& filePath) {
     std::stringstream stringStream[2];
     ShaderType type = ShaderType::NONE;
 
-    while (getline(stream, line)) {
+    while (std::getline(stream, line)) {
         if (line.find("#shader") != std::string::npos) {
             if (line.find("vertex") != std::string::npos) {
                 type = ShaderType::VERTEX;
@@ -89,6 +94,19 @@ Shader::ProgramSource Shader::ParseShader(const std::string& filePath) {
 
     return { stringStream[0].str(), stringStream[1].str() };
 }
+
+Shader::ProgramSource Shader::ParseShaderStr(const std::string& shaderStr) {
+    auto vertexShIndex = shaderStr.find("#version", shaderStr.find("#shader vertex"));
+    auto fragmentShIndex = shaderStr.find("#version", shaderStr.find("#shader fragment"));
+
+    std::size_t i;
+    return
+    {
+        shaderStr.substr(vertexShIndex, (i = shaderStr.find("#shader", vertexShIndex)) == std::string::npos ? shaderStr.size() : i - vertexShIndex),
+        shaderStr.substr(fragmentShIndex, (i = shaderStr.find("#shader", fragmentShIndex)) == std::string::npos ? shaderStr.size() : i - fragmentShIndex)
+    };
+}
+
 
 unsigned int Shader::CompileShader(unsigned int type, const std::string& name) {
     unsigned int id = glCreateShader(type);
@@ -114,6 +132,8 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& name) {
 
 unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader) {
     unsigned int program = glCreateProgram();
+    std::cout << vertexShader << std::endl;
+    std::cout << fragmentShader << std::endl;
     unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
     unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 

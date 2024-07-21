@@ -20,7 +20,8 @@ private:
 
 public:
     Shader(const Shader& other);
-    Shader(const std::string& shaderFilePath);
+    Shader(const std::string& shaderString);
+    Shader(std::istream& shaderStream);
     Shader(const std::string& shaderVertexFilePath, const std::string& shaderFragmentFilePath);
     ~Shader();
 
@@ -33,7 +34,8 @@ public:
     void Unbind() const;
 
 private:
-    ProgramSource ParseShader(const std::string& filePath);
+    ProgramSource ParseShaderStream(std::istream& filePath);
+    ProgramSource ParseShaderStr(const std::string& filePath);
     std::string ParseFile(const std::string& filePath);
     unsigned int CompileShader(unsigned int type, const std::string& name);
     unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);

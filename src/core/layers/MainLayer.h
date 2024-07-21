@@ -5,6 +5,10 @@
 #include "Models/OneColorCube.h"
 #include "Renderer.h"
 
+// shaders
+#include "shader_prism.h"
+#include "shader_plain_color.h"
+
 #include "Models/SixColorCube.h"
 
 #include "../Layer.h"
@@ -51,8 +55,8 @@ public:
         : Layer("Game of Life layer")
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , renderer()
-        , prismShader("resources/shaders/prism.shader")
-        , cubeShader("resources/shaders/plain_color.shader") {
+        , prismShader(__shader_prism)
+        , cubeShader(__shader_plain_color) {
         sixColor = new SixColorCube(this->cubeShader);
         sixColor->SetScaleFactor(0.35f);
         sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });
