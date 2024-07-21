@@ -2,7 +2,9 @@
 #pragma once
 #include <string>
 
-const std::string __shader_plain_color = "\
+namespace GoL {
+
+const std::string SHADER_PLAIN_COLOR = "\
 #shader fragment\n\
 #version 330 core\n\
 \n\
@@ -30,3 +32,5 @@ void main()\n\
     gl_Position = ProjectionView * Model * position;\n\
 };\n\
 ";
+
+}

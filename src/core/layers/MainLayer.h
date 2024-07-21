@@ -55,8 +55,8 @@ public:
         : Layer("Game of Life layer")
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , renderer()
-        , prismShader(__shader_prism)
-        , cubeShader(__shader_plain_color) {
+        , prismShader(SHADER_PRISM)
+        , cubeShader(SHADER_PLAIN_COLOR) {
         sixColor = new SixColorCube(this->cubeShader);
         sixColor->SetScaleFactor(0.35f);
         sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });

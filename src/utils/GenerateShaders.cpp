@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -57,9 +58,12 @@ int main() {
             std::cerr << "failed to open file for write: " << headerPath.string() + "/" + outName + ".h" << std::endl;
             continue;
         }
+
+        std::for_each(outName.begin(), outName.end(), [](char& l) { l = std::toupper(l); });
+
         out <<
             disclaimer +
-            "\n#pragma once\n#include <string>\n\nconst std::string __" +
+            "\n#pragma once\n#include <string>\n\nnamespace GoL {\n\nconst std::string " +
             outName +
             " = \"\\\n";
 
@@ -67,7 +71,7 @@ int main() {
         while (std::getline(src, line)) {
             out << line + "\\n\\\n";
         }
-        out << "\";";
+        out << "\";\n\n}";
 
         out.close();
     }

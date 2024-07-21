@@ -2,7 +2,9 @@
 #pragma once
 #include <string>
 
-const std::string __shader_test = "\
+namespace GoL {
+
+const std::string SHADER_TEST = "\
 #shader vertex\n\
 #version 330 core\n\
 \n\
@@ -30,3 +32,5 @@ void main()\n\
     color = i_color;\n\
 };\n\
 ";
+
+}
