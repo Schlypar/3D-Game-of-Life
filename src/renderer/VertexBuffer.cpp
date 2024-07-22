@@ -34,8 +34,7 @@ void VertexBuffer::Realloc(const size_t size, GLenum usage) {
 }
 
 void VertexBuffer::Write(const void* data, size_t size, unsigned int offset) {
-    Bind();
-    glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+    glNamedBufferSubData(id, offset, size, data);
 }
 
 void VertexBuffer::Bind() const {

@@ -1,13 +1,3 @@
-#shader fragment
-#version 330 core
-
-in vec4 i_color;
-out vec4 color;
-
-void main()
-{
-    color = i_color;
-};
 #shader vertex
 #version 330 core
 
@@ -23,4 +13,15 @@ void main()
 {
     i_color = Color;
     gl_Position = ProjectionView * Model * position;
+};
+
+#shader fragment
+#version 330 core
+
+in vec4 i_color;
+out vec4 color;
+
+void main()
+{
+    color = i_color;
 };

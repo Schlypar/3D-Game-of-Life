@@ -17,9 +17,7 @@ namespace GoL {
 class Batcher {
 public:
     struct Config {
-        int maxVerticesPerBatch = 128;
         unsigned int maxThreads = 8;
-        glm::mat4 batchTransform = glm::mat4 { 1.0f };
     };
 
 private:
@@ -32,11 +30,14 @@ private:
     Config config;
     std::vector<SurfaceBundle> surfaces;
 
+    int maxVerticesPerBatch = 128;
+    glm::mat4 batchTransform = glm::mat4 { 1.0f };
+
 public:
     Batcher() = delete;
     Batcher(const Batcher& other) = delete;
     Batcher(Batcher&& other) = delete;
-    Batcher(const Config& config = Config { 128, 8, glm::mat4 { 1.0f } });
+    Batcher(const Config& config = Config { .maxThreads = 8 });
     ~Batcher() = default;
 
     void SetConfig(const Config& config);
