@@ -37,12 +37,6 @@ private:
 
     glm::vec4 color = { 0.3f, 0.4f, 0.7f, 1.0f };
 
-    // bool changed;
-
-    // // TODO: Refactor this to renderer class
-    // int vCount = 144;
-    // Batcher batcher = Batcher(Batcher::Config { .maxVerticesPerBatch = vCount });
-
 public:
     MainLayer(
             glm::vec3 position = glm::vec3(0.0f, 0.0f, -3.0f),
