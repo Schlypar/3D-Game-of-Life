@@ -35,13 +35,13 @@ Window::Window(const Data& settings) {
         data.Width = width;
         data.Height = height;
 
-        WindowResizeEvent event(width, height);
+        auto event = new WindowResizeEvent(width, height);
         data.EventCallback(event);
     });
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
         Data& data = *(Data*) glfwGetWindowUserPointer(window);
-        WindowCloseEvent event;
+        auto event = new WindowCloseEvent;
         data.EventCallback(event);
     });
 
@@ -51,19 +51,19 @@ Window::Window(const Data& settings) {
         switch (action) {
             case GLFW_PRESS:
                 {
-                    KeyPressedEvent event(key, 0);
+                    auto event = new KeyPressedEvent(key, 0);
                     data.EventCallback(event);
                     break;
                 }
             case GLFW_RELEASE:
                 {
-                    KeyReleasedEvent event(key);
+                    auto event = new KeyReleasedEvent(key);
                     data.EventCallback(event);
                     break;
                 }
             case GLFW_REPEAT:
                 {
-                    KeyPressedEvent event(key, true);
+                    auto event = new KeyPressedEvent(key, true);
                     data.EventCallback(event);
                     break;
                 }
@@ -73,7 +73,7 @@ Window::Window(const Data& settings) {
     glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int keycode) {
         Data& data = *(Data*) glfwGetWindowUserPointer(window);
 
-        KeyTypedEvent event(keycode);
+        auto event = new KeyTypedEvent(keycode);
         data.EventCallback(event);
     });
 
@@ -83,13 +83,13 @@ Window::Window(const Data& settings) {
         switch (action) {
             case GLFW_PRESS:
                 {
-                    MouseButtonPressedEvent event(button);
+                    auto event = new MouseButtonPressedEvent(button);
                     data.EventCallback(event);
                     break;
                 }
             case GLFW_RELEASE:
                 {
-                    MouseButtonReleasedEvent event(button);
+                    auto event = new MouseButtonReleasedEvent(button);
                     data.EventCallback(event);
                     break;
                 }
@@ -99,14 +99,14 @@ Window::Window(const Data& settings) {
     glfwSetScrollCallback(window, [](GLFWwindow* window, double xOffset, double yOffset) {
         Data& data = *(Data*) glfwGetWindowUserPointer(window);
 
-        MouseScrolledEvent event((float) xOffset, (float) yOffset);
+        auto event = new MouseScrolledEvent((float) xOffset, (float) yOffset);
         data.EventCallback(event);
     });
 
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xPos, double yPos) {
         Data& data = *(Data*) glfwGetWindowUserPointer(window);
 
-        MouseMovedEvent event((float) xPos, (float) yPos);
+        auto event = new MouseMovedEvent((float) xPos, (float) yPos);
         data.EventCallback(event);
     });
 }

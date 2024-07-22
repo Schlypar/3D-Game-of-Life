@@ -119,8 +119,8 @@ public:
         renderer.DrawSubmitted(camera);
     }
 
-    void OnEvent(Event& e) override {
-        EventDispatcher dispatcher(e);
+    void OnEvent(Event* e) override {
+        EventDispatcher dispatcher(*e);
 
         // probably make it async in the future ?
         dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(MainLayer::OnKeyPress));

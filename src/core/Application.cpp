@@ -16,22 +16,38 @@ Application::Application(
 )
     : window(Window::Data(title, width, height))
     , layerStack()
-    , imGuiLayer(new ImGuiLayer()) {
+    , imGuiLayer(new ImGuiLayer()) 
+    , eventQueue([this](Event* e) {
+        EventDispatcher dispatcher(*e);
+
+        dispatcher.Dispatch<WindowCloseEvent>(BIND_MEMBER_EVENT_FN(Application::OnWindowClose));
+        dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
+
+        for (auto it = this->layerStack.rbegin(); it != this->layerStack.rend(); it++) {
+            if (e->Handled) {
+                break;
+            }
+
+            (*it)->OnEvent(e);
+        }
+    }) {
     // only 1 appplication instance may be
     assert(!Application::instance);
     Application::instance = this;
 
     this->window.SetEventCallback(
-            [this](Event& e) {
+            [this](Event* e) {
                 this->OnEvent(e);
             }
     );
     this->window.Configure();
     this->layerStack.PushOverlay(this->imGuiLayer);
     this->imGuiLayer->OnAttach();
+    this->eventQueue.Run();
 }
 
 Application::~Application() {
+    this->eventQueue.Stop();
     Application::instance = nullptr;
 }
 
@@ -67,21 +83,8 @@ void Application::Run() {
     exit(EXIT_SUCCESS);
 }
 
-void Application::OnEvent(Event& e) {
-    EventDispatcher dispatcher(e);
-
-    // probably make it async in the future ?
-    dispatcher.Dispatch<WindowCloseEvent>(BIND_MEMBER_EVENT_FN(Application::OnWindowClose));
-
-    dispatcher.Dispatch<KeyPressedEvent>(BIND_MEMBER_EVENT_FN(Application::OnKeyPress));
-
-    for (auto it = layerStack.rbegin(); it != layerStack.rend(); it++) {
-        if (e.Handled) {
-            break;
-        }
-
-        (*it)->OnEvent(e);
-    }
+void Application::OnEvent(Event* e) {
+    eventQueue.Push(e);
 }
 
 // private:
