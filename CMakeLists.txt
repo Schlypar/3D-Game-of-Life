@@ -10,16 +10,30 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 # --- START PROJECT ---
 
 file(GLOB source CONFIGURE_DEPENDS 
-                "${SRC_DIR}/*.cpp" 
-                "${SRC_DIR}/renderer/*.cpp" 
-                "${SRC_DIR}/core/*.cpp"
-                "${SRC_DIR}/core/events/*.cpp"
-                "${SRC_DIR}/core/layers/*.cpp"
-    )
+"${SRC_DIR}/*.cpp" 
+"${SRC_DIR}/renderer/*.cpp" 
+"${SRC_DIR}/core/*.cpp"
+"${SRC_DIR}/core/events/*.cpp"
+"${SRC_DIR}/core/layers/*.cpp"
+)
 
+# generate shader headers
+add_executable(generate_shaders ${SRC_DIR}/utils/GenerateShaders.cpp)
+
+# Build and execute generate_shaders
+add_custom_target(run_generate_shaders
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --yellow "Building and executing generate_shaders..."
+    COMMAND ${CMAKE_BINARY_DIR}/generate_shaders
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue "Finished building and executing generate_shaders."
+    DEPENDS generate_shaders
+)
+
+# Build ${PROJECT_NAME} after executing generate_shaders
 add_executable(${PROJECT_NAME} ${source})
+add_dependencies(${PROJECT_NAME} run_generate_shaders)
 target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/renderer")
 target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/core")
+target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/resources/include")
 target_include_directories(${PROJECT_NAME} PUBLIC "${SRC_DIR}/vendor")
 
 # --- END PROJECT ---

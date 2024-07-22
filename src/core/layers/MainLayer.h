@@ -3,11 +3,15 @@
 #include "Application.h"
 #include "Renderer.h"
 
+// shaders
+#include "shader_prism.h"
+#include "shader_plain_color.h"
+
+#include "Models/SixColorCube.h"
+#include "Models/OneColorCube.h"
+
 #include "MaterialLibrary.h"
 #include "Materials/PlainColorMaterial.h"
-
-#include "Models/OneColorCube.h"
-#include "Models/SixColorCube.h"
 
 #include "../Layer.h"
 #include "imgui/imgui.h"
@@ -52,8 +56,8 @@ public:
         : Layer("Game of Life layer")
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , renderer()
-        , prismShader("resources/shaders/prism.shader")
-        , cubeShader("resources/shaders/plain_color.shader") {
+        , prismShader(SHADER_PRISM)
+        , cubeShader(SHADER_PLAIN_COLOR) {
         sixColor = new SixColorCube(this->cubeShader);
         sixColor->SetScaleFactor(0.35f);
         sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });
