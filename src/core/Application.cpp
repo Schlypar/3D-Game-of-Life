@@ -1,6 +1,8 @@
 #include <cassert>
 #include <cstdlib>
 
+#include "Logger.h"
+
 #include "Application.h"
 #include "layers/MainLayer.h"
 #include "layers/ImGuiLayer.h"
@@ -20,6 +22,8 @@ Application::Application(
     // only 1 appplication instance may be
     assert(!Application::instance);
     Application::instance = this;
+
+    Logger::Init();
 
     this->window.SetEventCallback(
             [this](Event& e) {

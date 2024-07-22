@@ -5,16 +5,6 @@
 namespace GoL {
 
 const std::string SHADER_PLAIN_COLOR = "\
-#shader fragment\n\
-#version 330 core\n\
-\n\
-in vec4 i_color;\n\
-out vec4 color;\n\
-\n\
-void main()\n\
-{\n\
-    color = i_color;\n\
-};\n\
 #shader vertex\n\
 #version 330 core\n\
 \n\
@@ -30,6 +20,17 @@ void main()\n\
 {\n\
     i_color = Color;\n\
     gl_Position = ProjectionView * Model * position;\n\
+};\n\
+\n\
+#shader fragment\n\
+#version 330 core\n\
+\n\
+in vec4 i_color;\n\
+out vec4 color;\n\
+\n\
+void main()\n\
+{\n\
+    color = i_color;\n\
 };\n\
 ";
 
