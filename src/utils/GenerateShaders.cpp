@@ -7,9 +7,15 @@
 const std::string disclaimer = "// DO NOT EDIT: GENERATED FILE";
 
 int main() {
+#ifdef _WIN32
+    std::filesystem::path resourcesPath = "../../../resources";
+    std::filesystem::path headerPath = "../../../resources/include";
+    std::filesystem::directory_entry resourcesDir(resourcesPath);
+#else
     std::filesystem::path resourcesPath = "../resources";
     std::filesystem::path headerPath = "../resources/include";
     std::filesystem::directory_entry resourcesDir(resourcesPath);
+#endif
 
     if (!resourcesDir.exists() || !resourcesDir.is_directory()) {
         std::cerr << "failed to open dir: " << resourcesPath << std::endl;
