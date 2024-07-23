@@ -4,12 +4,10 @@
 #include <thread>
 
 #include <range/v3/view/chunk_by.hpp>
-#include <range/v3/view/chunk_by.hpp>
 #include <range/v3/view/transform.hpp>
 
 #include <range/v3/numeric/accumulate.hpp>
 #include <range/v3/to_container.hpp>
-
 
 namespace GoL {
 
@@ -43,7 +41,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
     const auto projection = [](const Surface<Vertex>& s) -> int {
         return s.material->GetId();
     };
-    const auto material = [projection](Surface<Vertex>& l, Surface<Vertex>& r) -> bool {
+    const auto material = [projection](const Surface<Vertex>& l, const Surface<Vertex>& r) -> bool {
         auto left = projection(l);
         auto right = projection(r);
         return left == right;
@@ -57,8 +55,8 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         }
         return sb.surface;
     };
-    const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex>& {
-        Surface<Vertex>& res = vec[0];
+    const auto concat = [](const auto& vec) -> Surface<Vertex> {
+        Surface<Vertex> res = vec[0];
         std::for_each(vec.begin() + 1, vec.end(), [&res](const Surface<Vertex>& s) -> void {
             res += s;
         });
