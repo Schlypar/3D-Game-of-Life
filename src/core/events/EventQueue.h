@@ -1,0 +1,66 @@
+#pragma once
+
+#include <chrono>
+#include <mutex>
+#include <thread>
+#include <atomic>
+#include <queue>
+#include <functional>
+
+#include "Event.h"
+
+namespace GoL {
+
+using EventHandler = std::function<void(Event*)>;
+
+class EventQueue {
+private:
+    std::queue<Event*> queue;
+    std::mutex mu;
+    std::thread handleThread;
+    std::atomic<bool> run;
+    EventHandler handler;
+
+public:
+    EventQueue() = delete;
+    EventQueue(EventHandler handler)
+    : queue() {
+        this->handler = handler;
+    }
+    ~EventQueue() {
+        run = false;
+    }
+
+    void Push(Event* e) {
+        mu.lock();
+        queue.push(e);
+        mu.unlock();
+    }
+
+    void Run() {
+        run = true;
+        if (!handleThread.joinable()) {
+            handleThread = std::thread(&EventQueue::HandleEvents, this);
+        }
+    }
+
+    void Stop() {
+        run = false;
+    }
+
+private:
+    void HandleEvents() {
+        while (run) {
+            mu.lock();
+            if (!queue.empty()) {
+                handler(queue.front());
+                delete queue.front();
+                queue.pop();
+            }
+            mu.unlock();
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        }
+    }
+};
+
+}

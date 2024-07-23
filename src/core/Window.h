@@ -17,7 +17,7 @@ static void error_callback(int error, const char* description) {
 
 class Window {
 protected:
-    using EventCallbackFn = std::function<void(Event&)>;
+    using EventCallbackFn = std::function<void(Event*)>;
 
 public:
     struct Data {

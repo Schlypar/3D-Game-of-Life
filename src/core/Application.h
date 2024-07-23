@@ -5,6 +5,7 @@
 #include "Window.h"
 
 #include "events/Event.h"
+#include "events/EventQueue.h"
 
 #include "events/ApplicationEvent.h"
 #include "events/KeyEvent.h"
@@ -19,6 +20,7 @@ private:
     Window window;
     LayerStack layerStack;
     ImGuiLayer* imGuiLayer;
+    EventQueue eventQueue;
 
     static Application* instance;
 
@@ -43,7 +45,7 @@ public:
 
     void Run();
 
-    void OnEvent(Event& e);
+    void OnEvent(Event* e);
 
 private:
     bool OnWindowClose(WindowCloseEvent& e);
