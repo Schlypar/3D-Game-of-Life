@@ -1,8 +1,13 @@
 #include "Batcher.h"
 
 #include <algorithm>
-#include <ranges>
 #include <thread>
+
+#include <range/v3/view/chunk_by.hpp>
+#include <range/v3/view/transform.hpp>
+
+#include <range/v3/numeric/accumulate.hpp>
+#include <range/v3/to_container.hpp>
 
 namespace GoL {
 
@@ -16,11 +21,12 @@ void Batcher::SetConfig(const Config& config) {
 }
 
 void Batcher::Submit(Model<Vertex>* model) {
-    auto modelSurfaces = model->GetSurfaces()
-                       | std::ranges::views::transform([model](Surface<Vertex>& s) -> SurfaceBundle {
+    auto rawSurfaces = model->GetSurfaces();
+    auto modelSurfaces = rawSurfaces
+                       | ranges::views::transform([model](Surface<Vertex>& s) -> SurfaceBundle {
                              return SurfaceBundle { s, model->GetModelMatrix() };
                          })
-                       | std::ranges::to<std::vector<SurfaceBundle>>();
+                       | ranges::to<std::vector<SurfaceBundle>>();
     this->surfaces.insert(this->surfaces.end(), modelSurfaces.begin(), modelSurfaces.end());
 }
 
@@ -35,7 +41,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
     const auto projection = [](const Surface<Vertex>& s) -> int {
         return s.material->GetId();
     };
-    const auto material = [projection](Surface<Vertex>& l, Surface<Vertex>& r) -> bool {
+    const auto material = [projection](const Surface<Vertex>& l, const Surface<Vertex>& r) -> bool {
         auto left = projection(l);
         auto right = projection(r);
         return left == right;
@@ -49,8 +55,8 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         }
         return sb.surface;
     };
-    const auto concat = [](std::vector<Surface<Vertex>>& vec) -> Surface<Vertex>& {
-        Surface<Vertex>& res = vec[0];
+    const auto concat = [](const auto& vec) -> Surface<Vertex> {
+        Surface<Vertex> res = vec[0];
         std::for_each(vec.begin() + 1, vec.end(), [&res](const Surface<Vertex>& s) -> void {
             res += s;
         });
@@ -59,19 +65,21 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
 
     const auto optimize = [computeSurface, material, concat, &result, &mutex](const std::vector<SurfaceBundle>& vec) {
         auto transformed = vec
-                         | std::ranges::views::transform(computeSurface)
-                         | std::ranges::to<std::vector<Surface<Vertex>>>()
-                         | std::ranges::views::chunk_by(material)
-                         | std::ranges::to<std::vector<std::vector<Surface<Vertex>>>>()
-                         | std::ranges::views::transform(concat)
-                         | std::ranges::to<std::vector<Surface<Vertex>>>();
+                         | ranges::views::transform(computeSurface)
+                         | ranges::to<std::vector<Surface<Vertex>>>();
+        auto intermediate = transformed
+                          | ranges::views::chunk_by(material)
+                          | ranges::to<std::vector<std::vector<Surface<Vertex>>>>();
+        transformed = intermediate
+                    | ranges::views::transform(concat)
+                    | ranges::to<std::vector<Surface<Vertex>>>();
 
         mutex.lock();
         result.insert(result.end(), transformed.begin(), transformed.end());
         mutex.unlock();
     };
 
-    this->maxVerticesPerBatch = (std::ranges::fold_left(this->surfaces, 0, [](int acc, const auto& sb) -> int {
+    this->maxVerticesPerBatch = (ranges::accumulate(this->surfaces, 0, [](int acc, const auto& sb) -> int {
                                      return acc + sb.surface.vertexCount;
                                  })
                                  / this->config.maxThreads);
