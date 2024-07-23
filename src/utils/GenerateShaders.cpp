@@ -27,7 +27,7 @@ int main() {
             continue;
         }
 
-        if (!dirEntry.path().string().contains(".shader")) {
+        if (dirEntry.path().string().find(".shader") == std::string::npos) {
             continue;
         }
 
@@ -39,7 +39,7 @@ int main() {
             }
         }
         for (int i = 0; i < outName.size(); i++) {
-            if (!outName.substr(i).contains("/")) {
+            if (outName.substr(i).find("/") == std::string::npos) {
                 outName = outName.substr(i);
                 outName = "shader_" + outName;
             }
