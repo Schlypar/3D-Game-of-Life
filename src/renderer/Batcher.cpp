@@ -102,7 +102,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
     }
     batches.push_back(std::move(batch));
 
-    std::thread workers[this->config.maxThreads];
+    std::thread* workers = new std::thread[this->config.maxThreads];
     int threadComputedTimes = 0;
     while (batches.size() > threadComputedTimes * this->config.maxThreads) {
         if (batches.size() - threadComputedTimes * this->config.maxThreads >= this->config.maxThreads) {
@@ -125,6 +125,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
             threadComputedTimes++;
         }
     }
+    delete[] workers;
 
     return result;
 }
