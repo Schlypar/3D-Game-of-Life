@@ -1,14 +1,5 @@
 #include "Batcher.h"
 
-#include <algorithm>
-#include <thread>
-
-#include <range/v3/view/chunk_by.hpp>
-#include <range/v3/view/transform.hpp>
-
-#include <range/v3/numeric/accumulate.hpp>
-#include <range/v3/to_container.hpp>
-
 namespace GoL {
 
 Batcher::Batcher(const Config& config)

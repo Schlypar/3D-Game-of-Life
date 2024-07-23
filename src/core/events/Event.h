@@ -1,9 +1,10 @@
 #pragma once
 
+#include "precompiled.h"
+
 #include <sstream>
 #include <string>
 
-#include <functional>
 
 namespace GoL {
 
