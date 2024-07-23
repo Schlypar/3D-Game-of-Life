@@ -8,10 +8,7 @@ VertexBuffer::VertexBuffer(const void* data, const size_t size, GLenum usage) {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, size, data, usage);
-}
-
-VertexBuffer::VertexBuffer(const VertexBuffer& other)
-    : id(other.id) {
+    OPENGL_INFO("Created VBO with id {} of size {} and usage {}", id, size, usage);
 }
 
 VertexBuffer::VertexBuffer(VertexBuffer&& other) {
