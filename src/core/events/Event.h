@@ -1,7 +1,9 @@
 #pragma once
 
-#include <functional>
+#include <sstream>
 #include <string>
+
+#include <functional>
 
 namespace GoL {
 
