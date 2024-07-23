@@ -1,8 +1,8 @@
 #pragma once
 
-#include <algorithm>
-#include <bits/ranges_algo.h>
-#include <ranges>
+#include <range/v3/numeric/accumulate.hpp>
+#include <range/v3/view.hpp>
+
 #include <vector>
 
 #include <glad/gl.h>
@@ -73,7 +73,7 @@ public:
         this->vertexArray.Bind();
         this->vertexBuffer.Bind();
 
-        auto modelDataSize = std::ranges::fold_left(this->batched, 0, [](const unsigned int size, const Surface<Vertex>& s) -> int {
+        auto modelDataSize = ranges::accumulate(this->batched, 0, [](const unsigned int size, const Surface<Vertex>& s) -> int {
             return size + s.vertexCount * sizeof(Vertex);
         });
         if (modelDataSize > this->dataSize) {

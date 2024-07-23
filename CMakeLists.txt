@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4...3.28 FATAL_ERROR)
 
 project(cellular_automata)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
@@ -51,6 +51,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${DEPS_DIR}/glad/include/")
 
 add_subdirectory("${DEPS_DIR}/glfw")
 target_link_libraries(${PROJECT_NAME} "glfw")
+
+add_subdirectory("${DEPS_DIR}/range-v3")
+target_link_libraries(${PROJECT_NAME} "range-v3")
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL)

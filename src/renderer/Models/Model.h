@@ -1,13 +1,16 @@
 #pragma once
 
-#include <algorithm>
+#include <glad/gl.h>
+
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+
+#include <range/v3/algorithm/for_each.hpp>
+
 #include <iostream>
 #include <memory>
 #include <ostream>
 
-#include <glad/gl.h>
-#include <glm/ext/matrix_float4x4.hpp>
-#include <glm/ext/matrix_transform.hpp>
 
 #include "Meshes/UnindexedMesh.h"
 #include "Vertex.h"
@@ -136,7 +139,7 @@ struct Surface {
         os << "Surface {\n\tMode: " << s.mode
            << "\n\tVertex Count: " << s.vertexCount
            << "\n\tVertices: {\n";
-        std::ranges::for_each(
+        ranges::for_each(
                 s.mesh->GetData().bytes,
                 s.mesh->GetData().bytes + s.vertexCount,
                 [&os](const Vertex& x) { os << "\t\t" << x << "\n"; }

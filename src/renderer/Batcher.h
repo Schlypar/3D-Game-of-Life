@@ -2,7 +2,6 @@
 #define BATCHER_H_
 
 #include <algorithm>
-#include <bits/ranges_algo.h>
 #include <functional>
 #include <ranges>
 #include <vector>
