@@ -1,10 +1,8 @@
 #pragma once
 
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_float4x4.hpp"
-#include "glm/ext/matrix_transform.hpp"
+#include "precompiled.h"
+
 #include <glad/gl.h>
-#include <glm/glm.hpp>
 
 namespace GoL {
 

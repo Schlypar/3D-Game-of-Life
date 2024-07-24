@@ -1,9 +1,6 @@
 #pragma once
 
-#include <range/v3/numeric/accumulate.hpp>
-#include <range/v3/view.hpp>
-
-#include <vector>
+#include "precompiled.h"
 
 #include <glad/gl.h>
 

@@ -23,6 +23,7 @@ Window::Window(const Data& settings) {
             NULL
     );
     if (!this->window) {
+        CORE_ERROR("Unable to initialize window");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
@@ -117,12 +118,17 @@ Window::~Window() {
 
 void Window::Configure() {
     glEnable(GL_DEPTH_TEST);
+    OPENGL_INFO("Enabled GL_DEPTH_TEST");
 
     glEnable(GL_CULL_FACE);
+    OPENGL_INFO("Enabled GL_CULL_FACE");
     glFrontFace(GL_CCW);
+    OPENGL_INFO("Front face is CCW");
     glCullFace(GL_BACK);
+    OPENGL_INFO("Back face is culled");
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    OPENGL_INFO("glPolygonMode: GL_FRONT_AND_BACK, GL_FILL");
 }
 
 void Window::OnUpdate() {

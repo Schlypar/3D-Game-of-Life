@@ -1,5 +1,6 @@
+#include "precompiled.h"
+
 #include "MaterialLibrary.h"
-#include <unordered_map>
 
 namespace GoL {
 
@@ -8,6 +9,7 @@ std::vector<std::string> MaterialLibrary::names = std::vector<std::string>();
 
 bool MaterialLibrary::AddMaterial(std::pair<std::string, Material*> entry) {
     if (materials.contains(entry.first)) {
+        CORE_WARN("Material with name {} attempted to be added twice", entry.first);
         delete entry.second;
         return false;
     } else {

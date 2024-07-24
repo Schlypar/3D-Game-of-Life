@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include "precompiled.h"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -33,6 +35,11 @@ Shader::Shader(const std::string& shaderVertexFilePath, const std::string& shade
 
 Shader::~Shader() {
     glDeleteProgram(id);
+    auto errorCode = glGetError();
+    if (errorCode != GL_NO_ERROR) {
+        auto errorString = glad_glGetError();
+        OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    }
 }
 
 unsigned int Shader::GetShaderId() const {
@@ -41,10 +48,20 @@ unsigned int Shader::GetShaderId() const {
 
 void Shader::Bind() const {
     glUseProgram(id);
+    auto errorCode = glGetError();
+    if (errorCode != GL_NO_ERROR) {
+        auto errorString = glad_glGetError();
+        OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    }
 }
 
 void Shader::Unbind() const {
     glUseProgram(0);
+    auto errorCode = glGetError();
+    if (errorCode != GL_NO_ERROR) {
+        auto errorString = glad_glGetError();
+        OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    }
 }
 
 void Shader::SetUniform4f(const std::string& name, float f1, float f2, float f3, float f4) {
@@ -58,7 +75,7 @@ void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix) {
 std::string Shader::ParseFile(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << filePath << std::endl;
+        CORE_ERROR("Failed to open file: {}", filePath);
         return "";
     }
     std::string str;
@@ -100,19 +117,22 @@ Shader::ProgramSource Shader::ParseShaderStr(const std::string& shaderStr) {
     auto fragmentShIndex = shaderStr.find("#version", shaderStr.find("#shader fragment"));
 
     std::size_t i;
-    return
-    {
+    return {
         shaderStr.substr(vertexShIndex, (i = shaderStr.find("#shader", vertexShIndex)) == std::string::npos ? shaderStr.size() : i - vertexShIndex),
         shaderStr.substr(fragmentShIndex, (i = shaderStr.find("#shader", fragmentShIndex)) == std::string::npos ? shaderStr.size() : i - fragmentShIndex)
     };
 }
-
 
 unsigned int Shader::CompileShader(unsigned int type, const std::string& name) {
     unsigned int id = glCreateShader(type);
     const char* src = name.c_str();
     glShaderSource(id, 1, &src, nullptr);
     glCompileShader(id);
+    auto errorCode = glGetError();
+    if (errorCode != GL_NO_ERROR) {
+        auto errorString = glad_glGetError();
+        OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    }
 
     int result;
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
@@ -121,8 +141,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& name) {
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
         char* message = (char*) alloca(length * sizeof(char));
         glGetShaderInfoLog(id, length, &length, message);
-        std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
-        std::cout << message << std::endl;
+        OPENGL_ERROR("Failed to compile {} shader.\n{}", type == GL_VERTEX_SHADER ? "vertex" : "fragment", message);
         glDeleteShader(id);
         return 0;
     }
@@ -139,6 +158,11 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
     glAttachShader(program, fs);
     glLinkProgram(program);
     glValidateProgram(program);
+    auto errorCode = glGetError();
+    if (errorCode != GL_NO_ERROR) {
+        auto errorString = glad_glGetError();
+        OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    }
 
     glDeleteShader(vs);
     glDeleteShader(fs);
@@ -153,7 +177,7 @@ unsigned int Shader::GetUniformLocation(const std::string& name) {
 
     int location = glGetUniformLocation(id, name.c_str());
     if (location == -1) {
-        std::cout << "Warning: uniform " << name << " not found" << std::endl;
+        OPENGL_WARN("Warning: uniform {} not found", name);
     } else {
         uniformsCache[name] = location;
     }

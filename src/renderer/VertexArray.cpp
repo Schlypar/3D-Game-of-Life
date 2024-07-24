@@ -1,12 +1,16 @@
+#include <glad/gl.h>
+
+#include "precompiled.h"
+
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
-#include "glad/gl.h"
 
 namespace GoL {
 
 VertexArray::VertexArray() {
     glGenVertexArrays(1, &id);
+    OPENGL_INFO("VAO with id {} has been created", id);
 }
 
 VertexArray::VertexArray(VertexArray&& other) {
@@ -15,7 +19,13 @@ VertexArray::VertexArray(VertexArray&& other) {
 
 VertexArray::~VertexArray() {
     Unbind();
+    OPENGL_INFO("VAO with id {} has been destroyed", id);
     glDeleteVertexArrays(1, &id);
+    auto errorCode = glGetError();
+    if (errorCode != GL_NO_ERROR) {
+        auto errorString = glad_glGetError();
+        OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    }
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& other) {
@@ -40,11 +50,23 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
 }
 
 void VertexArray::Bind() const {
+    OPENGL_INFO("VAO with id {} was binded", id);
     glBindVertexArray(id);
+    auto errorCode = glGetError();
+    if (errorCode != GL_NO_ERROR) {
+        auto errorString = glad_glGetError();
+        OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    }
 }
 
 void VertexArray::Unbind() const {
+    OPENGL_INFO("VAO with id {} was unbinded", id);
     glBindVertexArray(0);
+    auto errorCode = glGetError();
+    if (errorCode != GL_NO_ERROR) {
+        auto errorString = glad_glGetError();
+        OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    }
 }
 
 }

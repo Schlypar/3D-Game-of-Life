@@ -1,10 +1,7 @@
 #ifndef BATCHER_H_
 #define BATCHER_H_
 
-#include <algorithm>
-#include <functional>
-#include <ranges>
-#include <vector>
+#include "precompiled.h"
 
 #include "Materials/Material.h"
 #include "Meshes/Mesh.h"
