@@ -4,8 +4,9 @@
 #include "Logger.h"
 
 #include "Application.h"
-#include "layers/MainLayer.h"
+
 #include "layers/ImGuiLayer.h"
+#include "layers/MainLayer.h"
 
 namespace GoL {
 
@@ -101,7 +102,7 @@ bool Application::OnKeyPress(KeyPressedEvent& e) {
         for (auto layer : layerStack) {
             auto mainlayer = dynamic_cast<MainLayer*>(layer);
             if (mainlayer) {
-                mainLayerMouseMoveHandle = ! mainLayerMouseMoveHandle;
+                mainLayerMouseMoveHandle = !mainLayerMouseMoveHandle;
                 mainlayer->SetMouseMoveHandler(mainLayerMouseMoveHandle);
             }
         }

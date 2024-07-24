@@ -24,15 +24,18 @@ public:
     static void Init();
     static spdlog::logger* GetOpenGLLogger();
     static spdlog::logger* GetGoLLogger();
-    static void SetLevel(spdlog::level::level_enum level);
+    static void SetOpenGLLevel(spdlog::level::level_enum level);
+    static void SetGoLLevel(spdlog::level::level_enum level);
 };
 
 }
 
 #endif // LOGGER_H_
 
+namespace GoL {
+
 #if defined(DEBUG)
-    #define OPENGL_TRACE(...) Logger::GetOpenGLLogger()->trace(__VA_ARGS__)
+    #define OPENGL_TRACE(...) GoL::Logger::GetOpenGLLogger()->trace(__VA_ARGS__)
     #define OPENGL_INFO(...) Logger::GetOpenGLLogger()->info(__VA_ARGS__)
     #define OPENGL_WARN(...) Logger::GetOpenGLLogger()->warn(__VA_ARGS__)
     #define OPENGL_ERROR(...) Logger::GetOpenGLLogger()->error(__VA_ARGS__)
@@ -43,6 +46,9 @@ public:
     #define CORE_WARN(...) Logger::GetGoLLogger()->warn(__VA_ARGS__)
     #define CORE_ERROR(...) Logger::GetGoLLogger()->error(__VA_ARGS__)
     #define CORE_FATAL(...) Logger::GetGoLLogger()->critical(__VA_ARGS__)
+
+    #define OPENGL_CHANGE_LEVEL(level) Logger::SetOpenGLLevel(level)
+    #define CORE_CHANGE_LEVEL(level) Logger::SetGoLLevel(level)
 #else
     #define OPENGL_TRACE(...)
     #define OPENGL_INFO(...)
@@ -55,4 +61,9 @@ public:
     #define CORE_WARN(...)
     #define CORE_ERROR(...)
     #define CORE_FATAL(...)
+
+    #define OPENGL_CHANGE_LEVEL(level)
+    #define CORE_CHANGE_LEVEL(level)
 #endif
+
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "precompiled.h"
+
 #include "LayerStack.h"
 
 #include "Window.h"

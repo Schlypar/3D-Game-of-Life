@@ -24,8 +24,11 @@ spdlog::logger* Logger::GetGoLLogger() {
     return GoLLogger.get();
 }
 
-void Logger::SetLevel(spdlog::level::level_enum level) {
+void Logger::SetOpenGLLevel(spdlog::level::level_enum level) {
     OpenGLLogger->set_level(level);
+}
+
+void Logger::SetGoLLevel(spdlog::level::level_enum level) {
     GoLLogger->set_level(level);
 }
 

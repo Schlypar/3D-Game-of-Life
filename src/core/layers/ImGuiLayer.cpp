@@ -15,6 +15,7 @@ void ImGuiLayer::OnAttach() {
 
     ImGui_ImplGlfw_InitForOpenGL(Application::Get().GetWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 410");
+    OPENGL_INFO("Imgui initialized with opengl version 410");
 }
 
 void ImGuiLayer::OnDetach() {
