@@ -1,15 +1,10 @@
 #ifndef MATERIALLIBRARY_H_
 #define MATERIALLIBRARY_H_
 
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-// #include "Materials/Material.h"
-
-
 
 namespace GoL {
 
@@ -27,8 +22,24 @@ public:
 
     ~MaterialLibrary() = default;
 
+    /**
+    * @name AddMaterial - Adds material to the library
+    * @param entry -  Entry is a pair of material name and a pointer to the Material
+    * @return bool - True if Material is added and false otherwise
+    */
     static bool AddMaterial(std::pair<std::string, Material*> entry);
+
+    /**
+    * @name GetMaterial - Looks for the given of type Material by name
+    * @param name - Name of Material to be searched
+    * @return Material* - Pointer to the Material (nullptr if not found)
+    */
     static Material* GetMaterial(const std::string& name);
+
+    /**
+    * @name GetNames - Gives all names of Materials currently at the library
+    * @return std::vector - collection of all Material names
+    */
     static const std::vector<std::string>& GetNames();
 };
 

@@ -54,96 +54,45 @@ public:
            float pitch = PITCH,
            float nearPlane = 0.01f,
            float farPlane = 100.0f
-    )
-        : Front(glm::vec3(0.0f, 0.0f, -1.0f))
-        , MovementSpeed(SPEED)
-        , MouseSensitivity(SENSITIVITY)
-        , FoV(ZOOM)
-        , width(width)
-        , height(height)
-        , nearPlane(nearPlane)
-        , farPlane(farPlane) {
-        Position = position;
-        WorldUp = up;
-        Yaw = yaw;
-        Pitch = pitch;
-        UpdateCameraVectors();
-    }
+    );
 
-    glm::mat4 GetViewMatrix() const {
-        return glm::lookAt(Position, Position + Front, Up);
-    }
+    /**
+    * @name GetViewMatrix - Returns matrix that transorms coordinates into the coordinates of observer
+    * @return glm::mat4 - View matrix in MVP model
+    */
+    glm::mat4 GetViewMatrix() const;
 
-    glm::mat4 GetProjectionMatrix() const {
-        return glm::perspective(glm::radians(FoV), width / height, nearPlane, farPlane);
-    }
+    /**
+    * @name GetProjectionMatrix - Returns matrix that transorms coordinates into normal coordinates
+    * @return glm::mat4 - Projection matrix in MVP model
+    */
+    glm::mat4 GetProjectionMatrix() const;
 
-    void ProcessKeyboard(CameraMovement direction, float deltaTime) {
-        float velocity = MovementSpeed * deltaTime;
-        if (direction == FORWARD) {
-            Position += Front * velocity;
-        }
-        if (direction == BACKWARD) {
-            Position -= Front * velocity;
-        }
-        if (direction == LEFT) {
-            Position -= Right * velocity;
-        }
-        if (direction == RIGHT) {
-            Position += Right * velocity;
-        }
-        if (direction == UP) {
-            Position += glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
-        }
-        if (direction == DOWN) {
-            Position -= glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
-        }
-    }
+    /**
+    * @name ProcessKeyboard - Moves Camera in coordinate space of observer (camera)
+    * @param direction -  Direction to move
+    * @param deltaTime - Value of delta Time between frames
+    * @return void
+    */
+    void ProcessKeyboard(CameraMovement direction, float deltaTime);
 
-    void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true) {
-        xoffset *= MouseSensitivity;
-        yoffset *= MouseSensitivity;
+    /**
+    * @name ProcessMouseMovement - Processes the change of perspective by mouse movement
+    * @param xoffset - Value of mouse xoffset
+    * @param yoffset - Value of mouse yoffset
+    * @param constrainPitch - Whether to constrain angles to 90 degree max
+    * @return void
+    */
+    void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 
-        Yaw += xoffset;
-        Pitch += yoffset;
-
-        // make sure that when pitch is out of bounds, screen doesn't get flipped
-        if (constrainPitch) {
-            if (Pitch > 89.0f) {
-                Pitch = 89.0f;
-            }
-            if (Pitch < -89.0f) {
-                Pitch = -89.0f;
-            }
-        }
-
-        // update Front, Right and Up Vectors using the updated Euler angles
-        UpdateCameraVectors();
-    }
-
-    void ProcessMouseScroll(float yoffset) {
-        FoV -= (float) yoffset;
-        if (FoV < 1.0f) {
-            FoV = 1.0f;
-        }
-        if (FoV > 75.0f) {
-            FoV = 75.0f;
-        }
-    }
-
+    /**
+    * @name ProcessMouseScroll - Processes zoom
+    * @param yoffset - Value of movement
+    * @return void
+    */
+    void ProcessMouseScroll(float yoffset);
 private:
-    void UpdateCameraVectors() {
-        // calculate the new Front vector
-        glm::vec3 front;
-        front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-        front.y = sin(glm::radians(Pitch));
-        front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-        Front = glm::normalize(front);
-
-        // also re-calculate the Right and Up vector
-        Right = glm::normalize(glm::cross(Front, WorldUp)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        Up = glm::normalize(glm::cross(Right, Front));
-    }
+    void UpdateCameraVectors();
 };
 
 }

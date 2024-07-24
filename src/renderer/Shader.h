@@ -25,12 +25,41 @@ public:
     Shader(const std::string& shaderVertexFilePath, const std::string& shaderFragmentFilePath);
     ~Shader();
 
+    /**
+    * @name SetUniform4f - Uploads vec4 to the GPU program
+    * @param name - Name of uniform variable
+    * @param f1 - Value of first coordinate
+    * @param f2 - Value of second coordinate
+    * @param f3 - Value of third coordinate
+    * @param f4 - Value of fourth coordinate
+    * @return void
+    */
     void SetUniform4f(const std::string& name, float f1, float f2, float f3, float f4);
+
+    /**
+    * @name SetUniformMat4f - Uploads mat4x4 to the GPU program
+    * @param name - Name of uniform variable
+    * @param matrix -  matrix to be uploaded
+    * @return void
+    */
     void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
 
+    /**
+    * @name GetShaderId - Returns id of shader
+    * @return id of shader
+    */
     unsigned int GetShaderId() const;
 
+    /**
+    * @name Bind - Tells OpenGL to use this shader
+    * @return void
+    */
     void Bind() const;
+
+    /**
+    * @name Unbind - Tells OpenGL to not use any shader
+    * @return void
+    */
     void Unbind() const;
 
 private:
