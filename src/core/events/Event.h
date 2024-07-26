@@ -5,7 +5,6 @@
 #include <sstream>
 #include <string>
 
-
 namespace GoL {
 
 #define EVENT_IMPL_GETTYPE(type)                        \
@@ -24,6 +23,7 @@ namespace GoL {
         return category;                            \
     }
 
+// Will be used for binding methods to be handlers for events
 #define BIND_MEMBER_EVENT_FN(fn)                          \
     [this](auto&&... args) -> decltype(auto) {            \
         return fn(std::forward<decltype(args)>(args)...); \
@@ -58,18 +58,41 @@ public:
     };
 
 public:
-    virtual ~Event() = default;
-
     bool Handled = false;
 
+    virtual ~Event() = default;
+
+    /**
+    * @name GetEventType - Returns type of event
+    * @return Type
+    */
     virtual Type GetEventType() const = 0;
+
+    /**
+    * @name GetName - Returns name of the type
+    * @return char*
+    */
     virtual const char* GetName() const = 0;
+
+    /**
+    * @name GetCategoryFlags - Returns all category flags
+    * @return int - Bitfield of category flags
+    */
     virtual int GetCategoryFlags() const = 0;
 
+    /**
+    * @name ToString - Returns name of the type
+    * @return std::string
+    */
     virtual std::string ToString() const {
         return GetName();
     }
 
+    /**
+    * @name IsInCategory - Checks if Event is in category
+    * @param category -  Category to be checked
+    * @return bool
+    */
     bool IsInCategory(Category category) {
         return GetCategoryFlags() & category;
     }
