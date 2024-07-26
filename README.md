@@ -31,7 +31,7 @@ WIP
 ### Linux
 
 Чтобы собрать, делаем следующие шаги:
-1)
+1) `git clone https://github.com/Schlypar/3D-Game-of-Life.git`
 2) `cd 3D-Game-of-Life`
 3) `cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++`
 4) `cmake --build build/ --target=all`
