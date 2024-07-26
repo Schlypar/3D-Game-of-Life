@@ -9,6 +9,8 @@
 #include <range/v3/range.hpp>
 #include <range/v3/view.hpp>
 
+#include "range/v3/algorithm/for_each.hpp"
+
 #include <range/v3/view/chunk_by.hpp>
 #include <range/v3/view/transform.hpp>
 
@@ -17,8 +19,10 @@
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <mutex>
+#include <ostream>
 #include <thread>
 #include <unordered_map>
 #include <vector>

@@ -2,8 +2,6 @@
 
 #include <cstring>
 
-#include "VertexArray.h"
-#include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 
 namespace GoL {

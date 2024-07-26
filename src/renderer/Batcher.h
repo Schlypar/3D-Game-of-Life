@@ -36,15 +36,31 @@ public:
     Batcher(const Config& config = Config { .maxThreads = 8 });
     ~Batcher() = default;
 
+    /**
+    * @name SetConfig - Sets config to the given one
+    * @param config -  New config
+    * @return void
+    */
     void SetConfig(const Config& config);
 
+    /**
+    * @name Submit - Stores Model for future optimizations
+    * @param model -  Model to be submitted
+    * @return void
+    */
     void Submit(Model<Vertex>* model);
-    void Reset();
-    std::vector<Surface<Vertex>> ComputeBatches();
 
-    unsigned int GetSize() {
-        return this->surfaces.size();
-    }
+    /**
+    * @name Reset - Resets the parameters
+    * @return void
+    */
+    void Reset();
+
+    /**
+    * @name ComputeBatches - Optimizes geometry for reduction of draw calls
+    * @return std::vector - collection concatenated Surfaces
+    */
+    std::vector<Surface<Vertex>> ComputeBatches();
 };
 
 }
