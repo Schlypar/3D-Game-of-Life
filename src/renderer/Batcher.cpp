@@ -1,5 +1,9 @@
 #include "Batcher.h"
 
+#include <range/v3/range/conversion.hpp>
+#include <range/v3/view/for_each.hpp>
+#include <range/v3/view/iota.hpp>
+#include <range/v3/view/repeat_n.hpp>
 namespace GoL {
 
 Batcher::Batcher(const Config& config)
@@ -37,6 +41,9 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         auto right = projection(r);
         return left == right;
     };
+    const auto mode = [projection](const Surface<Vertex>& left, const Surface<Vertex>& right) -> bool {
+        return left.mode == right.mode;
+    };
     const auto computeSurface = [](const SurfaceBundle& sb) -> const Surface<Vertex>& {
         auto& data = sb.surface.mesh->GetData();
         Vertex* vertexData = (Vertex*) data.bytes;
@@ -54,14 +61,20 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         return res;
     };
 
-    const auto optimize = [computeSurface, material, concat, &result, &mutex](const std::vector<SurfaceBundle>& vec) {
+    const auto optimize = [computeSurface, material, mode, concat, &result, &mutex](const std::vector<SurfaceBundle>& vec) {
         auto transformed = vec
                          | ranges::views::transform(computeSurface)
                          | ranges::to<std::vector<Surface<Vertex>>>();
-        auto intermediate = transformed
+        auto stage1 = transformed
                           | ranges::views::chunk_by(material)
                           | ranges::to<std::vector<std::vector<Surface<Vertex>>>>();
-        transformed = intermediate
+        auto stage2 = stage1
+                        | ranges::views::join
+                        | ranges::to<std::vector<Surface<Vertex>>>();
+        auto stage3 = stage2
+                        | ranges::views::chunk_by(mode)
+                        | ranges::to<std::vector<std::vector<Surface<Vertex>>>>();
+        transformed = stage3
                     | ranges::views::transform(concat)
                     | ranges::to<std::vector<Surface<Vertex>>>();
 
