@@ -18,6 +18,7 @@ public:
             const Shader& shader,
             const glm::vec3& position = glm::vec3(0.0f),
             const glm::vec3& rotation = glm::vec3(0.0f),
+            const glm::vec4& color = glm::vec4 { 0.2f, 0.3f, 0.6f, 1.0f },
             float scaleFactor = 1.0f
     )
         : Model(position, rotation, scaleFactor) {
@@ -26,7 +27,8 @@ public:
         layout.Push<float>(3);
         layout.Push<float>(3);
 
-        MaterialLibrary::AddMaterial({ "PlainColorMaterial", new PlainColorMaterial(shader, glm::vec4 { 0.2f, 0.3f, 0.6f, 1.0f }) });
+        // MaterialLibrary::AddMaterial({ "PlainColorMaterial", new PlainColorMaterial(shader, glm::vec4 { 0.2f, 0.3f, 0.6f, 1.0f }) });
+        auto material = new PlainColorMaterial(shader, color);
 
         Vertex vertices[] = {
             // front
@@ -80,7 +82,7 @@ public:
         };
         builder.SetMesh(new UnindexedMesh<Vertex>(vertices, sizeof(vertices), layout));
         builder.SetVertexCount(6 * 6);
-        builder.SetMaterial(MaterialLibrary::GetMaterial("PlainColorMaterial"));
+        builder.SetMaterial(material);
         this->surface = builder.Build();
     }
 
