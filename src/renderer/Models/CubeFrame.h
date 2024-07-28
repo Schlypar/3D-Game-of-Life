@@ -77,6 +77,11 @@ public:
         this->surface = builder.Build();
     }
 
+    void SetMaterial(const MaterialPointer& material) override {
+        this->materialPointer = material;
+        this->surface.material = material.material;
+    }
+
     std::vector<Surface<Vertex>> GetSurfaces() const override {
         return std::vector<Surface<Vertex>> { this->surface };
     }

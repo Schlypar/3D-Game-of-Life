@@ -1,6 +1,7 @@
 #include "precompiled.h"
 
 #include "MaterialLibrary.h"
+#include "Materials/Material.h"
 
 namespace GoL {
 
@@ -19,11 +20,11 @@ bool MaterialLibrary::AddMaterial(std::pair<std::string, Material*> entry) {
     }
 }
 
-Material* MaterialLibrary::GetMaterial(const std::string& name) {
+MaterialPointer MaterialLibrary::GetMaterial(const std::string& name) {
     if (materials.contains(name)) {
-        return materials[name];
+        return MaterialPointer(materials[name], false);
     } else {
-        return nullptr;
+        return MaterialPointer(nullptr, false);
     }
 }
 

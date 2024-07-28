@@ -9,10 +9,10 @@
 #include "layers/MainLayer.h"
 
 #define GET_SCENE_OR_RETURN_FALSE(scenes, sceneName) \
-    LayerStack* scene; \
-    if (!scenes.contains(sceneName)) { \
-        return false; \
-    } \
+    LayerStack* scene;                               \
+    if (!scenes.contains(sceneName)) {               \
+        return false;                                \
+    }                                                \
     scene = scenes[sceneName];
 
 namespace GoL {
@@ -27,7 +27,7 @@ Application::Application(
     : window(Window::Data(title, width, height))
     , scenes()
     , activeScene(nullptr)
-    , imGuiLayer(new ImGuiLayer()) 
+    , imGuiLayer(new ImGuiLayer())
     , eventQueue([this](Event* e) {
         auto scene = this->activeScene.load();
         if (scene == nullptr) {
@@ -76,7 +76,6 @@ bool Application::PushLayer(std::string sceneName, Layer* layer) {
     GET_SCENE_OR_RETURN_FALSE(this->scenes, sceneName);
     if (scene == activeScene.load()) {
         eventQueue.Stop();
-        
     }
 
     layer->Scene() = sceneName;
@@ -85,7 +84,6 @@ bool Application::PushLayer(std::string sceneName, Layer* layer) {
 
     if (scene == activeScene.load()) {
         eventQueue.Run();
-        
     }
 
     return true;
@@ -95,7 +93,6 @@ bool Application::PushOverlay(std::string sceneName, Layer* overlay) {
     GET_SCENE_OR_RETURN_FALSE(this->scenes, sceneName);
     if (scene == activeScene.load()) {
         eventQueue.Stop();
-        
     }
 
     overlay->Scene() = sceneName;
@@ -103,9 +100,9 @@ bool Application::PushOverlay(std::string sceneName, Layer* overlay) {
     overlay->OnAttach();
 
     if (scene == activeScene.load()) {
-        eventQueue.Run();    
+        eventQueue.Run();
     }
-    
+
     return true;
 }
 
@@ -152,7 +149,7 @@ bool Application::NewScene(std::string sceneName) {
 
 std::list<std::string> Application::ListScenes() {
     auto sceneNames = std::list<std::string>(this->scenes.size());
-    for (auto &scene : this->scenes) {
+    for (auto& scene : this->scenes) {
         sceneNames.push_back(scene.first);
     }
 
@@ -161,7 +158,7 @@ std::list<std::string> Application::ListScenes() {
 
 bool Application::DeleteScene(std::string sceneName) {
     GET_SCENE_OR_RETURN_FALSE(this->scenes, sceneName);
-    
+
     if (scene == activeScene) {
         return false;
     }

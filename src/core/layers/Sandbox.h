@@ -56,7 +56,7 @@ private:
 
     View view;
 
-    glm::vec4 colorBase = { 0.675f, 0.685f, 0.723f, 1.0f };
+    glm::vec4 colorBase = { 0.2f, 0.3f, 0.6f, 1.0f };
     glm::vec4 colorSelected = { 1.0f, 1.0f, 1.0f, 1.0f };
     glm::vec4 colorMarked = { 0.855f, 0.09f, 0.14f, 1.0f };
 
@@ -74,18 +74,30 @@ public:
         , view(zeroes) {
             
         this->parentSceneName = sceneName;
+
+        PlainColorMaterial* material = new PlainColorMaterial(plainColorShader, colorBase);
+        MaterialLibrary::AddMaterial({ "PlainColorBase", material });
+
+        material = new PlainColorMaterial(plainColorShader, colorSelected);
+        MaterialLibrary::AddMaterial({ "PlainColorSelected", material });
+
+        material = new PlainColorMaterial(plainColorShader, colorMarked);
+        MaterialLibrary::AddMaterial({ "PlainColorMarked", material });
         
         cube = new CubeFrame(this->plainColorShader, glm::vec3{0.0f}, glm::vec3{0.0f});
         cube->SetScaleFactor(gridFactor * 0.95);
         cube->SetPosition({ 0.0f, 0.0f, 0.0f });
+        cube->SetMaterial(MaterialLibrary::GetMaterial("PlainColorBase"));
 
-        selectedCube = new CubeFrame(this->plainColorShader, glm::vec3{0.0f}, glm::vec3{0.0f}, colorSelected);
+        selectedCube = new CubeFrame(this->plainColorShader, glm::vec3{0.0f}, glm::vec3{0.0f});
         selectedCube->SetScaleFactor(gridFactor * 0.95);
         selectedCube->SetPosition({ 0.0f, 0.0f, 0.0f });
+        selectedCube->SetMaterial(MaterialLibrary::GetMaterial("PlainColorSelected"));
         
-        markedCube = new OneColorCube(this->plainColorShader, glm::vec3{0.0f}, glm::vec3{0.0f}, colorMarked);
+        markedCube = new OneColorCube(this->plainColorShader, glm::vec3{0.0f}, glm::vec3{0.0f});
         markedCube->SetPosition({ 0.0f, 0.0f, 0.0f });
         markedCube->SetScaleFactor(gridFactor * 0.95);
+        markedCube->SetMaterial(MaterialLibrary::GetMaterial("PlainColorMarked"));
 
         glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
         float yaw = YAW;

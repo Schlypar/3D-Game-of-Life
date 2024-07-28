@@ -1,5 +1,7 @@
 #pragma once
 
+#include "precompiled.h"
+
 #include <cassert>
 #include <string>
 
@@ -32,6 +34,8 @@ public:
 
     Material(const Material& other) = delete;
     Material(Material&& other) = delete;
+
+    virtual bool operator==(Material* other) = 0;
 
     virtual ~Material() = default;
 
@@ -83,6 +87,64 @@ protected:
         shader.Bind();
         shader.SetUniformMat4f("Model", *model);
         shader.SetUniformMat4f("ProjectionView", *projectionView);
+    }
+};
+
+struct MaterialPointer {
+    Material* material;
+    bool hasOwnership;
+
+    MaterialPointer()
+        : material(nullptr)
+        , hasOwnership(false) {
+    }
+
+    MaterialPointer(Material* material, bool hasOwnership)
+        : material(material)
+        , hasOwnership(hasOwnership) {
+    }
+
+    MaterialPointer(const MaterialPointer& other)
+        : material(other.material)
+        , hasOwnership(false) {
+    }
+
+    MaterialPointer(MaterialPointer&& other)
+        : material(other.material)
+        , hasOwnership(other.hasOwnership) {
+        other.material = nullptr;
+        other.hasOwnership = false;
+    }
+
+    ~MaterialPointer() {
+        if (hasOwnership) {
+            delete material;
+        }
+    }
+
+    MaterialPointer& operator=(const MaterialPointer& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        this->material = other.material;
+        this->hasOwnership = false;
+
+        return *this;
+    }
+
+    MaterialPointer& operator=(MaterialPointer&& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        this->material = other.material;
+        this->hasOwnership = other.hasOwnership;
+
+        this->material = other.material;
+        this->hasOwnership = false;
+
+        return *this;
     }
 };
 

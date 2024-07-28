@@ -18,6 +18,8 @@ protected:
     glm::vec3 rotation;
     float scaleFactor;
 
+    MaterialPointer materialPointer;
+
 protected:
     Model(const glm::vec3& position, const glm::vec3& rotation, float scaleFactor)
         : position(position)
@@ -50,6 +52,12 @@ public:
 
         return modelMatrix;
     }
+
+    MaterialPointer& GetMaterial() {
+        return this->materialPointer;
+    }
+
+    virtual void SetMaterial(const MaterialPointer& material) = 0;
 
     virtual std::vector<Surface<T>> GetSurfaces() const = 0;
 };
