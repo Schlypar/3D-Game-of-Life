@@ -32,8 +32,8 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
     const auto projectionToId = [](const Surface<Vertex>& s) -> int {
         return s.material->GetId();
     };
-    const auto materialAndMode = [projectionToId](const Surface<Vertex>& left, const Surface<Vertex>& right) -> bool {
-        return (left.mode == right.mode) && (projectionToId(left) == projectionToId(right));
+    const auto materialAndMode = [](const Surface<Vertex>& left, const Surface<Vertex>& right) -> bool {
+        return (left.mode == right.mode) && (*left.material == right.material);
     };
     const auto computeSurface = [](const SurfaceBundle& sb) -> const Surface<Vertex>& {
         auto& data = sb.surface.mesh->GetData();
