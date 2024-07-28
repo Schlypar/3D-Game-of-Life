@@ -52,7 +52,11 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         return res;
     };
 
-    const auto optimize = [computeSurface, materialAndMode, concat, &result, &mutex](const std::vector<SurfaceBundle>& vec) {
+    const auto optimize = [computeSurface, materialAndMode, concat, &result, &mutex](std::vector<SurfaceBundle>&& vec) {
+        // to minimalize draw calls this is needed
+        // note that this is per batch
+        std::ranges::sort(vec, {}, [](const auto& sb) -> GLenum { return sb.surface.mode; });
+
         auto transformed = vec
                          | ranges::views::transform(computeSurface)
                          | ranges::to<std::vector<Surface<Vertex>>>();
@@ -97,7 +101,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         if (batches.size() - threadComputedTimes * this->config.maxThreads >= this->config.maxThreads) {
             for (int i = 0; i < this->config.maxThreads; i++) {
                 auto& current = batches[i + threadComputedTimes * this->config.maxThreads];
-                workers[i] = std::thread(optimize, current);
+                workers[i] = std::thread(optimize, std::move(current));
             }
             for (int i = 0; i < this->config.maxThreads; i++) {
                 workers[i].join();
@@ -106,7 +110,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         } else {
             for (int i = 0; i < batches.size() - threadComputedTimes * this->config.maxThreads; i++) {
                 auto& current = batches[i + threadComputedTimes * this->config.maxThreads];
-                workers[i] = std::thread(optimize, current);
+                workers[i] = std::thread(optimize, std::move(current));
             }
             for (int i = 0; i < batches.size() - threadComputedTimes * this->config.maxThreads; i++) {
                 workers[i].join();
