@@ -7,6 +7,7 @@ namespace GoL {
 class Layer {
 protected:
     std::string label;
+    std::string parentSceneName;
 
 public:
     Layer(const std::string& name = "Not defined");
@@ -47,6 +48,10 @@ public:
     */
     inline const std::string& GetName() const {
         return label;
+    }
+
+    inline std::string& Scene() {
+        return parentSceneName;
     }
 };
 

@@ -21,6 +21,15 @@ public:
 
     ~PlainColorMaterial() = default;
 
+    bool operator==(Material* other) override {
+        PlainColorMaterial* otherMat = dynamic_cast<PlainColorMaterial*>(other);
+        if (otherMat == nullptr) {
+            return false;
+        }
+
+        return this->color == otherMat->color;
+    }
+
     void SetColor(const glm::vec4& color) {
         this->color = color;
     }

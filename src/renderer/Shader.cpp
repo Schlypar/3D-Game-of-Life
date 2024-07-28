@@ -35,6 +35,7 @@ Shader::Shader(const std::string& shaderVertexFilePath, const std::string& shade
 
 Shader::~Shader() {
     glDeleteProgram(id);
+    OPENGL_INFO("Deleting shader with id {}", id);
     auto errorCode = glGetError();
     if (errorCode != GL_NO_ERROR) {
         auto errorString = glad_glGetError();

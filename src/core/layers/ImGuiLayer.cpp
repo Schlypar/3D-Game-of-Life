@@ -29,7 +29,7 @@ void ImGuiLayer::OnUpdate() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    for (auto& display : displayFunctions) {
+    for (auto& display : displayFunctions[activeSceneName]) {
         display();
     }
 
@@ -42,8 +42,20 @@ void ImGuiLayer::OnUpdate() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiLayer::SubmitDisplay(DisplayFn display) {
-    displayFunctions.push_back(display);
+void ImGuiLayer::SubmitDisplay(std::string sceneName, DisplayFn display) {
+    displayFunctions[sceneName].push_back(display);
+}
+
+void ImGuiLayer::SwitchScene(std::string sceneName) {
+    this->activeSceneName = sceneName;
+}
+
+void ImGuiLayer::ClearDisplay(std::string sceneName) {
+    if (activeSceneName == sceneName) {
+        activeSceneName = "";
+    }
+
+    displayFunctions.erase(sceneName);
 }
 
 }

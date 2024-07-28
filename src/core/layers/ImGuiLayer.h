@@ -3,7 +3,8 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
-#include <vector>
+#include <list>
+#include <unordered_map>
 
 #include "Layer.h"
 
@@ -14,7 +15,8 @@ public:
     using DisplayFn = std::function<void()>;
 
 private:
-    std::vector<DisplayFn> displayFunctions;
+    std::unordered_map<std::string, std::list<DisplayFn>> displayFunctions;
+    std::string activeSceneName;
     float time = 0.0f;
 
 public:
@@ -26,7 +28,9 @@ public:
     void OnDetach() override;
     void OnUpdate() override;
 
-    void SubmitDisplay(DisplayFn display);
+    void SubmitDisplay(std::string sceneName, DisplayFn display);
+    void SwitchScene(std::string sceneName);
+    void ClearDisplay(std::string sceneName);
 };
 
 }

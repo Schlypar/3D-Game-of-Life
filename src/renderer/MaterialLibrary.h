@@ -9,6 +9,7 @@
 namespace GoL {
 
 class Material;
+class MaterialPointer;
 
 class MaterialLibrary {
 protected:
@@ -32,9 +33,9 @@ public:
     /**
     * @name GetMaterial - Looks for the given of type Material by name
     * @param name - Name of Material to be searched
-    * @return Material* - Pointer to the Material (nullptr if not found)
+    * @return MaterialPointer - Pointer to the Material (nullptr if not found). This pointer has no ownership of data and should not be deleted by user
     */
-    static Material* GetMaterial(const std::string& name);
+    static MaterialPointer GetMaterial(const std::string& name);
 
     /**
     * @name GetNames - Gives all names of Materials currently at the library

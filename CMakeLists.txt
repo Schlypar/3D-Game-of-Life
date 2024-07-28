@@ -38,6 +38,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/renderer")
 target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/core")
 target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/resources/include")
 target_include_directories(${PROJECT_NAME} PUBLIC "${SRC_DIR}/vendor")
+target_include_directories(${PROJECT_NAME} PUBLIC "${SRC_DIR}/vendor/spdlog/include")
 
 # --- END PROJECT ---
 
