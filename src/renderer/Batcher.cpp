@@ -4,6 +4,7 @@
 #include <range/v3/view/for_each.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/repeat_n.hpp>
+
 namespace GoL {
 
 Batcher::Batcher(const Config& config)
@@ -65,16 +66,14 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         auto transformed = vec
                          | ranges::views::transform(computeSurface)
                          | ranges::to<std::vector<Surface<Vertex>>>();
-        auto stage1 = transformed
-                          | ranges::views::chunk_by(material)
-                          | ranges::to<std::vector<std::vector<Surface<Vertex>>>>();
-        auto stage2 = stage1
-                        | ranges::views::join
-                        | ranges::to<std::vector<Surface<Vertex>>>();
-        auto stage3 = stage2
-                        | ranges::views::chunk_by(mode)
-                        | ranges::to<std::vector<std::vector<Surface<Vertex>>>>();
-        transformed = stage3
+        auto step1 = transformed
+                    | ranges::views::chunk_by(material)
+                    | ranges::views::join
+                    | ranges::to<std::vector<Surface<Vertex>>>();
+        auto step2 = step1
+                    | ranges::views::chunk_by(mode)
+                    | ranges::to<std::vector<std::vector<Surface<Vertex>>>>();
+        transformed = step2
                     | ranges::views::transform(concat)
                     | ranges::to<std::vector<Surface<Vertex>>>();
 
