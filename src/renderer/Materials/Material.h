@@ -118,7 +118,6 @@ struct MaterialPointer {
 
     ~MaterialPointer() {
         if (hasOwnership) {
-            OPENGL_INFO("Deleting material with id {}", material->GetId());
             delete material;
         }
     }
