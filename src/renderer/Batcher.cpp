@@ -1,10 +1,5 @@
 #include "Batcher.h"
 
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/for_each.hpp>
-#include <range/v3/view/iota.hpp>
-#include <range/v3/view/repeat_n.hpp>
-
 namespace GoL {
 
 Batcher::Batcher(const Config& config)
