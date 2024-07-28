@@ -113,8 +113,6 @@ public:
         lastFrameTime = currentFrameTime;
 
         renderer.Clear();
-        PlainColorMaterial* mat = (PlainColorMaterial*) MaterialLibrary::GetMaterial("PlainColorMaterial");
-        mat->SetColor(color);
 
         renderer.DrawSubmitted(camera);
     }
