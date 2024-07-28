@@ -4,11 +4,11 @@
 #include "Renderer.h"
 
 // shaders
-#include "shader_prism.h"
 #include "shader_plain_color.h"
+#include "shader_prism.h"
 
-#include "Models/SixColorCube.h"
 #include "Models/OneColorCube.h"
+#include "Models/SixColorCube.h"
 
 #include "MaterialLibrary.h"
 #include "Materials/PlainColorMaterial.h"
