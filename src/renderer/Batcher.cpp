@@ -34,16 +34,11 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
     std::mutex mutex;
     std::vector<Surface<Vertex>> result;
 
-    const auto projection = [](const Surface<Vertex>& s) -> int {
+    const auto projectionToId = [](const Surface<Vertex>& s) -> int {
         return s.material->GetId();
     };
-    const auto material = [projection](const Surface<Vertex>& l, const Surface<Vertex>& r) -> bool {
-        auto left = projection(l);
-        auto right = projection(r);
-        return left == right;
-    };
-    const auto mode = [projection](const Surface<Vertex>& left, const Surface<Vertex>& right) -> bool {
-        return left.mode == right.mode;
+    const auto materialAndMode = [projectionToId](const Surface<Vertex>& left, const Surface<Vertex>& right) -> bool {
+        return (left.mode == right.mode) && (projectionToId(left) == projectionToId(right));
     };
     const auto computeSurface = [](const SurfaceBundle& sb) -> const Surface<Vertex>& {
         auto& data = sb.surface.mesh->GetData();
@@ -62,18 +57,14 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
         return res;
     };
 
-    const auto optimize = [computeSurface, material, mode, concat, &result, &mutex](const std::vector<SurfaceBundle>& vec) {
+    const auto optimize = [computeSurface, materialAndMode, concat, &result, &mutex](const std::vector<SurfaceBundle>& vec) {
         auto transformed = vec
                          | ranges::views::transform(computeSurface)
                          | ranges::to<std::vector<Surface<Vertex>>>();
-        auto step1 = transformed
-                    | ranges::views::chunk_by(material)
-                    | ranges::views::join
-                    | ranges::to<std::vector<Surface<Vertex>>>();
-        auto step2 = step1
-                    | ranges::views::chunk_by(mode)
-                    | ranges::to<std::vector<std::vector<Surface<Vertex>>>>();
-        transformed = step2
+        auto intermediate = transformed
+                          | ranges::views::chunk_by(materialAndMode)
+                          | ranges::to<std::vector<std::vector<Surface<Vertex>>>>();
+        transformed = intermediate
                     | ranges::views::transform(concat)
                     | ranges::to<std::vector<Surface<Vertex>>>();
 
@@ -87,7 +78,7 @@ std::vector<Surface<Vertex>> Batcher::ComputeBatches() {
                                  })
                                  / this->config.maxThreads);
 
-    std::ranges::sort(this->surfaces, {}, [projection](const auto& sb) -> int { return projection(sb.surface); });
+    std::ranges::sort(this->surfaces, {}, [projectionToId](const auto& sb) -> int { return projectionToId(sb.surface); });
 
     std::vector<std::vector<SurfaceBundle>> batches;
     std::vector<SurfaceBundle> batch;
