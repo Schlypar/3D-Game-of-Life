@@ -6,7 +6,7 @@
 int main() {
     GoL::Application application;
 
-    GoL::OPENGL_CHANGE_LEVEL(spdlog::level::warn);
+    GoL::OPENGL_CHANGE_LEVEL(spdlog::level::trace);
     GoL::CORE_CHANGE_LEVEL(spdlog::level::trace);
 
     application.PushLayer(new GoL::MainLayer());
