@@ -33,6 +33,8 @@ public:
     Material(const Material& other) = delete;
     Material(Material&& other) = delete;
 
+    virtual bool operator==(Material* other) = 0;
+
     virtual ~Material() = default;
 
     /**
