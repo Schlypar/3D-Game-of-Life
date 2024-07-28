@@ -22,6 +22,7 @@
 
 namespace GoL {
 
+
 class MainLayer : public Layer {
 private:
     Camera camera;
@@ -44,6 +45,7 @@ private:
 
 public:
     MainLayer(
+            std::string sceneName = "",
             glm::vec3 position = glm::vec3(0.0f, 0.0f, -3.0f),
             glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
             float width = 1920,
@@ -58,10 +60,13 @@ public:
         , renderer()
         , prismShader(SHADER_PRISM)
         , cubeShader(SHADER_PLAIN_COLOR) {
+        this->parentSceneName = sceneName;
+
         sixColor = new SixColorCube(this->cubeShader);
         sixColor->SetScaleFactor(0.35f);
         sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });
         sixColor->SetRotation(glm::vec3 { 15.0f });
+
         oneColor = new OneColorCube(this->cubeShader);
         oneColor->SetPosition({ 0.5f, -0.35f, -0.25f });
         oneColor->SetScaleFactor(0.05f);
@@ -81,7 +86,7 @@ public:
         }
 
         Application& app = Application::Get();
-        app.SubmitToImgui([this]() {
+        app.SubmitToImgui([this, &app]() {
             ImGui::InputFloat("RED", &color.r);
             ImGui::InputFloat("GREEN", &color.g);
             ImGui::InputFloat("BLUE", &color.b);
@@ -99,7 +104,11 @@ public:
                     }
                 }
             };
-        });
+
+            if (ImGui::Button("Sandbox")) {
+                app.SwitchScene("sandbox");
+            }
+        }, this->parentSceneName);
     }
 
     void OnDetach() override {

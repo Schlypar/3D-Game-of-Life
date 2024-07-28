@@ -63,6 +63,7 @@ private:
 
 public:
     Sandbox(
+            std::string sceneName = "",
             int gridSize = 10,
             float width = 1920,
             float height = 1080)
@@ -72,6 +73,8 @@ public:
         , gridSize(gridSize)
         , view(zeroes) {
             
+        this->parentSceneName = sceneName;
+        
         cube = new CubeFrame(this->plainColorShader, glm::vec3{0.0f}, glm::vec3{0.0f});
         cube->SetScaleFactor(gridFactor * 0.95);
         cube->SetPosition({ 0.0f, 0.0f, 0.0f });
@@ -104,12 +107,12 @@ public:
         this->OnChanged();
 
         Application& app = Application::Get();
-        app.SubmitToImgui([this]() {
-            if (ImGui::Button("Resubmit")) {
-                this->UpdateCameraOnView();
-                this->changed = true;
+        app.SubmitToImgui([this, &app]() {
+            if (ImGui::Button("Done")) {
+                // return configuration
+                app.SwitchScene("main");
             };
-        });
+        }, this->parentSceneName);
     }
 
     void OnDetach() override {

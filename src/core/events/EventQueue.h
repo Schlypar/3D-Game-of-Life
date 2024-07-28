@@ -38,14 +38,20 @@ public:
     }
 
     void Run() {
-        run = true;
-        if (!handleThread.joinable()) {
-            handleThread = std::thread(&EventQueue::HandleEvents, this);
+        if (!run) {
+            run = true;
+            if (!handleThread.joinable()) {
+                handleThread = std::thread(&EventQueue::HandleEvents, this);
+            }
+        } else {
+            mu.unlock();
         }
     }
 
     void Stop() {
-        run = false;
+        if (run) {
+            mu.lock();
+        }
     }
 
 private:

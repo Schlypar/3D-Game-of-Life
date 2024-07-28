@@ -1,5 +1,10 @@
 #pragma once
 
+#include <atomic>
+#include <unordered_map>
+#include <list>
+#include <string>
+
 #include "precompiled.h"
 
 #include "LayerStack.h"
@@ -20,7 +25,8 @@ class Application {
 private:
     bool isRunning = true;
     Window window;
-    LayerStack layerStack;
+    std::unordered_map<std::string, LayerStack*> scenes;
+    std::atomic<LayerStack*> activeScene;
     ImGuiLayer* imGuiLayer;
     EventQueue eventQueue;
 
@@ -44,23 +50,23 @@ public:
     /**
     * @name PushLayer - Adds layer to the LayerStack of Application
     * @param layer -  Layer to be added
-    * @return void
+    * @return bool
     */
-    void PushLayer(Layer* layer);
+    bool PushLayer(std::string sceneName, Layer* layer);
 
     /**
     * @name PushOverlay - Adds overlay to the LayerStack of Application. Overlays are drawn on top of layers.
     * @param overlay -  Overlay to be added
-    * @return void
+    * @return bool
     */
-    void PushOverlay(Layer* overlay);
+    bool PushOverlay(std::string sceneName, Layer* overlay);
 
     /**
     * @name SubmitToImgui - Tells ImGui to display in Debug window
     * @param display -  ImGui widget ti be displayed
     * @return void
     */
-    void SubmitToImgui(ImGuiLayer::DisplayFn display);
+    void SubmitToImgui(ImGuiLayer::DisplayFn display, std::string sceneName = "");
 
     /**
     * @name Get - Gives instance of Application singleton class
@@ -82,6 +88,33 @@ public:
     * @return void
     */
     void OnEvent(Event* e);
+
+    /**
+    * @name NewScene - Adds new scene
+    * @param sceneName - scene name
+    * @return bool - true if scene was creates, false if scene with such name already exists
+    */
+    bool NewScene(std::string sceneName);
+
+    /**
+    * @name ListScenes - List existing scenes
+    * @return std::list<std::string>
+    */
+    std::list<std::string> ListScenes();
+
+    /**
+    * @name DeleteScene - Deletes scene from Application
+    * @param sceneName - scene name
+    * @return bool - true if scene was deletes, false if no such scene exists 
+    */
+    bool DeleteScene(std::string sceneName);
+
+    /**
+    * @nameSwitchScene - Sets specified scene active: displays its layers and use theirs callbacks
+    * @param sceneName - scene name
+    * @return bool - true if scene was switched on, false if no such scene exists 
+    */
+    bool SwitchScene(std::string sceneName);
 
 private:
     bool OnWindowClose(WindowCloseEvent& e);
