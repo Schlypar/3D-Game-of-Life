@@ -70,6 +70,9 @@ public:
     ~MainLayer() = default;
 
     void OnAttach() override {
+        PlainColorMaterial* mat = new PlainColorMaterial(cubeShader, color);
+        MaterialLibrary::AddMaterial({ "SharedPlainColor", mat });
+        // oneColor->SetMaterial(MaterialLibrary::GetMaterial("SharedPlainColor"));
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 for (int z = 0; z < 10; z++) {
@@ -86,6 +89,9 @@ public:
             ImGui::InputFloat("GREEN", &color.g);
             ImGui::InputFloat("BLUE", &color.b);
             ImGui::InputFloat("ALPHA", &color.a);
+
+            auto mat = (PlainColorMaterial*) MaterialLibrary::GetMaterial("SharedPlainColor").material;
+            mat->SetColor(color);
 
             if (ImGui::Button("Resubmit")) {
                 this->renderer.Reset();
