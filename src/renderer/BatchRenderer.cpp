@@ -1,10 +1,10 @@
-#include "Renderer.h"
+#include "BatchRenderer.h"
 
 #include "Meshes/Mesh.h"
 
 namespace GoL {
 
-Renderer::Renderer()
+BatchRenderer::BatchRenderer()
     : batcher(Batcher::Config { .maxThreads = 8 })
     , vertexArray()
     , vertexBuffer(nullptr, 0, GL_DYNAMIC_DRAW) {
@@ -19,17 +19,17 @@ Renderer::Renderer()
     this->vertexBuffer.Unbind();
 }
 
-void Renderer::Submit(Model<Vertex>* model) {
+void BatchRenderer::Submit(Model<Vertex>* model) {
     this->batcher.Submit(model);
     this->changed = true;
 }
 
-void Renderer::Reset() {
+void BatchRenderer::Reset() {
     this->batcher.Reset();
     this->changed = true;
 }
 
-void Renderer::DrawSubmitted(const Camera& camera) {
+void BatchRenderer::DrawSubmitted(const Camera& camera) {
     if (changed) {
         this->batched = std::move(this->batcher.ComputeBatches());
         this->changed = false;
@@ -62,7 +62,7 @@ void Renderer::DrawSubmitted(const Camera& camera) {
     this->vertexBuffer.Unbind();
 }
 
-void Renderer::DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) {
+void BatchRenderer::DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) {
     unsigned int offset = 0;
     for (Surface<Vertex>& surface : surfaces) {
         Material* material = surface.material;

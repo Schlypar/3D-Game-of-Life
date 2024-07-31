@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Application.h"
-#include "Renderer.h"
+#include "BatchRenderer.h"
 
 // shaders
 #include "shader_plain_color.h"
@@ -26,7 +26,7 @@ namespace GoL {
 class MainLayer : public Layer {
 private:
     Camera camera;
-    Renderer renderer;
+    BatchRenderer renderer;
 
     bool firstMouse = true;
     bool mouseMoveHandle = true;

@@ -3,7 +3,7 @@
 #include <list>
 
 #include "Application.h"
-#include "Renderer.h"
+#include "BatchRenderer.h"
 
 // shaders
 #include "shader_plain_color.h"
@@ -28,7 +28,7 @@ private:
     enum View { zeroes, first, second };
 
     Camera camera[2];
-    Renderer renderer;
+    BatchRenderer renderer;
 
     bool changed = false;
 
@@ -288,6 +288,7 @@ private:
                 changed = true;
                 break;
             case GLFW_KEY_ESCAPE:
+                break;
                 // exit sandbox
             }
             break;

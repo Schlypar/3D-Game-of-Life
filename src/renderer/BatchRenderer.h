@@ -17,7 +17,7 @@
 
 namespace GoL {
 
-class Renderer {
+class BatchRenderer {
 private:
     struct SurfaceBundle {
         Surface<Vertex> surface;
@@ -34,7 +34,7 @@ private:
     unsigned int dataSize = 0;
 
 public:
-    Renderer();
+    BatchRenderer();
 
     /**
     * @name Clear - Clears screen and depth buffer
