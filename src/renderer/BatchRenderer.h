@@ -2,10 +2,6 @@
 
 #include "precompiled.h"
 
-#include <glad/gl.h>
-
-#include <GLFW/glfw3.h>
-
 #include "Batcher.h"
 #include "Camera.h"
 
