@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "BatchRenderer.h"
+#include "RandomRenderer.h"
 
 // shaders
 #include "shader_plain_color.h"
@@ -22,11 +23,11 @@
 
 namespace GoL {
 
-
 class MainLayer : public Layer {
 private:
     Camera camera;
-    BatchRenderer renderer;
+    BatchRenderer batchRenderer;
+    RandomRenderer randomRenderer;
 
     bool firstMouse = true;
     bool mouseMoveHandle = true;
@@ -57,7 +58,7 @@ public:
     )
         : Layer("Game of Life layer")
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
-        , renderer()
+        , batchRenderer()
         , prismShader(SHADER_PRISM)
         , cubeShader(SHADER_PLAIN_COLOR) {
         this->parentSceneName = sceneName;
@@ -83,7 +84,8 @@ public:
                 for (int z = 0; z < 10; z++) {
                     oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
                     oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                    renderer.Submit(oneColor);
+                    // batchRenderer.Submit(oneColor);
+                    randomRenderer.Submit(oneColor);
                 }
             }
         }
@@ -99,13 +101,13 @@ public:
             mat->SetColor(color);
 
             if (ImGui::Button("Resubmit")) {
-                this->renderer.Reset();
+                this->batchRenderer.Reset();
                 for (int x = 0; x < 10; x++) {
                     for (int y = 0; y < 10; y++) {
                         for (int z = 0; z < 10; z++) {
                             oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
                             oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                            renderer.Submit(oneColor);
+                            batchRenderer.Submit(oneColor);
                         }
                     }
                 }
@@ -114,7 +116,8 @@ public:
             if (ImGui::Button("Sandbox")) {
                 app.SwitchScene("sandbox");
             }
-        }, this->parentSceneName);
+        },
+                          this->parentSceneName);
     }
 
     void OnDetach() override {
@@ -127,9 +130,11 @@ public:
         deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
 
-        renderer.Clear();
+        // batchRenderer.Clear();
+        // batchRenderer.DrawSubmitted(camera);
 
-        renderer.DrawSubmitted(camera);
+        randomRenderer.Clear();
+        randomRenderer.DrawSubmitted(camera);
     }
 
     void OnEvent(Event* e) override {
