@@ -27,7 +27,7 @@ void RandomRenderer::Reset() {
     this->changed = true;
 }
 
-void RandomRenderer::DrawSubmitted(const Camera& camera) {
+void RandomRenderer::DrawSubmitted(const FlyingCamera& camera) {
     this->vertexArray.Bind();
     this->vertexBuffer.Bind();
 

@@ -22,7 +22,7 @@ constexpr float SPEED = 2.5f;
 constexpr float SENSITIVITY = 0.1f;
 constexpr float ZOOM = 45.0f;
 
-class Camera {
+class FlyingCamera {
 public:
     // camera Attributes
     glm::vec3 Position;
@@ -46,7 +46,7 @@ public:
     float nearPlane;
     float farPlane;
 
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+    FlyingCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
            float width = 4,
            float height = 3,

@@ -3,7 +3,7 @@
 
 #include "precompiled.h"
 
-#include "Camera.h"
+#include "FlyingCamera.h"
 
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -53,7 +53,7 @@ public:
     * @param camera -  Perspective of the observer
     * @return void
     */
-    void DrawSubmitted(const Camera& camera);
+    void DrawSubmitted(const FlyingCamera& camera);
 
 private:
     unsigned int DrawSurfaces(

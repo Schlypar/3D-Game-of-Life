@@ -29,7 +29,7 @@ void BatchRenderer::Reset() {
     this->changed = true;
 }
 
-void BatchRenderer::DrawSubmitted(const Camera& camera) {
+void BatchRenderer::DrawSubmitted(const FlyingCamera& camera) {
     this->vertexArray.Bind();
     this->vertexBuffer.Bind();
 

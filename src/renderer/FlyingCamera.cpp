@@ -1,8 +1,8 @@
-#include "Camera.h"
+#include "FlyingCamera.h"
 
 namespace GoL {
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float width, float height, float yaw, float pitch, float nearPlane, float farPlane)
+FlyingCamera::FlyingCamera(glm::vec3 position, glm::vec3 up, float width, float height, float yaw, float pitch, float nearPlane, float farPlane)
     : Front(glm::vec3(0.0f, 0.0f, -1.0f))
     , MovementSpeed(SPEED)
     , MouseSensitivity(SENSITIVITY)
@@ -18,15 +18,15 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float width, float height, floa
     UpdateCameraVectors();
 }
 
-glm::mat4 Camera::GetViewMatrix() const {
+glm::mat4 FlyingCamera::GetViewMatrix() const {
     return glm::lookAt(Position, Position + Front, Up);
 }
 
-glm::mat4 Camera::GetProjectionMatrix() const {
+glm::mat4 FlyingCamera::GetProjectionMatrix() const {
     return glm::perspective(glm::radians(FoV), width / height, nearPlane, farPlane);
 }
 
-void Camera::ProcessKeyboard(CameraMovement direction, float deltaTime) {
+void FlyingCamera::ProcessKeyboard(CameraMovement direction, float deltaTime) {
     float velocity = MovementSpeed * deltaTime;
     if (direction == FORWARD) {
         Position += Front * velocity;
@@ -48,7 +48,7 @@ void Camera::ProcessKeyboard(CameraMovement direction, float deltaTime) {
     }
 }
 
-void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
+void FlyingCamera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
     xoffset *= MouseSensitivity;
     yoffset *= MouseSensitivity;
 
@@ -69,7 +69,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
     UpdateCameraVectors();
 }
 
-void Camera::ProcessMouseScroll(float yoffset) {
+void FlyingCamera::ProcessMouseScroll(float yoffset) {
     FoV -= (float) yoffset;
     if (FoV < 1.0f) {
         FoV = 1.0f;
@@ -79,7 +79,7 @@ void Camera::ProcessMouseScroll(float yoffset) {
     }
 }
 
-void Camera::UpdateCameraVectors() {
+void FlyingCamera::UpdateCameraVectors() {
     // calculate the new Front vector
     glm::vec3 front;
     front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));

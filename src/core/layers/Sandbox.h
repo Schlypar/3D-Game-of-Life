@@ -27,7 +27,7 @@ class Sandbox : public Layer {
 private:
     enum View { zeroes, first, second };
 
-    Camera camera[2];
+    FlyingCamera camera[2];
     BatchRenderer renderer;
 
     bool changed = false;
@@ -105,10 +105,10 @@ public:
         float nearPlane = 0.01f;
         float farPlane = 100.0;
 
-        camera[0] = Camera(
+        camera[0] = FlyingCamera(
             glm::vec3{ -gridFactor * gridSize / 2, gridFactor * gridSize, -1.5* gridFactor * gridSize },
             up, width, height, yaw - 30, pitch - 15, nearPlane, farPlane);
-        camera[1] = Camera(
+        camera[1] = FlyingCamera(
             glm::vec3{ gridFactor * gridSize / 2, 1.5 * gridFactor * gridSize, gridFactor * gridSize / 2 }
         );
     }
@@ -168,7 +168,7 @@ private:
         this->SubmitMarked();
     }
 
-    Camera& GetCurrentCamera() {
+    FlyingCamera& GetCurrentCamera() {
         if (view == second) {
             return camera[1];
         }
@@ -265,7 +265,7 @@ private:
     }
 
     void UpdateCameraOnView() {
-        camera[1] = Camera(
+        camera[1] = FlyingCamera(
             glm::vec3{ gridFactor * gridSize / 2, 20 * gridFactor + gridFactor * selectedCoords.y, gridFactor * gridSize / 2 },
             glm::vec3{0.0f, 0.0f, 1.0f},
             camera[0].width,

@@ -25,7 +25,7 @@ namespace GoL {
 
 class MainLayer : public Layer {
 private:
-    Camera camera;
+    FlyingCamera camera;
     BatchRenderer batchRenderer;
     RandomRenderer randomRenderer;
 
