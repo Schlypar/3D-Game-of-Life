@@ -10,8 +10,10 @@ const std::string SandboxSceneName = "sandbox";
 int main() {
     GoL::Application app;
 
+#ifdef DEBUG
     GoL::OPENGL_CHANGE_LEVEL(spdlog::level::trace);
     GoL::CORE_CHANGE_LEVEL(spdlog::level::trace);
+#endif
 
     app.NewScene(MainSceneName);
     app.NewScene(SandboxSceneName);

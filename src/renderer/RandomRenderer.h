@@ -1,12 +1,8 @@
-#pragma once
+#ifndef RENDERER_H_
+#define RENDERER_H_
 
 #include "precompiled.h"
 
-#include <glad/gl.h>
-
-#include <GLFW/glfw3.h>
-
-#include "Batcher.h"
 #include "Camera.h"
 
 #include "VertexArray.h"
@@ -17,16 +13,15 @@
 
 namespace GoL {
 
-class Renderer {
+class RandomRenderer {
 private:
     struct SurfaceBundle {
-        Surface<Vertex> surface;
+        std::vector<Surface<Vertex>> surfaces;
         glm::mat4 matrix;
     };
 
 private:
-    Batcher batcher;
-    std::vector<Surface<Vertex>> batched;
+    std::vector<SurfaceBundle> surfaces;
     bool changed = true;
 
     VertexArray vertexArray;
@@ -34,12 +29,8 @@ private:
     unsigned int dataSize = 0;
 
 public:
-    Renderer();
+    RandomRenderer();
 
-    /**
-    * @name Clear - Clears screen and depth buffer
-    * @return void
-    */
     inline void Clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
@@ -65,7 +56,14 @@ public:
     void DrawSubmitted(const Camera& camera);
 
 private:
-    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView);
+    unsigned int DrawSurfaces(
+            std::vector<Surface<Vertex>>& surfaces,
+            const glm::mat4& modelMatrix,
+            const glm::mat4& projectionView,
+            unsigned int offset = 0
+    );
 };
 
 }
+
+#endif // RENDERER_H_
