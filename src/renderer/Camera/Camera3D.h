@@ -28,7 +28,6 @@ public:
     float MouseSensitivity;
     float FoV;
 
-protected:
     // perspective parameters
     float width;
     float height;
@@ -53,6 +52,8 @@ public:
         , nearPlane(nearPlane)
         , farPlane(farPlane) {
     }
+
+    virtual ~Camera3D() = default;
 
     /**
     * @name GetViewMatrix - Returns matrix that transorms coordinates into the coordinates of observer

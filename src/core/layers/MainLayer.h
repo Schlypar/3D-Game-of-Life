@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Application.h"
+
 #include "BatchRenderer.h"
-#include "RadialCamera.h"
 #include "RandomRenderer.h"
+
+#include "Camera/FlyingCamera.h"
+#include "Camera/RadialCamera.h"
 
 // shaders
 #include "shader_plain_color.h"
@@ -137,7 +140,7 @@ public:
         // batchRenderer.DrawSubmitted(camera);
 
         randomRenderer.Clear();
-        randomRenderer.DrawSubmitted(camera2);
+        randomRenderer.DrawSubmitted(&camera2);
     }
 
     void OnEvent(Event* e) override {

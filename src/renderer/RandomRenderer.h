@@ -1,10 +1,9 @@
 #ifndef RENDERER_H_
 #define RENDERER_H_
 
-#include "RadialCamera.h"
 #include "precompiled.h"
 
-#include "FlyingCamera.h"
+#include "Camera/Camera3D.h"
 
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -54,9 +53,7 @@ public:
     * @param camera -  Perspective of the observer
     * @return void
     */
-    void DrawSubmitted(const FlyingCamera& camera);
-
-    void DrawSubmitted(const RadialCamera& camera);
+    void DrawSubmitted(const Camera3D* camera);
 
 private:
     unsigned int DrawSurfaces(

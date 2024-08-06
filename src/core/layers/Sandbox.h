@@ -3,7 +3,10 @@
 #include <list>
 
 #include "Application.h"
+
 #include "BatchRenderer.h"
+
+#include "Camera/FlyingCamera.h"
 
 // shaders
 #include "shader_plain_color.h"
@@ -168,12 +171,12 @@ private:
         this->SubmitMarked();
     }
 
-    FlyingCamera& GetCurrentCamera() {
+    const Camera3D* GetCurrentCamera() {
         if (view == second) {
-            return camera[1];
+            return &camera[1];
         }
 
-        return camera[0];
+        return &camera[0];
     }
 
     void SubmitGrid() {
