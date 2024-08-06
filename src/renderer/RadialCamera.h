@@ -8,8 +8,8 @@
 namespace GoL {
 
 // defaults
-constexpr float PHI2 = 0.0f;
-constexpr float THETA2 = 0.0f;
+constexpr float PHI = 0.0f;
+constexpr float THETA = 0.0f;
 constexpr float SPEED2 = 2.5f;
 constexpr float SENSITIVITY2 = 1.0f;
 constexpr float ZOOM2 = 45.0f;
@@ -46,8 +46,8 @@ public:
             float radiusVector = 1.0f,
             float width = 4,
             float height = 3,
-            float phi = PHI2,
-            float theta = THETA2,
+            float phi = PHI,
+            float theta = THETA,
             float nearPlane = 0.01f,
             float farPlane = 100.0f
     );
@@ -65,16 +65,16 @@ public:
     glm::mat4 GetProjectionMatrix() const;
 
     /**
-    * @name ProcessMouseMovement - Processes the change of perspective by mouse movement
+    * @name ProcessMouseMovement - Processes the change of perspective around Center point by mouse movement
     * @param xoffset - Value of mouse xoffset
     * @param yoffset - Value of mouse yoffset
-    * @param constrainPitch - Whether to constrain angles to 90 degree max
+    * @param constrainTheta - Whether to constrain angles to 90 degree max
     * @return void
     */
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainTheta = true);
 
     /**
-    * @name ProcessMouseScroll - Processes zoom
+    * @name ProcessMouseScroll - Processes zoom and radius magnitude
     * @param yoffset - Value of movement
     * @return void
     */
