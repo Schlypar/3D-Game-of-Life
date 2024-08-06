@@ -53,14 +53,13 @@ void RadialCamera::ProcessMouseMovement(float xoffset, float yoffset, bool const
     }
     if (constrainTheta) {
         if (Theta > 90.0f) {
-            Theta = 90.0f;
+            Theta = 89.9f;
         }
         if (Theta < -90.0f) {
-            Theta = -90.0f;
+            Theta = -89.9f;
         }
     }
 
-    // update Front, Right and Up Vectors using the updated Euler angles
     UpdateCameraVectors();
 }
 
