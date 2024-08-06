@@ -15,18 +15,20 @@ RadialCamera::RadialCamera(
         float nearPlane,
         float farPlane
 )
-    : Center(center)
-    , MovementSpeed(SPEED2)
-    , MouseSensitivity(SENSITIVITY2)
-    , FoV(ZOOM2)
-    , width(width)
-    , height(height)
-    , nearPlane(nearPlane)
-    , farPlane(farPlane) {
-    Radius = radius;
-    WorldUp = up;
-    Phi = phi;
-    Theta = theta;
+    : Camera3D(
+              SPEED,
+              SENSITIVITY,
+              ZOOM,
+              width,
+              height,
+              nearPlane,
+              farPlane
+      )
+    , Center(center)
+    , WorldUp(up)
+    , Phi(phi)
+    , Theta(theta)
+    , Radius(radius) {
     UpdateCameraVectors();
 }
 
@@ -35,12 +37,12 @@ glm::mat4 RadialCamera::GetViewMatrix() const {
 }
 
 glm::mat4 RadialCamera::GetProjectionMatrix() const {
-    return glm::perspective(glm::radians(FoV), width / height, nearPlane, farPlane);
+    return glm::perspective(glm::radians(this->FoV), this->width / this->height, this->nearPlane, this->farPlane);
 }
 
 void RadialCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainTheta) {
-    xoffset *= MouseSensitivity;
-    yoffset *= MouseSensitivity;
+    xoffset *= this->MouseSensitivity;
+    yoffset *= this->MouseSensitivity;
 
     Phi -= xoffset;
     Theta -= yoffset;
@@ -64,13 +66,13 @@ void RadialCamera::ProcessMouseMovement(float xoffset, float yoffset, bool const
 }
 
 void RadialCamera::ProcessMouseScroll(float yoffset) {
-    Radius += yoffset * MouseSensitivity;
-    FoV -= (float) yoffset * MouseSensitivity;
-    if (FoV < 1.0f) {
-        FoV = 1.0f;
+    Radius += yoffset * this->MouseSensitivity;
+    FoV -= (float) yoffset * this->MouseSensitivity;
+    if (this->FoV < 1.0f) {
+        this->FoV = 1.0f;
     }
-    if (FoV > 75.0f) {
-        FoV = 75.0f;
+    if (this->FoV > 75.0f) {
+        this->FoV = 75.0f;
     }
 
     UpdateCameraVectors();

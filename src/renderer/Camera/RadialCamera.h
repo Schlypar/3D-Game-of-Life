@@ -1,20 +1,14 @@
 #ifndef RADIALCAMERA_H_
 #define RADIALCAMERA_H_
 
-#include "precompiled.h"
-
-#include <glad/gl.h>
+#include "Camera3D.h"
 
 namespace GoL {
 
-// defaults
 constexpr float PHI = 0.0f;
 constexpr float THETA = 0.0f;
-constexpr float SPEED2 = 2.5f;
-constexpr float SENSITIVITY2 = 1.0f;
-constexpr float ZOOM2 = 45.0f;
 
-class RadialCamera {
+class RadialCamera : public Camera3D {
 private:
     // camera Attributes
     glm::vec3 Position;
@@ -27,17 +21,6 @@ private:
     float Phi;
     float Theta;
     float Radius;
-
-    // camera options
-    float MovementSpeed;
-    float MouseSensitivity;
-    float FoV;
-
-    // perspective parameters
-    float width;
-    float height;
-    float nearPlane;
-    float farPlane;
 
 public:
     RadialCamera(
@@ -52,17 +35,8 @@ public:
             float farPlane = 100.0f
     );
 
-    /**
-    * @name GetViewMatrix - Returns matrix that transorms coordinates into the coordinates of observer
-    * @return glm::mat4 - View matrix in MVP model
-    */
-    glm::mat4 GetViewMatrix() const;
-
-    /**
-    * @name GetProjectionMatrix - Returns matrix that transorms coordinates into normal coordinates
-    * @return glm::mat4 - Projection matrix in MVP model
-    */
-    glm::mat4 GetProjectionMatrix() const;
+    glm::mat4 GetViewMatrix() const override;
+    glm::mat4 GetProjectionMatrix() const override;
 
     /**
     * @name ProcessMouseMovement - Processes the change of perspective around Center point by mouse movement

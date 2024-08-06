@@ -1,16 +1,28 @@
 #include "FlyingCamera.h"
+#include "Camera/Camera3D.h"
 
 namespace GoL {
 
-FlyingCamera::FlyingCamera(glm::vec3 position, glm::vec3 up, float width, float height, float yaw, float pitch, float nearPlane, float farPlane)
-    : Front(glm::vec3(0.0f, 0.0f, -1.0f))
-    , MovementSpeed(SPEED)
-    , MouseSensitivity(SENSITIVITY)
-    , FoV(ZOOM)
-    , width(width)
-    , height(height)
-    , nearPlane(nearPlane)
-    , farPlane(farPlane) {
+FlyingCamera::FlyingCamera(
+        glm::vec3 position,
+        glm::vec3 up,
+        float width,
+        float height,
+        float yaw,
+        float pitch,
+        float nearPlane,
+        float farPlane
+)
+    : Camera3D(
+              SPEED,
+              SENSITIVITY,
+              ZOOM,
+              width,
+              height,
+              nearPlane,
+              farPlane
+      )
+    , Front(glm::vec3(0.0f, 0.0f, -1.0f)) {
     Position = position;
     WorldUp = up;
     Yaw = yaw;
@@ -23,11 +35,11 @@ glm::mat4 FlyingCamera::GetViewMatrix() const {
 }
 
 glm::mat4 FlyingCamera::GetProjectionMatrix() const {
-    return glm::perspective(glm::radians(FoV), width / height, nearPlane, farPlane);
+    return glm::perspective(glm::radians(this->FoV), this->width / this->height, this->nearPlane, this->farPlane);
 }
 
 void FlyingCamera::ProcessKeyboard(CameraMovement direction, float deltaTime) {
-    float velocity = MovementSpeed * deltaTime;
+    float velocity = this->MovementSpeed * deltaTime;
     if (direction == FORWARD) {
         Position += Front * velocity;
     }
@@ -49,8 +61,8 @@ void FlyingCamera::ProcessKeyboard(CameraMovement direction, float deltaTime) {
 }
 
 void FlyingCamera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
-    xoffset *= MouseSensitivity;
-    yoffset *= MouseSensitivity;
+    xoffset *= this->MouseSensitivity;
+    yoffset *= this->MouseSensitivity;
 
     Yaw += xoffset;
     Pitch += yoffset;
@@ -71,11 +83,11 @@ void FlyingCamera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean 
 
 void FlyingCamera::ProcessMouseScroll(float yoffset) {
     FoV -= (float) yoffset;
-    if (FoV < 1.0f) {
-        FoV = 1.0f;
+    if (this->FoV < 1.0f) {
+        this->FoV = 1.0f;
     }
-    if (FoV > 75.0f) {
-        FoV = 75.0f;
+    if (this->FoV > 75.0f) {
+        this->FoV = 75.0f;
     }
 }
 
@@ -85,11 +97,11 @@ void FlyingCamera::UpdateCameraVectors() {
     front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
     front.y = sin(glm::radians(Pitch));
     front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    Front = glm::normalize(front);
+    this->Front = glm::normalize(front);
 
     // also re-calculate the Right and Up vector
-    Right = glm::normalize(glm::cross(Front, WorldUp)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-    Up = glm::normalize(glm::cross(Right, Front));
+    this->Right = glm::normalize(glm::cross(Front, WorldUp)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    this->Up = glm::normalize(glm::cross(Right, Front));
 }
 
 }
