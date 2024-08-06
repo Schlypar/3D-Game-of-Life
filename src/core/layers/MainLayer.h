@@ -212,6 +212,13 @@ private:
         lastY = e.GetY();
 
         // camera1.ProcessMouseMovement(offset.x, offset.y);
+
+        Application& app = Application::Get();
+        int state = glfwGetMouseButton(app.GetWindow(), GLFW_MOUSE_BUTTON_LEFT);
+        if (state == GLFW_RELEASE) {
+            return true;
+        }
+
         camera2.ProcessMouseMovement(offset.x, offset.y);
 
         return true;
