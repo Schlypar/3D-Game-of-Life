@@ -65,8 +65,8 @@ void RadialCamera::ProcessMouseMovement(float xoffset, float yoffset, bool const
 }
 
 void RadialCamera::ProcessMouseScroll(float yoffset) {
-    Radius += yoffset * 0.1f;
-    FoV -= (float) yoffset * 0.1f;
+    Radius += yoffset * MouseSensitivity;
+    FoV -= (float) yoffset * MouseSensitivity;
     if (FoV < 1.0f) {
         FoV = 1.0f;
     }
@@ -84,14 +84,14 @@ void RadialCamera::UpdateCameraVectors() {
     glm::quat rotationY = glm::angleAxis(glm::radians(Phi), Yaxis);
 
     radiusVector = rotationY * radiusVector;
-    glm::vec3 PerpendicularAxis = glm::normalize(glm::cross(radiusVector, Yaxis));
+    glm::vec3 perpendicularAxis = glm::normalize(glm::cross(radiusVector, Yaxis));
 
-    glm::quat rotationUpDown = glm::angleAxis(glm::radians(Theta), PerpendicularAxis);
+    glm::quat rotationUpDown = glm::angleAxis(glm::radians(Theta), perpendicularAxis);
     radiusVector = rotationUpDown * radiusVector;
 
     Position = radiusVector;
-    Right = glm::normalize(glm::cross(-Position, WorldUp));
-    Up = glm::normalize(glm::cross(Right, -Position));
+    Right = perpendicularAxis;
+    Up = glm::normalize(glm::cross(Right, Position));
 }
 
 }
