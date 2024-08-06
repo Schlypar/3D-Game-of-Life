@@ -1,11 +1,5 @@
 #include "RadialCamera.h"
 
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/fwd.hpp"
-#include "glm/geometric.hpp"
-#include "glm/trigonometric.hpp"
-#include <glm/common.hpp>
-#include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 namespace GoL {
