@@ -66,8 +66,8 @@ void RadialCamera::ProcessMouseMovement(float xoffset, float yoffset, bool const
 }
 
 void RadialCamera::ProcessMouseScroll(float yoffset) {
-    Radius += yoffset * this->MouseSensitivity;
-    FoV -= (float) yoffset * this->MouseSensitivity;
+    Radius -= yoffset * this->MouseSensitivity;
+    FoV += (float) yoffset * this->MouseSensitivity;
     if (this->FoV < 1.0f) {
         this->FoV = 1.0f;
     }
