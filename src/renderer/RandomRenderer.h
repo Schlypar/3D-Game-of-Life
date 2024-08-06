@@ -1,6 +1,7 @@
 #ifndef RENDERER_H_
 #define RENDERER_H_
 
+#include "RadialCamera.h"
 #include "precompiled.h"
 
 #include "FlyingCamera.h"
@@ -54,6 +55,8 @@ public:
     * @return void
     */
     void DrawSubmitted(const FlyingCamera& camera);
+
+    void DrawSubmitted(const RadialCamera& camera);
 
 private:
     unsigned int DrawSurfaces(

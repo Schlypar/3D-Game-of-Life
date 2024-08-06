@@ -1,4 +1,5 @@
 #include "RandomRenderer.h"
+#include "RadialCamera.h"
 
 namespace GoL {
 
@@ -25,6 +26,45 @@ void RandomRenderer::Submit(Model<Vertex>* model) {
 void RandomRenderer::Reset() {
     this->surfaces.clear();
     this->changed = true;
+}
+
+void RandomRenderer::DrawSubmitted(const RadialCamera& camera) {
+    this->vertexArray.Bind();
+    this->vertexBuffer.Bind();
+
+    if (changed) {
+        this->changed = false;
+        auto modelDataSize = ranges::accumulate(this->surfaces, 0, [](unsigned int size, const SurfaceBundle& sb) -> int {
+            for (auto& surface : sb.surfaces) {
+                size += surface.vertexCount * sizeof(Vertex);
+            }
+            return size;
+        });
+        if (modelDataSize > this->dataSize) {
+            this->vertexBuffer.Realloc(modelDataSize, GL_DYNAMIC_DRAW);
+            this->dataSize = modelDataSize;
+        }
+        unsigned int offset = 0;
+        for (SurfaceBundle& sb : this->surfaces) {
+            for (Surface<Vertex>& surface : sb.surfaces) {
+                Mesh<Vertex>* mesh = surface.mesh;
+
+                auto& data = mesh->GetData();
+                this->vertexBuffer.Write(data.bytes, data.size, offset * sizeof(Vertex));
+                offset += surface.vertexCount;
+            }
+        }
+    }
+
+    unsigned int offset = 0;
+    for (SurfaceBundle& sb : this->surfaces) {
+        glm::mat4 modelMatrix = sb.matrix;
+        glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
+        offset = DrawSurfaces(sb.surfaces, modelMatrix, projectionView, offset);
+    }
+
+    this->vertexArray.Unbind();
+    this->vertexBuffer.Unbind();
 }
 
 void RandomRenderer::DrawSubmitted(const FlyingCamera& camera) {

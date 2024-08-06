@@ -11,7 +11,7 @@ int main() {
     GoL::Application app;
 
 #ifdef DEBUG
-    GoL::OPENGL_CHANGE_LEVEL(spdlog::level::trace);
+    GoL::OPENGL_CHANGE_LEVEL(spdlog::level::warn);
     GoL::CORE_CHANGE_LEVEL(spdlog::level::trace);
 #endif
 
