@@ -3,7 +3,7 @@
 #include "precompiled.h"
 
 #include "Batcher.h"
-#include "Camera.h"
+#include "Camera/Camera3D.h"
 
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -58,7 +58,7 @@ public:
     * @param camera -  Perspective of the observer
     * @return void
     */
-    void DrawSubmitted(const Camera& camera);
+    void DrawSubmitted(const Camera3D* camera);
 
 private:
     void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView);
