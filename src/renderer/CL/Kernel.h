@@ -3,7 +3,7 @@
 #include <CL/cl.h>
 #include <concepts>
 #include <string>
-
+#include <vector>
 namespace GoL {
 namespace CL {
 
@@ -19,30 +19,32 @@ namespace CL {
         cl_kernel kernel;
 
     public:
-        std::string name;
-
+        std::string kernelName;
         Kernel() {
             program = nullptr;
             kernel = nullptr;
         }
 
         Kernel(Kernel& oth) {
-            this->Release();
             program = oth.program;
             kernel = oth.kernel;
+            kernelName = oth.kernelName;
         }
 
         Kernel(Kernel&& oth) {
             program = oth.program;
             kernel = oth.kernel;
+            kernelName = oth.kernelName;
             oth.program = nullptr;
             oth.kernel = nullptr;
+            oth.kernelName = "";
         }
 
         Kernel& operator=(Kernel& oth) {
             this->Release();
             program = oth.program;
             kernel = oth.kernel;
+            kernelName = oth.kernelName;
 
             return *this;
         }
@@ -51,39 +53,44 @@ namespace CL {
             this->Release();
             program = oth.program;
             kernel = oth.kernel;
+            kernelName = oth.kernelName;
             oth.program = nullptr;
             oth.kernel = nullptr;
+            oth.kernelName = "";
 
             return *this;
         }
 
-        Kernel(std::string kernelName, std::vector<const unsigned char*> sources, cl_context ctx, cl_uint num_devs, cl_device_id* devs) {
-            auto sourceSizes = std::vector<std::size_t>(sources.size());
-            for (int i = 0; i < sourceSizes.size(); i++) {
-                sourceSizes[i] = sizeof(sources[i]);
-            }
-
+        Kernel(const char* source, std::size_t srcSize, cl_context ctx, cl_uint num_devs, cl_device_id* devs) {
             cl_int errcode_ret;
-            program = clCreateProgramWithBinary(
+            program = clCreateProgramWithSource(
                     ctx,
                     num_devs,
-                    devs,
-                    sourceSizes.data(),
-                    sources.data(),
-                    nullptr,
+                    &source,
+                    &srcSize,
                     &errcode_ret
             );
             if (errcode_ret != CL_SUCCESS) {
-                // handle
-                return;
+                std::vector<char> msg(100);
+                std::sprintf(msg.data(), "CL::Kernel constructor failed: failed to create program (errcode:%d)", errcode_ret);
+                throw(std::runtime_error(msg.data()));
             }
+
+            errcode_ret = clBuildProgram(program, num_devs, devs, nullptr, nullptr, nullptr);
+            if (errcode_ret != CL_SUCCESS) {
+                std::vector<char> msg(100);
+                std::sprintf(msg.data(), "CL::Kernel constructor failed: failed to build (compile and link) program (errcode:%d)", errcode_ret);
+                throw(std::runtime_error(msg.data()));
+            }
+
+            kernelName = GetKernelNameFromSource(source);
 
             kernel = clCreateKernel(program, kernelName.c_str(), &errcode_ret);
             if (errcode_ret != CL_SUCCESS) {
-                // handle
+                std::vector<char> msg(100);
+                std::sprintf(msg.data(), "CL::Kernel constructor failed: failed to create kernel (errcode:%d)", errcode_ret);
+                throw(std::runtime_error(msg.data()));
             }
-
-            name = kernelName;
         }
 
         template <KernelArg T>
@@ -94,7 +101,7 @@ namespace CL {
         template <KernelArg T, KernelArg... E>
         bool SetArg(cl_uint arg_index, T arg, E... args) {
             return CL_SUCCESS == clSetKernelArg(kernel, arg_index, arg.sizeArg(), arg.dataArg())
-                || this->SetArg(arg_index + 1, args...);
+                && this->SetArg(arg_index + 1, args...);
         }
 
         cl_int Run(cl_command_queue queue, std::vector<std::size_t> dimensionSizes, std::vector<std::size_t> workOffsets, std::vector<std::size_t> workgroupSizes) {
@@ -119,7 +126,17 @@ namespace CL {
             if (program && kernel) {
                 clReleaseKernel(kernel);
                 clReleaseProgram(program);
+                program = nullptr;
+                kernel = nullptr;
             }
+        }
+
+        std::string GetKernelNameFromSource(const char* src) {
+            auto s = std::string(src);
+            auto start = s.find("__kernel void ");
+            s = s.substr(start + sizeof("__kernel void ") - 1);
+            auto end = s.find('(');
+            return s.substr(0, end);
         }
     };
 

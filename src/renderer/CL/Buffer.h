@@ -22,7 +22,7 @@ public:
         cl_int errcode_ret;
         id = clCreateBuffer(ctx, flags, size, data, &errcode_ret);
         if (errcode_ret != CL_SUCCESS) {
-            // handle
+            throw(std::runtime_error("CL::Buffer constructor failed"));
         }
 
         fromGL = false;
@@ -34,7 +34,7 @@ public:
         cl_int errcode_ret;
         id = clCreateFromGLBuffer(ctx, flags, glbuff, &errcode_ret);
         if (errcode_ret != CL_SUCCESS) {
-            // handle
+            throw(std::runtime_error("CL::Buffer constructor from GL failed"));
         }
 
         fromGL = true;

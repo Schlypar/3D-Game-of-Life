@@ -34,6 +34,10 @@ struct Vertex {
         return *this;
     }
 
+    bool operator==(Vertex& oth) {
+        return position == oth.position && color == oth.color;
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Vertex& v) {
         os << "Pos: "
            << "(x: " << v.position.x
