@@ -46,6 +46,10 @@ public:
     * @return void
     */
     void Unbind() const;
+
+    inline unsigned int GetID() {
+        return id;
+    }
 };
 
 }

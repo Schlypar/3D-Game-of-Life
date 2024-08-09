@@ -21,22 +21,22 @@ file(GLOB source CONFIGURE_DEPENDS
 )
 
 # generate shader headers
-add_executable(generate_shaders ${SRC_DIR}/utils/GenerateShaders.cpp)
+add_executable(prebuild_setup ${SRC_DIR}/utils/PrebuildSetup.cpp)
 
-# Build and execute generate_shaders
-add_custom_target(run_generate_shaders
-    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --yellow "Building and executing generate_shaders..."
-    COMMAND ${CMAKE_BINARY_DIR}/generate_shaders
-    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue "Finished building and executing generate_shaders."
-    DEPENDS generate_shaders
+# Build and execute prebuild_setup
+add_custom_target(run_prebuild_setup
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --yellow "Building and executing prebuild_setup..."
+    COMMAND ${CMAKE_BINARY_DIR}/prebuild_setup
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue "Finished building and executing prebuild_setup."
+    DEPENDS prebuild_setup
 )
 
-# Build ${PROJECT_NAME} after executing generate_shaders
+# Build ${PROJECT_NAME} after executing prebuild_setup
 add_executable(${PROJECT_NAME} ${source})
-add_dependencies(${PROJECT_NAME} run_generate_shaders)
+add_dependencies(${PROJECT_NAME} run_prebuild_setup)
 target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/renderer")
 target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}/core")
-target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/resources/include")
+target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/resources/include/")
 target_include_directories(${PROJECT_NAME} PUBLIC "${SRC_DIR}/vendor")
 target_include_directories(${PROJECT_NAME} PUBLIC "${SRC_DIR}/vendor/spdlog/include")
 
@@ -58,6 +58,9 @@ target_link_libraries(${PROJECT_NAME} "range-v3")
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL)
+
+find_package(OpenCL REQUIRED)
+target_link_libraries(${PROJECT_NAME} OpenCL::OpenCL)
 
 add_library(gladlib STATIC "${DEPS_DIR}/glad/src/gl.c")
 target_include_directories(gladlib PUBLIC "${DEPS_DIR}/glad/include/")
