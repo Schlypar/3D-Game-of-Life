@@ -34,8 +34,8 @@ public:
         this->color = color;
     }
 
-    void Bind() override {
-        this->BaseBind();
+    void Bind(glm::mat4* model) override {
+        this->BaseBind(model);
         shader.SetUniform4f("Color", color.r, color.g, color.b, color.a);
     }
 };

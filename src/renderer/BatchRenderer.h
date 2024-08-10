@@ -61,7 +61,7 @@ public:
     void DrawSubmitted(const Camera& camera);
 
 private:
-    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView);
+    void DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, glm::mat4& modelMatrix, const glm::mat4& projectionView);
 };
 
 }

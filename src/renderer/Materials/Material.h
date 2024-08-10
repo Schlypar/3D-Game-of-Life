@@ -14,21 +14,18 @@ class Material {
 protected:
     Shader shader;
     std::string name;
-    const glm::mat4* model;
     const glm::mat4* projectionView;
 
 public:
     Material(const Shader& shader, const std::string& name)
         : shader(shader)
         , name(name)
-        , model(nullptr)
         , projectionView(nullptr) {
     }
 
     Material(Material* other)
         : shader(other->shader)
         , name(other->name)
-        , model(other->model)
         , projectionView(other->projectionView) {
     }
 
@@ -55,16 +52,7 @@ public:
         return name;
     }
 
-    /**
-    * @name SetModel - Sets Model on which this Material will apply
-    * @param model -  Pointer to the model
-    * @return void
-    */
-    void SetModel(const glm::mat4& model) {
-        this->model = &model;
-    }
-
-    /**
+        /**
     * @name SetProjectionView - Uploads matrix into the GPU program
     * @param projectionView - Result of multiplication of projection and View (proj * view)
     * @return void
@@ -77,12 +65,12 @@ public:
     * @name Bind - Loads all matrices into GPU program as well as Model matrix of the Model set with SetModel
     * @return void
     */
-    virtual void Bind() {
-        BaseBind();
+    virtual void Bind(glm::mat4* model) {
+        BaseBind(model);
     }
 
 protected:
-    virtual void BaseBind() {
+    virtual void BaseBind(glm::mat4* model) {
         assert(model != nullptr && projectionView != nullptr);
         shader.Bind();
         shader.SetUniformMat4f("Model", *model);

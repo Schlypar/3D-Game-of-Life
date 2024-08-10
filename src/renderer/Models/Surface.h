@@ -23,6 +23,7 @@ struct Surface {
     unsigned int vertexCount;
     Mesh<T>* mesh;
     Material* material;
+    glm::mat4* model;
 
     Surface()
         : mode(GL_TRIANGLES)
@@ -42,6 +43,7 @@ struct Surface {
         this->mode = other.mode;
         this->vertexCount = other.vertexCount;
         this->material = other.material;
+        this->model = other.model;
 
         auto& otherData = other.mesh->GetData();
         this->mesh = new UnindexedMesh<T>(otherData.bytes, other.vertexCount * sizeof(T), other.mesh->GetLayout(), GL_STATIC_DRAW);
@@ -51,11 +53,13 @@ struct Surface {
         : mode(other.mode)
         , vertexCount(other.vertexCount)
         , mesh(other.mesh)
-        , material(other.material) {
+        , material(other.material)
+        , model(other.model) {
         other.mode = 0;
         other.vertexCount = 0;
         other.mesh = nullptr;
         other.material = nullptr;
+        other.model = nullptr;
     }
 
     ~Surface() {
@@ -75,6 +79,7 @@ struct Surface {
         this->mode = other.mode;
         this->vertexCount = other.vertexCount;
         this->material = other.material;
+        this->model = other.model;
 
         auto& otherData = other.mesh->GetData();
         delete this->mesh;
@@ -93,11 +98,13 @@ struct Surface {
         this->material = other.material;
         delete this->mesh;
         this->mesh = other.mesh;
+        this->model = other.model;
 
         other.mode = 0;
         other.vertexCount = 0;
         other.mesh = nullptr;
         other.material = nullptr;
+        other.model = nullptr;
 
         return *this;
     }
@@ -140,6 +147,14 @@ struct Surface {
         );
         os << "\t}\n}\n";
         return os;
+    }
+
+    void SetModel(glm::mat4* model) {
+        this->model = model;
+    }
+
+    glm::mat4* GetModel() {
+        return this->model;
     }
 };
 

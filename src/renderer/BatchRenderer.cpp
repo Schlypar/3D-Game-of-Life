@@ -17,6 +17,7 @@ BatchRenderer::BatchRenderer()
 
     this->vertexArray.Unbind();
     this->vertexBuffer.Unbind();
+
 }
 
 void BatchRenderer::Submit(Model<Vertex>* model) {
@@ -62,13 +63,12 @@ void BatchRenderer::DrawSubmitted(const Camera& camera) {
     this->vertexBuffer.Unbind();
 }
 
-void BatchRenderer::DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, const glm::mat4& modelMatrix, const glm::mat4& projectionView) {
+void BatchRenderer::DrawSurfaces(std::vector<Surface<Vertex>>& surfaces, glm::mat4& modelMatrix, const glm::mat4& projectionView) {
     unsigned int offset = 0;
     for (Surface<Vertex>& surface : surfaces) {
         Material* material = surface.material;
-        material->SetModel(modelMatrix);
         material->SetProjectionView(projectionView);
-        material->Bind();
+        material->Bind(&modelMatrix);
         glDrawArrays(surface.mode, offset, surface.vertexCount);
         offset += surface.vertexCount;
     }

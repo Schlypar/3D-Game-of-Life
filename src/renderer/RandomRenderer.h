@@ -58,7 +58,7 @@ public:
 private:
     unsigned int DrawSurfaces(
             std::vector<Surface<Vertex>>& surfaces,
-            const glm::mat4& modelMatrix,
+            glm::mat4& modelMatrix,
             const glm::mat4& projectionView,
             unsigned int offset = 0
     );

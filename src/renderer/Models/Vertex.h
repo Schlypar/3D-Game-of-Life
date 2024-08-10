@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 
+#pragma pack(push, 1)
 struct Vertex {
     glm::vec3 position;
     glm::vec3 color;
@@ -46,3 +47,4 @@ struct Vertex {
         return os;
     }
 };
+#pragma pack(pop)
