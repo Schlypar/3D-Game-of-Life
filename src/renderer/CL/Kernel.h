@@ -4,6 +4,7 @@
 #include <concepts>
 #include <string>
 #include <vector>
+
 namespace GoL {
 namespace CL {
 
@@ -20,6 +21,7 @@ namespace CL {
 
     public:
         std::string kernelName;
+
         Kernel() {
             program = nullptr;
             kernel = nullptr;

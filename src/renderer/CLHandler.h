@@ -1,6 +1,10 @@
 #pragma once
 
+#if defined(__linux__)
 #include <GL/glx.h>
+#else
+#include <GL/wglext.h>
+#endif
 
 #include <CL/cl.h>
 #include <unordered_map>
@@ -45,6 +49,15 @@ private:
     std::string vertexPerMatrixID = "vertexpermatrix";
 
 public:
+#pragma pack(push, 1)
+
+    struct clVertex {
+        Vertex vertex;
+        cl_float matrixIndex;
+    };
+
+#pragma pack(pop)
+
     CLHandler() {
     }
 
@@ -57,14 +70,42 @@ public:
 
     CLHandler(CL::Platform& platform, CL::Device& device) {
         batcherCtx = CL::Context({
-            CL_GL_CONTEXT_KHR,
-            (cl_context_properties)glXGetCurrentContext(),
-            // CL_GLX_DISPLAY_KHR,
-            // (cl_context_properties)glXGetCurrentDisplay(),
-            CL_CONTEXT_PLATFORM,
-            (cl_context_properties)platform.id,
-            0
-        }, { device }, nullptr, nullptr);
+
+// We need to add information about the OpenGL context with
+// which we want to exchange information with the OpenCL context.
+#if defined(WIN32)
+                                         // We should first check for cl_khr_gl_sharing extension.
+                                         CL_GL_CONTEXT_KHR,
+                                         (cl_context_properties) wglGetCurrentContext(),
+                                         CL_WGL_HDC_KHR,
+                                         (cl_context_properties) wglGetCurrentDC(),
+#elif defined(__linux__)
+                                         // We should first check for cl_khr_gl_sharing extension.
+                                         CL_GL_CONTEXT_KHR,
+                                         (cl_context_properties) glXGetCurrentContext(),
+                                         CL_GLX_DISPLAY_KHR,
+                                         (cl_context_properties) glXGetCurrentDisplay(),
+#elif defined(__APPLE__)
+// We should first check for cl_APPLE_gl_sharing extension.
+#if 0
+            // This doesn't work.
+            CL_GL_CONTEXT_KHR , (cl_context_properties) CGLGetCurrentContext() ,
+            CL_CGL_SHAREGROUP_KHR , (cl_context_properties) CGLGetShareGroup( CGLGetCurrentContext() ) ,
+#else
+                                         CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties) CGLGetShareGroup(CGLGetCurrentContext()),
+#endif
+#endif
+
+                                         CL_GL_CONTEXT_KHR,
+                                         (cl_context_properties) glXGetCurrentContext(),
+                                         CL_GLX_DISPLAY_KHR,
+                                         (cl_context_properties) glXGetCurrentDisplay(),
+                                         CL_CONTEXT_PLATFORM,
+                                         (cl_context_properties) platform.id,
+                                         0 },
+                                 { device },
+                                 nullptr,
+                                 nullptr);
         std::vector<char> src(sizeof(KERNEL_CALC_MODEL_MATRICES));
         std::memcpy(src.data(), KERNEL_CALC_MODEL_MATRICES, src.size());
         this->AddKernel(src);
@@ -78,54 +119,28 @@ public:
         return CL::Device::Enumerate(platform.id, CL_DEVICE_TYPE_GPU);
     }
 
-    bool CalculateModelMatrices(std::vector<Model<Vertex>*> models, std::size_t vertexSize, VertexBuffer& vbo) {
+    std::vector<Vertex> CalculateModelMatrices(std::vector<clVertex> vertices, std::vector<glm::mat4> matrices, VertexBuffer& vbo, std::size_t vboSize) {
         auto& kernel = batcherCtx.kernels[batcherKeyCL];
 
-        std::size_t vertexCount = 0, i = 0;
-        std::size_t vboSize = vertexSize * sizeof(Vertex);
+        std::size_t vertexSize = vertices.size();
+        std::size_t VboSize = vboSize ? vboSize : vertexSize * sizeof(Vertex);
 
-        std::vector<cl_float16> modelsBuffer(models.size());
-        std::vector<cl_float> vertexBuffer(vertexSize * sizeof(Vertex) / sizeof(cl_float));
-        std::vector<cl_uint> verticesForMatricesBorders(models.size() + 1);
+        // non-zero vboSize here and further means cl_khr_gl_sharing mode
+        std::vector<Vertex> vboData(!vboSize ? VboSize : 0);
 
-        std::memset(verticesForMatricesBorders.data(), 0, verticesForMatricesBorders.size() * sizeof(cl_uint));
-        auto modelsPtr = modelsBuffer.data();
-        auto vertexPtr = vertexBuffer.data();
-        for (auto& m : models) {
-            auto& modelMatrix = m->GetModelMatrix();
-            float* ptr = (float*) modelsPtr;
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    ptr[i * 4 + j] = modelMatrix[i][j];
-                }
-            }
-            modelsPtr++;
-
-            verticesForMatricesBorders[i++] = vertexCount;
-
-            for (auto& surface : m->GetSurfaces()) {
-                auto& data = surface.mesh->GetData();
-                std::memcpy(vertexPtr + vertexCount * sizeof(Vertex) / sizeof(cl_float), data.bytes, data.size);
-
-                vertexCount += surface.vertexCount;
-            }
+        if (vboSize) {
+            batcherCtx.AddBufferSafe(clvboBufferID, CL_MEM_WRITE_ONLY, VboSize, vbo.GetID());
+        } else {
+            batcherCtx.AddBufferSafe(clvboBufferID, CL_MEM_WRITE_ONLY, VboSize, nullptr);
         }
-        verticesForMatricesBorders[i] = vertexCount;
+        batcherCtx.AddBufferSafe(matrixBufferID, CL_MEM_READ_ONLY, matrices.size() * sizeof(cl_float16), nullptr);
+        batcherCtx.AddBufferSafe(vertexBufferID, CL_MEM_READ_ONLY, vertexSize * sizeof(clVertex), nullptr);
 
-        batcherCtx.AddBufferSafe(vertexPerMatrixID, CL_MEM_READ_ONLY, verticesForMatricesBorders.size() * sizeof(cl_uint), nullptr);
-        batcherCtx.AddBufferSafe(clvboBufferID, CL_MEM_WRITE_ONLY, vboSize, (cl_GLuint) vbo.GetID());
-        batcherCtx.AddBufferSafe(matrixBufferID, CL_MEM_READ_ONLY, models.size() * sizeof(cl_float16), nullptr);
-        batcherCtx.AddBufferSafe(vertexBufferID, CL_MEM_READ_ONLY, vertexSize * sizeof(Vertex), nullptr);
+        std::size_t singleVertexSizeInFloats = sizeof(clVertex) / sizeof(cl_float);
 
-        cl_uint singleVertexSizeInFloats = (cl_uint) (sizeof(Vertex) / sizeof(cl_float));
-
-        glFinish();
-        batcherCtx.buffers[clvboBufferID].AcquireGL(batcherCtx.DeviceQueue(0));
-
-        if (!this->SetKernelArgs<CL::Buffer, CL::Buffer, CL::Buffer, CL::Buffer, kernelArg>(
+        if (!this->SetKernelArgs<CL::Buffer, CL::Buffer, CL::Buffer, kernelArg>(
                     batcherKeyCL,
                     batcherCtx.buffers[clvboBufferID],
-                    batcherCtx.buffers[vertexPerMatrixID],
                     batcherCtx.buffers[matrixBufferID],
                     batcherCtx.buffers[vertexBufferID],
                     { .data = &singleVertexSizeInFloats, .size = sizeof(singleVertexSizeInFloats) }
@@ -134,36 +149,43 @@ public:
         }
 
         bool res = true;
-        res = res && batcherCtx.buffers[vertexPerMatrixID].Write(batcherCtx.DeviceQueue(0), verticesForMatricesBorders.size() * sizeof(cl_uint), 0, verticesForMatricesBorders.data());
-        res = res && batcherCtx.buffers[matrixBufferID].Write(batcherCtx.DeviceQueue(0), modelsBuffer.size() * sizeof(cl_float16), 0, modelsBuffer.data());
-        res = res && batcherCtx.buffers[vertexBufferID].Write(batcherCtx.DeviceQueue(0), vertexBuffer.size() * sizeof(cl_float), 0, vertexBuffer.data());
+        res = res && batcherCtx.buffers[matrixBufferID].Write(batcherCtx.DeviceQueue(0), matrices.size() * sizeof(cl_float16), 0, matrices.data());
+        res = res && batcherCtx.buffers[vertexBufferID].Write(batcherCtx.DeviceQueue(0), vertexSize * sizeof(clVertex), 0, vertices.data());
 
         if (!res) {
             throw(std::runtime_error("faied to write data to buffers"));
         }
 
-        for (std::size_t offset = 0; offset < models.size(); offset += batcherCtx.devices[0].maxComputeUnits) {
-            res = this->RunKernel(
-                    batcherKeyCL,
-                    { std::min((std::size_t) batcherCtx.devices[0].maxComputeUnits, std::min(models.size(), models.size() - offset)) },
-                    {},
-                    { offset }
-            );
-
-            if (!res) {
-                batcherCtx.buffers[clvboBufferID].ReleaseGL(batcherCtx.DeviceQueue(0));
-                this->CLFinish();
-                return res;
+        if (vboSize) {
+            glFinish();
+            if (!batcherCtx.buffers[clvboBufferID].AcquireGL(batcherCtx.DeviceQueue(0))) {
+                // error
+                return {};
             }
         }
 
-        batcherCtx.buffers[clvboBufferID].ReleaseGL(batcherCtx.DeviceQueue(0));
-        // if (!batcherCtx.buffers[clvboBufferID].Read(batcherCtx.DeviceQueue(0), vboSize, 0, vbo)) {
-        //     throw(std::runtime_error("faied to read data from buffers"));
-        // }
+        res = this->RunKernel(
+                batcherKeyCL,
+                { vertices.size() },
+                {},
+                {}
+        );
+        if (!res) {
+            // error
+            return {};
+        }
+
+        if (vboSize) {
+            batcherCtx.buffers[clvboBufferID].ReleaseGL(batcherCtx.DeviceQueue(0));
+        } else {
+            if (!batcherCtx.buffers[clvboBufferID].Read(batcherCtx.DeviceQueue(0), VboSize, 0, vboData.data())) {
+                throw(std::runtime_error("faied to read data from buffers"));
+            }
+        }
+
         this->CLFinish();
 
-        return res;
+        return vboData;
     }
 
     // private: ?

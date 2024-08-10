@@ -26,6 +26,10 @@ public:
             assert(false);
             return 0;
         }
+
+        bool operator==(const Element& oth) const {
+            return type == oth.type && count == oth.count && normalized == oth.normalized;
+        }
     };
 
 private:
@@ -69,6 +73,10 @@ public:
 
     inline unsigned int GetStride() const {
         return this->stride;
+    }
+
+    bool operator==(const VertexBufferLayout& oth) const {
+        return this->elements == oth.elements;
     }
 };
 

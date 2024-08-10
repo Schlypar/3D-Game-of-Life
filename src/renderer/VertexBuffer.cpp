@@ -44,22 +44,24 @@ void VertexBuffer::Realloc(const size_t size, GLenum usage) {
 }
 
 void VertexBuffer::Write(const void* data, size_t size, unsigned int offset) {
-    OPENGL_INFO("Data of size {} has been written in VAO with id {} at offest {} bytes", size, id, offset);
     glNamedBufferSubData(id, offset, size, data);
     auto errorCode = glGetError();
     if (errorCode != GL_NO_ERROR) {
         auto errorString = glad_glGetError();
         OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    } else {
+        OPENGL_INFO("Data of size {} has been written in VAO with id {} at offest {} bytes", size, id, offset);
     }
 }
 
 void VertexBuffer::Bind() const {
-    OPENGL_INFO("VAO with id {} was binded", id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
     auto errorCode = glGetError();
     if (errorCode != GL_NO_ERROR) {
         auto errorString = glad_glGetError();
         OPENGL_ERROR("Error {}: {}", errorCode, errorString);
+    } else {
+        OPENGL_INFO("VAO with id {} was binded", id);
     }
 }
 

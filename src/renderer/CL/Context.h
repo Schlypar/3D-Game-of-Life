@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <CL/cl.h>
 #include <string>
 #include <unordered_map>
@@ -75,17 +74,21 @@ namespace CL {
                 ctx = nullptr;
             }
         }
-        
+
         bool AddBufferSafe(std::string strID, cl_map_flags flags, std::size_t size, void* data) {
-            if (!buffers.contains(strID)) {
-               buffers[strID] = { ctx, flags, size, data };
+            if (!buffers.contains(strID) || buffers[strID].size < size) {
+                buffers[strID] = { ctx, flags, size, data };
             }
+
+            return true;
         }
 
         bool AddBufferSafe(std::string strID, cl_map_flags flags, std::size_t size, GLuint vbo) {
-            if (!buffers.contains(strID)) {
-               buffers[strID] = { ctx, flags, size, vbo };
+            if (!buffers.contains(strID) || buffers[strID].size < size) {
+                buffers[strID] = { ctx, flags, size, vbo };
             }
+
+            return true;
         }
 
         cl_command_queue DeviceQueue(uint deviceID) {

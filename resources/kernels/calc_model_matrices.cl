@@ -1,9 +1,9 @@
 float4 productVecAndMat4(float* vec, float* mat) {
-    float res[4] = {0};
+    float res[4] = { 0 };
 
     for (uint i = 0; i < 4; i++) {
         for (uint j = 0; j < 4; j++) {
-            res[i] += mat[i * 4 + j] * vec[i];
+            res[i] += mat[i + j * 4] * vec[j];
         }
     }
 
@@ -11,34 +11,31 @@ float4 productVecAndMat4(float* vec, float* mat) {
 }
 
 __kernel void calculateModelMatrices(
-    __global float* vbo,
-    __global uint* vertexForMatricesBorders,
-    __global float16* matrices,
-    __global float* vertices,
-    uint vertexSize) {
+        __global float* vbo,
+        __global float16* matrices,
+        __global float* vertices,
+        uint clVertexSize
+) {
 
-    uint modelIndex = get_global_id(0);
-    uint verticesStart = vertexForMatricesBorders[modelIndex];
-    uint verticesEnd = vertexForMatricesBorders[modelIndex + 1];
+    uint vertexIndex = get_global_id(0);
+    uint modelIndex = (uint) vertices[vertexIndex * clVertexSize + 6];
+    uint vboVertexSize = clVertexSize - 1;
 
     float mat[16];
     vstore16(matrices[modelIndex], 0, mat);
 
-    for (uint i = verticesStart; i < verticesEnd; i++) {
-        float vec[4] = {0};
-        for (uint j = 0; j < 3; j++) {
-            vec[j] = vertices[i * vertexSize + j];
-        }
-
-        float4 res = productVecAndMat4(vec, mat);
-        vstore4(res, 0, vec);
-
-        for (uint j = 0; j < 3; j++) {
-            vbo[i * vertexSize + j] = vec[j];
-        }
-        for (uint j = 3; j < vertexSize; j++) {
-            vbo[i * vertexSize + j] = vertices[i * vertexSize + j];
-        }
+    float vec[4] = { 0, 0, 0, 1 };
+    for (uint j = 0; j < 3; j++) {
+        vec[j] = vertices[vertexIndex * clVertexSize + j];
     }
 
+    float4 res = productVecAndMat4(vec, mat);
+    vstore4(res, 0, vec);
+
+    for (uint j = 0; j < 3; j++) {
+        vbo[vertexIndex * vboVertexSize + j] = vec[j];
+    }
+    for (uint j = 3; j < vboVertexSize; j++) {
+        vbo[vertexIndex * vboVertexSize + j] = modelIndex;
+    }
 }
