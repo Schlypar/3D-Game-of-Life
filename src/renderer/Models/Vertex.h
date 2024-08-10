@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 
+#pragma pack(push, 1)
 struct Vertex {
     glm::vec3 position;
     glm::vec3 color;
@@ -34,6 +35,10 @@ struct Vertex {
         return *this;
     }
 
+    bool operator==(Vertex& oth) {
+        return position == oth.position && color == oth.color;
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Vertex& v) {
         os << "Pos: "
            << "(x: " << v.position.x
@@ -42,3 +47,4 @@ struct Vertex {
         return os;
     }
 };
+#pragma pack(pop)

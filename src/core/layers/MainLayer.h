@@ -4,6 +4,9 @@
 #include "BatchRenderer.h"
 #include "RandomRenderer.h"
 
+#include "CLHandler.h"
+#include "CLBatcher.h"
+
 // shaders
 #include "shader_plain_color.h"
 #include "shader_prism.h"
@@ -28,6 +31,7 @@ private:
     Camera camera;
     BatchRenderer batchRenderer;
     RandomRenderer randomRenderer;
+    CLBatcher clBatcher;
 
     bool firstMouse = true;
     bool mouseMoveHandle = true;
@@ -43,9 +47,11 @@ private:
     Model<Vertex>* oneColor;
 
     glm::vec4 color = { 0.3f, 0.4f, 0.7f, 1.0f };
+    int dim;
 
 public:
     MainLayer(
+            CLBatcher::Config clConfig,
             std::string sceneName = "",
             glm::vec3 position = glm::vec3(0.0f, 0.0f, -3.0f),
             glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -60,17 +66,22 @@ public:
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , batchRenderer()
         , prismShader(SHADER_PRISM)
-        , cubeShader(SHADER_PLAIN_COLOR) {
+        , cubeShader(SHADER_PLAIN_COLOR)
+        , clBatcher(clConfig) {
+
         this->parentSceneName = sceneName;
 
         sixColor = new SixColorCube(this->cubeShader);
-        sixColor->SetScaleFactor(0.35f);
+        sixColor->SetScaleFactor(2.0f);
         sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });
         sixColor->SetRotation(glm::vec3 { 15.0f });
 
         oneColor = new OneColorCube(this->cubeShader);
         oneColor->SetPosition({ 0.5f, -0.35f, -0.25f });
         oneColor->SetScaleFactor(0.05f);
+
+        dim = 20;
+
     }
 
     ~MainLayer() = default;
@@ -79,35 +90,39 @@ public:
         PlainColorMaterial* mat = new PlainColorMaterial(cubeShader, color);
         MaterialLibrary::AddMaterial({ "SharedPlainColor", mat });
         // oneColor->SetMaterial(MaterialLibrary::GetMaterial("SharedPlainColor"));
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                for (int z = 0; z < 10; z++) {
+        for (int x = 0; x < dim; x++) {
+            for (int y = 0; y < dim; y++) {
+                for (int z = 0; z < dim; z++) {
                     oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
                     oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                    // batchRenderer.Submit(oneColor);
-                    randomRenderer.Submit(oneColor);
+                    batchRenderer.Submit(oneColor);
+                    // randomRenderer.Submit(oneColor);
+                    clBatcher.Submit(oneColor);
                 }
             }
         }
+        clBatcher.Submit(sixColor);
+
 
         Application& app = Application::Get();
         app.SubmitToImgui([this, &app]() {
-            ImGui::InputFloat("RED", &color.r);
-            ImGui::InputFloat("GREEN", &color.g);
-            ImGui::InputFloat("BLUE", &color.b);
-            ImGui::InputFloat("ALPHA", &color.a);
+            ImGui::InputInt("DIM", &dim);
+            // ImGui::InputFloat("GREEN", &color.g);
+            // ImGui::InputFloat("BLUE", &color.b);
+            // ImGui::InputFloat("ALPHA", &color.a);
 
             auto mat = (PlainColorMaterial*) MaterialLibrary::GetMaterial("SharedPlainColor").material;
             mat->SetColor(color);
 
             if (ImGui::Button("Resubmit")) {
-                this->batchRenderer.Reset();
-                for (int x = 0; x < 10; x++) {
-                    for (int y = 0; y < 10; y++) {
-                        for (int z = 0; z < 10; z++) {
+                this->clBatcher.Reset();
+                for (int x = 0; x < dim; x++) {
+                    for (int y = 0; y < dim; y++) {
+                        for (int z = 0; z < dim; z++) {
                             oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
                             oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                            batchRenderer.Submit(oneColor);
+                            // batchRenderer.Submit(oneColor);
+                            this->clBatcher.Submit(oneColor);
                         }
                     }
                 }
@@ -133,8 +148,11 @@ public:
         // batchRenderer.Clear();
         // batchRenderer.DrawSubmitted(camera);
 
-        randomRenderer.Clear();
-        randomRenderer.DrawSubmitted(camera);
+        // randomRenderer.Clear();
+        // randomRenderer.DrawSubmitted(camera);
+    
+        this->clBatcher.Clear();
+        this->clBatcher.DrawSubmitted(camera);
     }
 
     void OnEvent(Event* e) override {

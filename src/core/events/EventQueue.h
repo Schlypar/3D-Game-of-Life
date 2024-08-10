@@ -17,7 +17,7 @@ class EventQueue {
 private:
     std::queue<Event*> queue;
     std::mutex mu;
-    std::thread handleThread;
+    std::thread eventHandlerThread;
     std::atomic<bool> run;
     EventHandler handler;
 
@@ -29,6 +29,9 @@ public:
     }
     ~EventQueue() {
         run = false;
+        if (this->eventHandlerThread.joinable()) {
+            this->eventHandlerThread.join();
+        }
     }
 
     void Push(Event* e) {
@@ -40,8 +43,8 @@ public:
     void Run() {
         if (!run) {
             run = true;
-            if (!handleThread.joinable()) {
-                handleThread = std::thread(&EventQueue::HandleEvents, this);
+            if (!eventHandlerThread.joinable()) {
+                eventHandlerThread = std::thread(&EventQueue::HandleEvents, this);
             }
         } else {
             mu.unlock();

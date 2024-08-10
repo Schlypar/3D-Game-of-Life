@@ -68,15 +68,14 @@ void RandomRenderer::DrawSubmitted(const Camera& camera) {
 
 unsigned int RandomRenderer::DrawSurfaces(
         std::vector<Surface<Vertex>>& surfaces,
-        const glm::mat4& modelMatrix,
+        glm::mat4& modelMatrix,
         const glm::mat4& projectionView,
         unsigned int offset
 ) {
     for (Surface<Vertex>& surface : surfaces) {
         Material* material = surface.material;
-        material->SetModel(modelMatrix);
         material->SetProjectionView(projectionView);
-        material->Bind();
+        material->Bind(&modelMatrix);
         glDrawArrays(surface.mode, offset, surface.vertexCount);
         offset += surface.vertexCount;
     }

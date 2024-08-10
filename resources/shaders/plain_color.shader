@@ -12,7 +12,7 @@ uniform vec4 Color;
 void main()
 {
     i_color = Color;
-    gl_Position = ProjectionView * Model * position;
+    gl_Position = ProjectionView * position;
 };
 
 #shader fragment
