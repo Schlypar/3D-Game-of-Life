@@ -18,7 +18,7 @@ VertexBuffer::VertexBuffer(VertexBuffer&& other) {
 }
 
 VertexBuffer::~VertexBuffer() {
-    OPENGL_INFO("VAO with id {} has been destroyed", id);
+    OPENGL_INFO("VBO with id {} has been destroyed", id);
     glDeleteBuffers(1, &id);
     auto errorCode = glGetError();
     if (errorCode != GL_NO_ERROR) {
@@ -34,7 +34,7 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) {
 }
 
 void VertexBuffer::Realloc(const size_t size, GLenum usage) {
-    OPENGL_INFO("VAO with id {} was reallocated to size {} bytes and usage {}", id, size, usage);
+    OPENGL_INFO("VBO with id {} was reallocated to size {} bytes and usage {}", id, size, usage);
     glNamedBufferData(id, size, nullptr, usage);
     auto errorCode = glGetError();
     if (errorCode != GL_NO_ERROR) {
@@ -44,7 +44,7 @@ void VertexBuffer::Realloc(const size_t size, GLenum usage) {
 }
 
 void VertexBuffer::Write(const void* data, size_t size, unsigned int offset) {
-    OPENGL_INFO("Data of size {} has been written in VAO with id {} at offest {} bytes", size, id, offset);
+    OPENGL_INFO("Data of size {} has been written in VBO with id {} at offest {} bytes", size, id, offset);
     glNamedBufferSubData(id, offset, size, data);
     auto errorCode = glGetError();
     if (errorCode != GL_NO_ERROR) {
@@ -54,7 +54,7 @@ void VertexBuffer::Write(const void* data, size_t size, unsigned int offset) {
 }
 
 void VertexBuffer::Bind() const {
-    OPENGL_INFO("VAO with id {} was binded", id);
+    OPENGL_INFO("VBO with id {} was binded", id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
     auto errorCode = glGetError();
     if (errorCode != GL_NO_ERROR) {
@@ -64,7 +64,7 @@ void VertexBuffer::Bind() const {
 }
 
 void VertexBuffer::Unbind() const {
-    OPENGL_INFO("VAO with id {} was unbinded", id);
+    OPENGL_INFO("VBO with id {} was unbinded", id);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     auto errorCode = glGetError();
     if (errorCode != GL_NO_ERROR) {
