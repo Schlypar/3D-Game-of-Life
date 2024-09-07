@@ -1,16 +1,22 @@
 #pragma once
 
+// renderers
 #include "Application.h"
 #include "BatchRenderer.h"
 #include "RandomRenderer.h"
+#include "VoxelRenderer.h"
 
 // shaders
 #include "shader_plain_color.h"
 #include "shader_prism.h"
+#include "shader_voxel.h"
 
+// models
 #include "Models/OneColorCube.h"
 #include "Models/SixColorCube.h"
+#include "Models/CubeVoxel.h"
 
+// materials
 #include "MaterialLibrary.h"
 #include "Materials/PlainColorMaterial.h"
 
@@ -28,6 +34,7 @@ private:
     Camera camera;
     BatchRenderer batchRenderer;
     RandomRenderer randomRenderer;
+    VoxelRenderer voxels;
 
     bool firstMouse = true;
     bool mouseMoveHandle = true;
@@ -39,10 +46,14 @@ private:
 
     Shader prismShader;
     Shader cubeShader;
+    Shader voxelShader;
+    
     Model<Vertex>* sixColor;
     Model<Vertex>* oneColor;
+    CubeVoxel* voxelCube;
 
     glm::vec4 color = { 0.3f, 0.4f, 0.7f, 1.0f };
+    int dim = 10;
 
 public:
     MainLayer(
@@ -60,17 +71,21 @@ public:
         , camera(position, up, width, height, yaw, pitch, nearPlane, farPlane)
         , batchRenderer()
         , prismShader(SHADER_PRISM)
-        , cubeShader(SHADER_PLAIN_COLOR) {
+        , cubeShader(SHADER_PLAIN_COLOR)
+        , voxelShader(SHADER_VOXEL) {
         this->parentSceneName = sceneName;
 
-        sixColor = new SixColorCube(this->cubeShader);
-        sixColor->SetScaleFactor(0.35f);
-        sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });
-        sixColor->SetRotation(glm::vec3 { 15.0f });
+        // sixColor = new SixColorCube(this->cubeShader);
+        // sixColor->SetScaleFactor(0.35f);
+        // sixColor->SetPosition({ -0.5f, 0.25f, 0.25f });
+        // sixColor->SetRotation(glm::vec3 { 15.0f });
 
-        oneColor = new OneColorCube(this->cubeShader);
-        oneColor->SetPosition({ 0.5f, -0.35f, -0.25f });
-        oneColor->SetScaleFactor(0.05f);
+        // oneColor = new OneColorCube(this->cubeShader);
+        // oneColor->SetPosition({ 0.5f, -0.35f, -0.25f });
+        // oneColor->SetScaleFactor(0.05f);
+
+        voxelCube = new CubeVoxel(this->voxelShader);
+        this->voxelCube->SetScaleFactor(0.05);
     }
 
     ~MainLayer() = default;
@@ -79,13 +94,16 @@ public:
         PlainColorMaterial* mat = new PlainColorMaterial(cubeShader, color);
         MaterialLibrary::AddMaterial({ "SharedPlainColor", mat });
         // oneColor->SetMaterial(MaterialLibrary::GetMaterial("SharedPlainColor"));
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                for (int z = 0; z < 10; z++) {
-                    oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
-                    oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+        for (int x = 0; x < dim; x++) {
+            for (int y = 0; y < dim; y++) {
+                for (int z = 0; z < dim; z++) {
+                    // oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
+                    // oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
                     // batchRenderer.Submit(oneColor);
-                    randomRenderer.Submit(oneColor);
+                    // randomRenderer.Submit(oneColor);
+                    voxelCube->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
+                    voxelCube->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+                    voxels.Submit(voxelCube);
                 }
             }
         }
@@ -96,18 +114,28 @@ public:
             ImGui::InputFloat("GREEN", &color.g);
             ImGui::InputFloat("BLUE", &color.b);
             ImGui::InputFloat("ALPHA", &color.a);
+            ImGui::InputInt("Instances", &this->dim);
 
             auto mat = (PlainColorMaterial*) MaterialLibrary::GetMaterial("SharedPlainColor").material;
             mat->SetColor(color);
 
             if (ImGui::Button("Resubmit")) {
-                this->batchRenderer.Reset();
-                for (int x = 0; x < 10; x++) {
-                    for (int y = 0; y < 10; y++) {
-                        for (int z = 0; z < 10; z++) {
-                            oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
-                            oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
-                            batchRenderer.Submit(oneColor);
+                this->voxels.Reset();
+                int i = 0;
+                for (int x = 0; x < 50; x++) {
+                    for (int y = 0; y < 50; y++) {
+                        for (int z = 0; z < 50; z++) {
+                            // oneColor->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
+                            // oneColor->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+                            // batchRenderer.Submit(oneColor);
+                            // randomRenderer.Submit(oneColor);
+                            if (++i >= this->dim) {
+                                return;
+                            }
+
+                            voxelCube->SetPosition({ x * 0.25f, y * 0.25f, z * 0.25f });
+                            voxelCube->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+                            voxels.Submit(voxelCube);
                         }
                     }
                 }
@@ -121,8 +149,9 @@ public:
     }
 
     void OnDetach() override {
-        delete sixColor;
-        delete oneColor;
+        // delete sixColor;
+        // delete oneColor;
+        delete voxelCube;
     }
 
     void OnUpdate() override {
@@ -133,8 +162,22 @@ public:
         // batchRenderer.Clear();
         // batchRenderer.DrawSubmitted(camera);
 
-        randomRenderer.Clear();
-        randomRenderer.DrawSubmitted(camera);
+        // randomRenderer.Clear();
+        // randomRenderer.DrawSubmitted(camera);
+        
+        this->voxels.Reset();
+        for (int x = 0; x < dim; x++) {
+            for (int y = 0; y < dim; y++) {
+                for (int z = 0; z < dim; z++) {
+                    voxelCube->SetPosition({ x * 0.5f, y * 0.5f, z * 0.5f });
+                    voxelCube->SetRotation(glm::vec3 { x * 10, y * 10, z * 10 });
+                    voxels.Submit(voxelCube);
+                }
+            }
+        }
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        voxels.DrawSubmitted(camera);
     }
 
     void OnEvent(Event* e) override {

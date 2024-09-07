@@ -5,7 +5,7 @@
 namespace GoL {
 
 class PlainColorMaterial : public Material {
-private:
+protected:
     glm::vec4 color;
 
 public:
