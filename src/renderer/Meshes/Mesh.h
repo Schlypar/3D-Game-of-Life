@@ -86,7 +86,7 @@ public:
     virtual ~Mesh() {
     }
 
-    const VertexBufferLayout& GetLayout() const {
+    VertexBufferLayout& GetLayout() {
         return this->layout;
     }
 
