@@ -14,7 +14,8 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
 file(GLOB source CONFIGURE_DEPENDS 
 "${SRC_DIR}/*.cpp" 
-"${SRC_DIR}/renderer/*.cpp" 
+"${SRC_DIR}/renderer/*.cpp"
+"${SRC_DIR}/renderer/Camera/*.cpp"
 "${SRC_DIR}/core/*.cpp"
 "${SRC_DIR}/core/events/*.cpp"
 "${SRC_DIR}/core/layers/*.cpp"

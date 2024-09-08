@@ -29,7 +29,7 @@ void BatchRenderer::Reset() {
     this->changed = true;
 }
 
-void BatchRenderer::DrawSubmitted(const Camera& camera) {
+void BatchRenderer::DrawSubmitted(const Camera3D* camera) {
     this->vertexArray.Bind();
     this->vertexBuffer.Bind();
 
@@ -55,7 +55,7 @@ void BatchRenderer::DrawSubmitted(const Camera& camera) {
     }
 
     glm::mat4 modelMatrix = glm::mat4(1.0f);
-    glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
+    glm::mat4 projectionView = camera->GetProjectionMatrix() * camera->GetViewMatrix();
     DrawSurfaces(this->batched, modelMatrix, projectionView);
 
     this->vertexArray.Unbind();

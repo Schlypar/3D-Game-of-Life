@@ -27,7 +27,7 @@ void RandomRenderer::Reset() {
     this->changed = true;
 }
 
-void RandomRenderer::DrawSubmitted(const Camera& camera) {
+void RandomRenderer::DrawSubmitted(const Camera3D* camera) {
     this->vertexArray.Bind();
     this->vertexBuffer.Bind();
 
@@ -58,7 +58,7 @@ void RandomRenderer::DrawSubmitted(const Camera& camera) {
     unsigned int offset = 0;
     for (SurfaceBundle& sb : this->surfaces) {
         glm::mat4 modelMatrix = sb.matrix;
-        glm::mat4 projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
+        glm::mat4 projectionView = camera->GetProjectionMatrix() * camera->GetViewMatrix();
         offset = DrawSurfaces(sb.surfaces, modelMatrix, projectionView, offset);
     }
 
