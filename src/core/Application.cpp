@@ -1,6 +1,9 @@
 #include <cassert>
 #include <cstdlib>
 
+#include <mutex>
+#include <condition_variable>
+
 #include "Logger.h"
 
 #include "Application.h"
@@ -119,14 +122,40 @@ void Application::SubmitToImgui(ImGuiLayer::DisplayFn display, std::string scene
 }
 
 void Application::Run() {
-    while (isRunning) {
+    // std::mutex m;
+    // std::condition_variable cv;
+    // bool ready, stop = false, processed = true;
+    
+    // auto dumper = std::thread([&]() {
+    //     cv.notify_one();
+    //     auto pixels = std::vector<char>(1920*1080*24);
+    //     while (true) {
+    //         std::unique_lock lk(m);
+    //         cv.wait(lk, [&]{ return ready; });
 
+    //         if (stop) break;
+            
+    //         glReadPixels(0, 0, 1920, 1080, GL_RGB,  GL_UNSIGNED_BYTE, (void*)pixels.data());
+    //         fwrite(pixels.data(), sizeof(char), pixels.size(), stdout);
+    //         processed = true;
+    //         ready = false;
+            
+    //         lk.unlock();
+    //         cv.notify_one();
+    //     }
+    // });
+
+    auto pixels = std::vector<char>(1920*1080*3);
+    while (isRunning) {
         auto scene = this->activeScene.load();
         for (auto it = scene->begin(); it != scene->end(); it++) {
             (*it)->OnUpdate();
         }
 
         window.OnUpdate();
+
+        glReadPixels(0, 0, 1920, 1080, GL_RGB,  GL_UNSIGNED_BYTE, (void*)pixels.data());
+        fwrite(pixels.data(), sizeof(char), pixels.size(), stdout);
     }
 
     glfwTerminate();
